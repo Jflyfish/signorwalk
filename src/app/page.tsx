@@ -17,6 +17,7 @@ function CheckIcon() {
 export default function LandingPage() {
   return (
     <div>
+      <span style={{display:'none'}}>Impact-Site-Verification: e7de6a6f-016b-4648-9f9c-158540f33c60</span>
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-12 text-center">
         <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
