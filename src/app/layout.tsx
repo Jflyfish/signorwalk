@@ -11,14 +11,14 @@ export const metadata: Metadata = {
     description: 'Free AI-powered car deal grader. Grade your lease or finance deal in seconds.',
     type: 'website',
   },
-  other: {
-    'impact-site-verification': 'e84779b8-0703-4594-9df3-c61e703bd7a3',
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <meta name='impact-site-verification' value='e7de6a6f-016b-4648-9f9c-158540f33c60' />
+      </head>
       <body className="min-h-screen bg-slate-50">
         <nav className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
