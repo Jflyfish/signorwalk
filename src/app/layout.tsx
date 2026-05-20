@@ -17,7 +17,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        <meta name='impact-site-verification' value='e7de6a6f-016b-4648-9f9c-158540f33c60' />
+        {
+          // @ts-expect-error -- Impact.com uses non-standard value attribute
+          <meta name='impact-site-verification' value='e7de6a6f-016b-4648-9f9c-158540f33c60' />
+        }
       </head>
       <body className="min-h-screen bg-slate-50">
         <nav className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
