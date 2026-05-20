@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     description: 'Free AI-powered car deal grader. Grade your lease or finance deal in seconds.',
     type: 'website',
   },
+  other: {
+    'impact-site-verification': 'e84779b8-0703-4594-9df3-c61e703bd7a3',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
