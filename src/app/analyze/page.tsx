@@ -165,6 +165,7 @@ export default function AnalyzePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const formElementRef = useRef<HTMLFormElement>(null);
 
   // ── Derived values ───────────────────────────────────────────────────────────
   const dealerOffer = parseFloat(tradeIn.dealerOffer || '0');
@@ -388,7 +389,7 @@ export default function AnalyzePage() {
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       applyExtracted(data.data);
-      setDocStatus({ type: 'success', msg: 'Review all fields — amounts on deal sheets can be formatted differently than expected.' });
+      setDocStatus({ type: 'success', msg: 'Review all fields — amounts on quotes can be formatted differently than expected.' });
     } catch (err) {
       setDocStatus({ type: 'error', msg: err instanceof Error ? err.message : 'Could not read that document.' });
     }
@@ -412,6 +413,36 @@ export default function AnalyzePage() {
 
   const updateLease = (f: keyof LeaseFormData, v: string) => setLease(p => ({ ...p, [f]: v }));
   const updateFinance = (f: keyof FinanceFormData, v: string) => setFinance(p => ({ ...p, [f]: v }));
+
+  function handleDealTypeChange(newType: 'lease' | 'finance') {
+    if (newType === dealType) return;
+    if (newType === 'finance') {
+      setFinance(p => ({
+        ...p,
+        vehicleYear: lease.vehicleYear,
+        vehicleMake: lease.vehicleMake,
+        vehicleModel: lease.vehicleModel,
+        vehicleTrim: lease.vehicleTrim,
+        msrp: lease.msrp,
+        negotiatedPrice: lease.sellingPrice,
+        downPayment: lease.capCostReduction,
+        docFee: lease.docFee,
+      }));
+    } else {
+      setLease(p => ({
+        ...p,
+        vehicleYear: finance.vehicleYear,
+        vehicleMake: finance.vehicleMake,
+        vehicleModel: finance.vehicleModel,
+        vehicleTrim: finance.vehicleTrim,
+        msrp: finance.msrp,
+        sellingPrice: finance.negotiatedPrice,
+        capCostReduction: finance.downPayment,
+        docFee: finance.docFee,
+      }));
+    }
+    setDealType(newType);
+  }
   const updateTradeIn = (f: keyof TradeInData, v: string) => setTradeIn(p => ({ ...p, [f]: v }));
   const updateBundled = (f: keyof BundledCosts, v: string) => setBundled(p => ({ ...p, [f]: v }));
 
@@ -656,36 +687,50 @@ export default function AnalyzePage() {
             </div>
           </div>
         )}
-        <div className="p-5">
-          <p className="text-xs text-gray-500 mb-2">Upload a quote screenshot or PDF worksheet:</p>
-          <div className="flex items-center gap-3">
-            <label className="cursor-pointer flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition">
-              <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-              {isExtractingDoc ? 'Extracting…' : 'Upload file'}
-              <input ref={fileInputRef} type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} disabled={isExtractingDoc} />
-            </label>
-            <span className="text-xs text-gray-400">JPG, PNG, WEBP, PDF — max 10MB</span>
-          </div>
+        <div className="p-5 flex flex-col items-center text-center">
+          <p className="text-sm font-semibold text-gray-700 mb-1">One-click quote upload</p>
+          <p className="text-xs text-gray-400 mb-4">Photo or PDF of your dealer quote — we&apos;ll read it and fill your form automatically</p>
+          <label className={`cursor-pointer inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${isExtractingDoc ? 'bg-blue-300 text-white cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-400 text-white'}`}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+            {isExtractingDoc ? 'Extracting…' : 'Upload your quote'}
+            <input ref={fileInputRef} type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} disabled={isExtractingDoc} />
+          </label>
+          <p className="text-xs text-gray-400 mt-3">JPG, PNG, HEIC or PDF</p>
           {docStatus.type !== 'idle' && (
             <p className={`text-xs mt-2 ${docStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{docStatus.msg}</p>
           )}
         </div>
       </div>
 
+      {/* Quick grade shortcut — shown after successful upload */}
+      {autofillSummary && (
+        <div className="mb-4 flex flex-col items-center text-center">
+          <p className="text-xs text-gray-400 mb-2">We filled in what we found — or scroll down to review and adjust any fields</p>
+          <button
+            type="button"
+            onClick={() => formElementRef.current?.requestSubmit()}
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl transition-all"
+          >
+            Grade my deal →
+          </button>
+        </div>
+      )}
+
       {/* Main form */}
       <div ref={!isAdjustMode ? formRef : undefined} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <form onSubmit={handleSubmit}>
+        <form ref={formElementRef} onSubmit={handleSubmit}>
           <div className="p-6 pb-0">
             <p className="text-xs text-gray-400 mb-5">Enter what you can — the more you fill in, the better the analysis.</p>
             {/* Deal type toggle */}
-            <div className="flex gap-1.5 p-1 bg-gray-100 rounded-xl w-fit mb-6">
+            <div className="flex gap-1.5 p-1 bg-gray-100 rounded-xl w-fit">
               {(['lease', 'finance'] as const).map(type => (
-                <button key={type} type="button" onClick={() => setDealType(type)}
+                <button key={type} type="button" onClick={() => handleDealTypeChange(type)}
                   className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${dealType === type ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
                   {type === 'lease' ? 'Lease' : 'Finance / Buy'}
                 </button>
               ))}
             </div>
+            <p className="text-xs text-gray-400 mt-2 mb-6">Your information is saved if you switch modes</p>
 
             {/* Vehicle */}
             <SectionLabel>Vehicle</SectionLabel>
