@@ -21,6 +21,26 @@ body {
   }
 }
 
+@keyframes progress-fill {
+  0%   { width: 0%; }
+  60%  { width: 72%; }
+  85%  { width: 86%; }
+  100% { width: 92%; }
+}
+
+.animate-progress-fill {
+  animation: progress-fill 12s ease-out forwards;
+}
+
+@keyframes wheel-spin {
+  to { stroke-dashoffset: -15.71; }
+}
+
+@keyframes car-bob {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-3px); }
+}
+
 @media print {
   nav,
   footer,

@@ -83,6 +83,24 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Deal Support */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 border border-gray-200 rounded-2xl bg-white">
+          <div className="flex-1">
+            <p className="text-sm font-bold text-gray-900 mb-1">Deal come back a C, D, or F?</p>
+            <p className="text-sm text-gray-500 leading-snug">A former car industry pro personally reviews your deal and emails you exactly what to say — within 24 hours. $39.</p>
+          </div>
+          <a
+            href={process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all"
+          >
+            Get expert help →
+          </a>
+        </div>
+      </section>
+
       {/* How it works */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         <h2 className="text-2xl font-black text-gray-900 mb-6 text-center">How it works</h2>

@@ -7,6 +7,7 @@ export interface LeaseFormData {
   vehicleTrim: string;
   msrp: string;
   sellingPrice: string;
+  rebates: string;
   moneyFactor: string;
   residualPercent: string;
   residualDollar: string;
@@ -27,6 +28,7 @@ export interface FinanceFormData {
   vehicleTrim: string;
   msrp: string;
   negotiatedPrice: string;
+  rebates: string;
   downPayment: string;
   amountFinanced: string;
   apr: string;

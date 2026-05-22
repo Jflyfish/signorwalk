@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { US_STATES } from '@/lib/states';
 import { STATE_TAX_DATA } from '@/lib/stateTaxData';
+import { AnalyzingOverlay } from '@/components/AnalyzingOverlay';
 import {
   AnalysisResult, AnalysisRequest, LeaseFormData, FinanceFormData,
   TradeInData, BundledCosts,
@@ -14,7 +15,7 @@ const FINANCE_TERM_OPTIONS = ['24', '36', '48', '60', '72', '84'];
 
 const LEASE_DEFAULTS: LeaseFormData = {
   vehicleYear: '', vehicleMake: '', vehicleModel: '', vehicleTrim: '',
-  msrp: '', sellingPrice: '', moneyFactor: '', residualPercent: '',
+  msrp: '', sellingPrice: '', rebates: '', moneyFactor: '', residualPercent: '',
   residualDollar: '', leaseTerm: '36', monthlyPayment: '', driveOff: '',
   capCostReduction: '', acquisitionFee: '', dispositionFee: '',
   milesPerYear: '12000', docFee: '',
@@ -22,7 +23,7 @@ const LEASE_DEFAULTS: LeaseFormData = {
 
 const FINANCE_DEFAULTS: FinanceFormData = {
   vehicleYear: '', vehicleMake: '', vehicleModel: '', vehicleTrim: '',
-  msrp: '', negotiatedPrice: '', downPayment: '', amountFinanced: '',
+  msrp: '', negotiatedPrice: '', rebates: '', downPayment: '', amountFinanced: '',
   apr: '', loanTerm: '60', monthlyPayment: '', outTheDoorPrice: '',
   docFee: '', vehicleMileage: '',
 };
@@ -156,6 +157,8 @@ export default function AnalyzePage() {
 
   // Analysis state
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [loaderVisible, setLoaderVisible] = useState(false);
+  const loaderHideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [showForm, setShowForm] = useState(true);
   const [isAdjustMode, setIsAdjustMode] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -166,6 +169,53 @@ export default function AnalyzePage() {
   const resultsRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const formElementRef = useRef<HTMLFormElement>(null);
+
+  // Save full session data for /negotiation-support pre-fill and email
+  useEffect(() => {
+    if (!analysis) return;
+    const data = {
+      // Form identity
+      dealType,
+      state,
+      grade: analysis.grade,
+      headline: analysis.headline,
+      // Full lease or finance data
+      lease: dealType === 'lease' ? lease : null,
+      finance: dealType === 'finance' ? finance : null,
+      // Trade-in
+      hasTradeIn: showTradeIn,
+      tradeIn: showTradeIn ? tradeIn : null,
+      // Bundled costs
+      hasBundled: showBundled,
+      bundled: showBundled ? bundled : null,
+      // Notes & payment range
+      notes,
+      paymentRange: usePaymentRange ? paymentRangeVal : null,
+      // Legacy fields used for form pre-fill
+      vehicleYear: dealType === 'lease' ? lease.vehicleYear : finance.vehicleYear,
+      vehicleMake: dealType === 'lease' ? lease.vehicleMake : finance.vehicleMake,
+      vehicleModel: dealType === 'lease' ? lease.vehicleModel : finance.vehicleModel,
+      vehicleTrim: dealType === 'lease' ? lease.vehicleTrim : finance.vehicleTrim,
+      sellingPrice: dealType === 'lease' ? lease.sellingPrice : finance.negotiatedPrice,
+      monthlyPayment: dealType === 'lease' ? lease.monthlyPayment : finance.monthlyPayment,
+      tradeInVehicle: [tradeIn.year, tradeIn.make, tradeIn.model].filter(Boolean).join(' '),
+      tradeInOffer: tradeIn.dealerOffer,
+      tradeInPayoff: tradeIn.payoffAmount,
+      hasUploadedQuote: !!autofillSummary,
+    };
+    sessionStorage.setItem('sow_session', JSON.stringify(data));
+  }, [analysis]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Show loader immediately; hide only after any in-flight fade completes
+  useEffect(() => {
+    if (isAnalyzing) {
+      clearTimeout(loaderHideTimer.current);
+      setLoaderVisible(true);
+    } else {
+      loaderHideTimer.current = setTimeout(() => setLoaderVisible(false), 400);
+    }
+    return () => clearTimeout(loaderHideTimer.current);
+  }, [isAnalyzing]);
 
   // ── Derived values ───────────────────────────────────────────────────────────
   const dealerOffer = parseFloat(tradeIn.dealerOffer || '0');
@@ -382,6 +432,22 @@ export default function AnalyzePage() {
     setIsExtractingDoc(true);
     setDocStatus({ type: 'idle', msg: '' });
     setAutofillSummary('');
+
+    // Persist the file to sessionStorage so negotiation-support can attach it
+    if (file.size <= 3.5 * 1024 * 1024) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          sessionStorage.setItem('sow_quote_b64', JSON.stringify({
+            filename: file.name,
+            type: file.type,
+            data: reader.result as string,
+          }));
+        } catch { /* sessionStorage full */ }
+      };
+      reader.readAsDataURL(file);
+    }
+
     try {
       const fd = new FormData();
       fd.append('file', file);
@@ -409,6 +475,7 @@ export default function AnalyzePage() {
     setAdditionalFees({ salesTax: '', titleReg: '', otherAmount: '', otherLabel: '' });
     setShowAdditionalFees(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    sessionStorage.removeItem('sow_quote_b64');
   }
 
   const updateLease = (f: keyof LeaseFormData, v: string) => setLease(p => ({ ...p, [f]: v }));
@@ -425,6 +492,7 @@ export default function AnalyzePage() {
         vehicleTrim: lease.vehicleTrim,
         msrp: lease.msrp,
         negotiatedPrice: lease.sellingPrice,
+        rebates: lease.rebates,
         downPayment: lease.capCostReduction,
         docFee: lease.docFee,
       }));
@@ -437,6 +505,7 @@ export default function AnalyzePage() {
         vehicleTrim: finance.vehicleTrim,
         msrp: finance.msrp,
         sellingPrice: finance.negotiatedPrice,
+        rebates: finance.rebates,
         capCostReduction: finance.downPayment,
         docFee: finance.docFee,
       }));
@@ -495,17 +564,8 @@ export default function AnalyzePage() {
   }
 
   // ── Loading ──────────────────────────────────────────────────────────────────
-  if (isAnalyzing) {
-    return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-4 text-center px-4">
-        <div className="w-16 h-16 relative">
-          <svg className="animate-spin w-16 h-16 text-gray-200" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" /></svg>
-          <svg className="animate-spin w-16 h-16 text-blue-500 absolute inset-0" fill="none" viewBox="0 0 24 24" style={{ animationDuration: '0.8s' }}><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-        </div>
-        <p className="text-xl font-bold text-gray-900">Analyzing your deal…</p>
-        <p className="text-gray-500 text-sm">Going through every number</p>
-      </div>
-    );
+  if (loaderVisible) {
+    return <AnalyzingOverlay />;
   }
 
   // ── Results ──────────────────────────────────────────────────────────────────
@@ -513,10 +573,11 @@ export default function AnalyzePage() {
     const colors = gradeColor(analysis.grade);
     const rec = recStyle(analysis.recommendation);
     return (
-      <div ref={resultsRef} className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-4 print-page">
+      <>
+      <div ref={resultsRef} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-3 print-page">
         {previousGrade && <GradeComparison prev={previousGrade} current={analysis.grade} />}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 print-card">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-7 print-card">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <GradeCircle grade={analysis.grade} size="lg" />
             <div className="flex-1">
@@ -540,10 +601,21 @@ export default function AnalyzePage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             Save as PDF
           </button>
+          {['C', 'D', 'F'].includes(analysis.grade) && (() => {
+            const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
+            return (
+              <button
+                onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
+              >
+                Ask a Pro — $39
+              </button>
+            );
+          })()}
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 print-card">
-          <h2 className="font-bold text-gray-900 text-base mb-3">Lease vs. Buy</h2>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
+          <h2 className="font-bold text-gray-900 text-sm mb-2">Lease vs. Buy</h2>
           <div className="flex items-start gap-3">
             <span className={`px-2.5 py-1 rounded-full text-xs font-bold flex-shrink-0 ${analysis.leaseVsBuy.recommendation === 'lease' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
               {analysis.leaseVsBuy.recommendation === 'lease' ? 'Lease' : 'Buy'}
@@ -552,13 +624,13 @@ export default function AnalyzePage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 print-card">
-          <h2 className="font-bold text-gray-900 text-base mb-4">Deal Breakdown</h2>
-          <div className="space-y-3">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
+          <h2 className="font-bold text-gray-900 text-sm mb-3">Deal Breakdown</h2>
+          <div className="space-y-0">
             {analysis.breakdown.map((row, i) => {
               const s = statusStyle(row.status);
               return (
-                <div key={i} className="flex items-start gap-3 py-3 border-b border-gray-50 last:border-0">
+                <div key={i} className="flex items-start gap-3 py-2.5 border-b border-gray-50 last:border-0">
                   <div className={`w-2.5 h-2.5 rounded-full ${s.dot} mt-1.5 flex-shrink-0`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-1">
@@ -593,20 +665,20 @@ export default function AnalyzePage() {
           </div>
         )}
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 print-card">
           <div className="flex items-start gap-3">
-            <div className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${analysis.stateTaxCredit.hasCredit ? 'bg-green-500' : 'bg-gray-400'}`} />
+            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${analysis.stateTaxCredit.hasCredit ? 'bg-green-500' : 'bg-gray-300'}`} />
             <div>
-              <p className="text-sm font-semibold text-gray-800 mb-1">State Trade-In Tax Credit</p>
-              <p className="text-sm text-gray-500 leading-relaxed">{analysis.stateTaxCredit.details}</p>
+              <p className="text-xs font-semibold text-gray-700 mb-0.5">State Trade-In Tax Credit</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{analysis.stateTaxCredit.details}</p>
             </div>
           </div>
         </div>
 
         {analysis.redFlags.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 print-card">
-            <h2 className="font-bold text-gray-900 text-base mb-4">Red Flags <span className="text-xs font-normal text-red-500">({analysis.redFlags.length})</span></h2>
-            <div className="space-y-3">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
+            <h2 className="font-bold text-gray-900 text-sm mb-3">Red Flags <span className="text-xs font-normal text-red-500">({analysis.redFlags.length})</span></h2>
+            <div className="space-y-2">
               {analysis.redFlags.map((flag, i) => (
                 <div key={i} className="rounded-xl border border-red-100 overflow-hidden">
                   <div className="bg-red-50 px-4 py-3">
@@ -629,21 +701,54 @@ export default function AnalyzePage() {
           </div>
         )}
 
-        <div className="bg-gray-900 rounded-2xl p-6 print-card">
-          <div className="flex items-center gap-2 mb-3">
-            <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-            <p className="text-sm font-semibold text-gray-300">Counter-Offer Script</p>
+        {['C', 'D', 'F'].includes(analysis.grade) && (() => {
+          const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
+          const heading = {
+            C: 'Want a pro to handle this?',
+            D: 'This deal needs work — get a pro in your corner.',
+            F: "Walk away, or get a pro's honest take first.",
+          }[analysis.grade as 'C' | 'D' | 'F'];
+          return (
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 no-print">
+              <h2 className="font-bold text-gray-900 text-base mb-2">{heading}</h2>
+              <p className="text-sm text-gray-500 mb-2">A former car industry pro personally reads your deal and emails you a custom strategy within 24 hours.</p>
+              <ul className="space-y-1 mb-3">
+                {[
+                  'Your 3 strongest negotiation points, in priority order',
+                  'Word-for-word scripts for each',
+                  'How to handle the dealer\'s likely responses',
+                  'Your walk-away number',
+                  'One follow-up question answered after your visit',
+                ].map(item => (
+                  <li key={item} className="flex items-start gap-1.5 text-sm text-gray-500">
+                    <span className="text-gray-300 select-none">—</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs text-gray-400 mb-4">Goal: save you $500–$2,500. Results vary — every deal and dealer is different.</p>
+              <button
+                onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all shadow-sm"
+              >
+                Get my strategy — $39
+              </button>
+            </div>
+          );
+        })()}
+
+        {analysis.counterOfferScript && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
+            <h2 className="font-bold text-gray-900 text-sm mb-3">Counter-Offer Script</h2>
+            <p className="text-sm text-gray-700 leading-relaxed italic">{analysis.counterOfferScript}</p>
           </div>
-          <div className="bg-gray-800 rounded-xl p-4">
-            <p className="text-gray-100 text-sm leading-relaxed italic">&ldquo;{analysis.counterOfferScript.replace(/^["']|["']$/g, '')}&rdquo;</p>
-          </div>
-          <p className="text-gray-600 text-xs mt-2">Word for word. Say it calmly. Then stop talking.</p>
-        </div>
+        )}
 
         <div className="text-xs text-gray-400 leading-relaxed p-4 bg-gray-50 rounded-xl border border-gray-100 print-card">
           <strong className="text-gray-500">Disclaimer:</strong> This analysis is AI-generated for informational purposes only and is not financial or legal advice. All figures are estimates based on the data you entered. Verify all numbers with your dealer and lender before signing any contract.
         </div>
       </div>
+      </>
     );
   }
 
@@ -781,6 +886,17 @@ export default function AnalyzePage() {
                     value={finance.negotiatedPrice} onChange={e => updateFinance('negotiatedPrice', e.target.value)}
                     hint="The negotiated price — always agree on this before discussing monthly payments"
                   />
+                )}
+
+                {/* 1b. Rebates */}
+                {dealType === 'lease' ? (
+                  <Field label="Manufacturer rebates / incentives" prefix="$" placeholder="1,500" type="number"
+                    value={lease.rebates} onChange={e => updateLease('rebates', e.target.value)}
+                    hint="Cash back, loyalty, conquest, military, college grad, etc. Leave blank if none." />
+                ) : (
+                  <Field label="Manufacturer rebates / incentives" prefix="$" placeholder="1,500" type="number"
+                    value={finance.rebates} onChange={e => updateFinance('rebates', e.target.value)}
+                    hint="Cash back, loyalty, conquest, military, college grad, etc. Leave blank if none." />
                 )}
 
                 {/* 2. MSRP */}

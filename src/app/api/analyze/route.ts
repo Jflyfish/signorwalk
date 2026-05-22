@@ -62,6 +62,7 @@ function buildPrompt(data: AnalysisRequest): string {
     const l = data.lease;
     vehicleInfo = [l.vehicleYear, l.vehicleMake, l.vehicleModel, l.vehicleTrim].filter(Boolean).join(' ') || 'Vehicle not fully specified';
 
+    const rebates = parseFloat(l.rebates || '0');
     const mf = parseFloat(l.moneyFactor || '0');
     const mfApr = mf > 0 ? (mf * 2400).toFixed(2) : 'N/A';
     const resPct = parseFloat(l.residualPercent || '0');
@@ -79,6 +80,7 @@ function buildPrompt(data: AnalysisRequest): string {
     dealDetails = `
 MSRP: ${l.msrp ? '$' + fmt(l.msrp) : 'not provided'}
 Selling Price (cap cost before adjustments): ${l.sellingPrice ? '$' + fmt(l.sellingPrice) : 'not provided'}
+Manufacturer rebates/incentives: ${rebates > 0 ? '$' + fmt(rebates) + ' (applied as cap cost reduction — verify buyer qualifies)' : 'none reported'}
 Money Factor: ${l.moneyFactor || 'not provided'}${mf > 0 ? ` → ${mfApr}% APR equivalent` : ''}
 Residual: ${resPct > 0 ? resPct + '%' : ''}${resDol > 0 ? ' = $' + fmt(resDol) : resPct === 0 ? 'not provided' : ''}
 Term: ${l.leaseTerm || '36'} months
@@ -99,6 +101,7 @@ Total lease cost: ${mp > 0 && term > 0 ? '$' + fmt(mp * term + effectiveDriveOff
     vehicleInfo = [f.vehicleYear, f.vehicleMake, f.vehicleModel, f.vehicleTrim].filter(Boolean).join(' ') || 'Vehicle not fully specified';
 
     const docFee = parseFloat(f.docFee || '0');
+    const financeRebates = parseFloat(f.rebates || '0');
     const cashDown = parseFloat(f.downPayment || '0');
     const effectiveDown = cashDown + (hasTrade ? netTradeIn : 0);
     const price = parseFloat(f.negotiatedPrice || '0');
@@ -118,6 +121,7 @@ Total lease cost: ${mp > 0 && term > 0 ? '$' + fmt(mp * term + effectiveDriveOff
     dealDetails = `
 MSRP: ${f.msrp ? '$' + fmt(f.msrp) : 'not provided'}
 Negotiated price: ${price > 0 ? '$' + fmt(price) + (discountPct ? ` (${discountPct}% off MSRP)` : '') : 'not provided'}
+Manufacturer rebates/incentives: ${financeRebates > 0 ? '$' + fmt(financeRebates) + ' (applied to reduce purchase price — verify buyer qualifies)' : 'none reported'}
 Cash down payment: ${cashDown > 0 ? '$' + fmt(cashDown) : 'not provided'}${hasTrade ? `
 Dealer trade-in offer: $${fmt(dealerOffer)}
 Trade-in payoff owed: $${fmt(payoffAmount)}
@@ -185,7 +189,20 @@ ${paymentRangeNote}
 ${paymentGapNote}
 
 ${notesSection}
-MISSING DATA GUIDANCE: If key fields are blank (shown as "not provided"), still give a grade based on what you have. Note in your summary what's missing and how it limits the analysis. Missing info = lower confidence, not automatically a bad deal.
+REBATE GUIDANCE: If manufacturer rebates are $500 or more, include a red flag or breakdown note reminding the buyer to confirm they qualify. Common conditions: financing through the manufacturer's captive lender, loyalty (current owner of same brand), conquest (switching from a competitor), military service, recent college graduate, specific trim level, or minimum credit score. If they don't qualify, the rebate disappears and the deal changes significantly.
+
+MISSING DATA GUIDANCE — CRITICAL:
+- Missing fields are NOT red flags and must NEVER lower the grade on their own.
+- When a field is missing, assume a reasonable market-average value and say so briefly. Examples:
+  - Missing APR → assume current average for buyer's likely credit tier (~7% for finance, note assumption)
+  - Missing doc fee → assume $300–400 (typical average), do not flag as an issue
+  - Missing residual → assume 50% for a 36-month lease on a mainstream vehicle
+  - Missing acquisition fee → assume $695 (industry standard), do not flag
+  - Missing mileage → assume 12,000/yr standard
+  - Missing MSRP → estimate from selling price context
+- Only grade and flag what the buyer actually provided. Incomplete data = lower confidence in the analysis, not a worse deal.
+- If fewer than 3 fields are provided total, note you need more info but still give a directional grade.
+- Never include a red flag for a field that wasn't provided.
 
 OUTPUT RULES:
 1. "headline": Max 12 words, punchy, no hedging.
@@ -247,7 +264,8 @@ export async function POST(req: NextRequest) {
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 2500,
-      system: 'You are a trusted automotive advisor. Respond with valid JSON only — no markdown, no code blocks. Keep all text fields concise and conversational.',
+      temperature: 0.3,
+      system: 'You are a trusted automotive advisor. Respond with valid JSON only — no markdown, no code blocks. Keep all text fields concise and conversational. Never fabricate numbers not present in the input.',
       messages: [{ role: 'user', content: buildPrompt(data) }],
     });
 
