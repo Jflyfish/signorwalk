@@ -601,7 +601,7 @@ export default function AnalyzePage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             Save as PDF
           </button>
-          {['C', 'D', 'F'].includes(analysis.grade) && (() => {
+          {(['B', 'C', 'D', 'F'] as string[]).includes(analysis.grade) && (() => {
             const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
             return (
               <button
@@ -701,37 +701,53 @@ export default function AnalyzePage() {
           </div>
         )}
 
-        {['C', 'D', 'F'].includes(analysis.grade) && (() => {
+        {(['B', 'C', 'D', 'F'] as string[]).includes(analysis.grade) && (() => {
           const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
+          const isB = analysis.grade === 'B';
           const heading = {
+            B: 'Good deal — want to confirm there\'s nothing left on the table?',
             C: 'Want a pro to handle this?',
             D: 'This deal needs work — get a pro in your corner.',
             F: "Walk away, or get a pro's honest take first.",
-          }[analysis.grade as 'C' | 'D' | 'F'];
+          }[analysis.grade as 'B' | 'C' | 'D' | 'F'];
+          const bullets = isB ? [
+            'Confirm whether any wiggle room remains on price or rate',
+            'Identify the 1–2 asks most likely to land with this dealer',
+            'Word-for-word script for each ask',
+            'One follow-up question answered after your visit',
+          ] : [
+            'Your 3 strongest negotiation points, in priority order',
+            'Word-for-word scripts for each',
+            'How to handle the dealer\'s likely responses',
+            'Your walk-away number',
+            'One follow-up question answered after your visit',
+          ];
           return (
             <div className="bg-white rounded-2xl border border-gray-200 p-5 no-print">
               <h2 className="font-bold text-gray-900 text-base mb-2">{heading}</h2>
-              <p className="text-sm text-gray-500 mb-2">A former car industry pro personally reads your deal and emails you a custom strategy within 24 hours.</p>
+              <p className="text-sm text-gray-500 mb-2">
+                {isB
+                  ? 'A former car industry pro reviews your numbers and tells you exactly what — if anything — is still worth pushing on.'
+                  : 'A former car industry pro personally reads your deal and emails you a custom strategy within 24 hours.'}
+              </p>
               <ul className="space-y-1 mb-3">
-                {[
-                  'Your 3 strongest negotiation points, in priority order',
-                  'Word-for-word scripts for each',
-                  'How to handle the dealer\'s likely responses',
-                  'Your walk-away number',
-                  'One follow-up question answered after your visit',
-                ].map(item => (
+                {bullets.map(item => (
                   <li key={item} className="flex items-start gap-1.5 text-sm text-gray-500">
                     <span className="text-gray-300 select-none">—</span>
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              <p className="text-xs text-gray-400 mb-4">Goal: save you $500–$2,500. Results vary — every deal and dealer is different.</p>
+              <p className="text-xs text-gray-400 mb-4">
+                {isB
+                  ? 'Sometimes the answer is "you\'re done." That\'s worth knowing too. Results vary — every deal and dealer is different.'
+                  : 'Goal: save you $500–$2,500. Results vary — every deal and dealer is different.'}
+              </p>
               <button
                 onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all shadow-sm"
               >
-                Get my strategy — $39
+                {isB ? 'Get my final check — $39' : 'Get my strategy — $39'}
               </button>
             </div>
           );
