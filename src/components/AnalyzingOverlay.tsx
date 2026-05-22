@@ -65,6 +65,7 @@ export function AnalyzingOverlay() {
   const mountedRef = useRef(false);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     mountedRef.current = true;
     // Always show rebate fact first, then rotate through the rest randomly
     const order = [FIRST_FACT, ...shuffle(FACTS)];
