@@ -638,8 +638,8 @@ export default function AnalyzePage() {
 
       {/* Heading */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight mb-3">Grade My Deal</h1>
-        <p className="text-base text-gray-500">Upload your dealer quote and get your full grade in 30 seconds.</p>
+        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight mb-3">Is Your Deal Worth Signing?</h1>
+        <p className="text-base text-gray-500">Upload your quote and we grade your deal A through F in 30 seconds and tell you if it&apos;s good enough.</p>
       </div>
 
       {/* Upload button */}
