@@ -62,7 +62,7 @@ export interface BundledCosts {
 
 export interface AnalysisRequest {
   dealType: DealType;
-  state: string;
+  state?: string;
   lease?: LeaseFormData;
   finance?: FinanceFormData;
   tradeIn?: TradeInData;

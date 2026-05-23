@@ -1,99 +1,34 @@
 'use client';
 
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
-import { US_STATES } from '@/lib/states';
-import { STATE_TAX_DATA } from '@/lib/stateTaxData';
+import { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { AnalyzingOverlay } from '@/components/AnalyzingOverlay';
-import {
-  AnalysisResult, AnalysisRequest, LeaseFormData, FinanceFormData,
-  TradeInData, BundledCosts,
-} from '@/lib/types';
+import { AnalysisResult, AnalysisRequest, DealType, TradeInData } from '@/lib/types';
 
-const LEASE_TERM_OPTIONS = ['24', '36', '39', '42', '48'];
-const LEASE_MILES_OPTIONS = ['8000', '10000', '12000', '15000', '18000', '20000'];
-const FINANCE_TERM_OPTIONS = ['24', '36', '48', '60', '72', '84'];
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-const LEASE_DEFAULTS: LeaseFormData = {
-  vehicleYear: '', vehicleMake: '', vehicleModel: '', vehicleTrim: '',
-  msrp: '', sellingPrice: '', rebates: '', moneyFactor: '', residualPercent: '',
-  residualDollar: '', leaseTerm: '36', monthlyPayment: '', driveOff: '',
-  capCostReduction: '', acquisitionFee: '', dispositionFee: '',
-  milesPerYear: '12000', docFee: '',
-};
-
-const FINANCE_DEFAULTS: FinanceFormData = {
-  vehicleYear: '', vehicleMake: '', vehicleModel: '', vehicleTrim: '',
-  msrp: '', negotiatedPrice: '', rebates: '', downPayment: '', amountFinanced: '',
-  apr: '', loanTerm: '60', monthlyPayment: '', outTheDoorPrice: '',
-  docFee: '', vehicleMileage: '',
-};
-
-const TRADEIN_DEFAULTS: TradeInData = {
-  year: '', make: '', model: '', mileage: '', condition: 'Good',
-  dealerOffer: '', payoffAmount: '', kbbEstimate: '', knownIssues: '',
-};
-
-const BUNDLED_DEFAULTS: BundledCosts = {
-  extendedWarranty: '', gapInsurance: '', tireWheelProtection: '',
-  paintInteriorProtection: '', otherLabel: '', otherAmount: '',
-};
-
-// ── UI primitives ─────────────────────────────────────────────────────────────
-
-interface FieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string; prefix?: string; suffix?: string; hint?: string; isHighlighted?: boolean;
-}
-function Field({ label, prefix, suffix, hint, className, isHighlighted, ...props }: FieldProps) {
-  return (
-    <div className={className}>
-      {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
-      <div className="relative">
-        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm select-none">{prefix}</span>}
-        <input
-          {...props}
-          className={`w-full border rounded-lg py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition
-            ${prefix ? 'pl-7' : 'pl-3'} ${suffix ? 'pr-10' : 'pr-3'}
-            ${isHighlighted ? 'border-yellow-400 bg-yellow-50 ring-2 ring-yellow-300' : 'border-gray-200'}`}
-        />
-        {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm select-none">{suffix}</span>}
-      </div>
-      {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
-    </div>
-  );
-}
-
-function SelectField({ label, hint, children, className, isHighlighted, ...props }: { label: string; hint?: string; children: React.ReactNode; className?: string; isHighlighted?: boolean } & React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <div className={className}>
-      {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
-      <select {...props} className={`w-full border rounded-lg px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none ${isHighlighted ? 'border-yellow-400 bg-yellow-50 ring-2 ring-yellow-300' : 'border-gray-200'}`}>
-        {children}
-      </select>
-      {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
-    </div>
-  );
-}
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      <div className="h-px flex-1 bg-gray-100" />
-      <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest whitespace-nowrap">{children}</span>
-      <div className="h-px flex-1 bg-gray-100" />
-    </div>
-  );
+function parseVehicle(s: string): { year: string; make: string; model: string } {
+  const parts = s.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return { year: '', make: '', model: '' };
+  if (/^(19|20)\d{2}$/.test(parts[0])) {
+    return { year: parts[0], make: parts[1] || '', model: parts.slice(2).join(' ') };
+  }
+  return { year: '', make: parts[0] || '', model: parts.slice(1).join(' ') };
 }
 
 function gradeColor(grade: string) {
-  if (grade === 'A' || grade === 'B') return { bg: 'bg-green-500', ring: 'ring-green-200', text: 'text-green-600', light: 'bg-green-50', border: 'border-green-200' };
-  if (grade === 'C') return { bg: 'bg-amber-500', ring: 'ring-amber-200', text: 'text-amber-600', light: 'bg-amber-50', border: 'border-amber-200' };
-  return { bg: 'bg-red-500', ring: 'ring-red-200', text: 'text-red-600', light: 'bg-red-50', border: 'border-red-200' };
+  if (grade === 'A' || grade === 'B') return { bg: 'bg-green-500', ring: 'ring-green-200', text: 'text-green-600' };
+  if (grade === 'C') return { bg: 'bg-amber-500', ring: 'ring-amber-200', text: 'text-amber-600' };
+  return { bg: 'bg-red-500', ring: 'ring-red-200', text: 'text-red-600' };
 }
+
 function recStyle(rec: string) {
   if (rec === 'sign') return { cls: 'bg-green-100 text-green-800 border-green-300', label: 'Sign It' };
   if (rec === 'negotiate') return { cls: 'bg-amber-100 text-amber-800 border-amber-300', label: 'Negotiate First' };
   return { cls: 'bg-red-100 text-red-800 border-red-300', label: 'Walk Away' };
 }
+
 function statusStyle(s: string) {
   if (s === 'good') return { dot: 'bg-green-500', badge: 'bg-green-50 text-green-700 border-green-200' };
   if (s === 'warn') return { dot: 'bg-amber-500', badge: 'bg-amber-50 text-amber-700 border-amber-200' };
@@ -110,340 +45,188 @@ function GradeCircle({ grade, size = 'md' }: { grade: string; size?: 'sm' | 'md'
   );
 }
 
-function GradeComparison({ prev, current }: { prev: string; current: string }) {
-  const prevC = gradeColor(prev);
-  const currC = gradeColor(current);
-  const improved = ['A', 'B', 'C', 'D', 'F'].indexOf(current) < ['A', 'B', 'C', 'D', 'F'].indexOf(prev);
-  const same = prev === current;
-  return (
-    <div className={`flex items-center gap-4 p-4 rounded-xl border mb-4 ${improved ? 'bg-green-50 border-green-200' : same ? 'bg-gray-50 border-gray-200' : 'bg-amber-50 border-amber-200'}`}>
-      <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-full ${prevC.bg} flex items-center justify-center ring-4 ${prevC.ring}`}><span className="text-white font-black text-lg">{prev}</span></div>
-        <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-        <div className={`w-10 h-10 rounded-full ${currC.bg} flex items-center justify-center ring-4 ${currC.ring}`}><span className="text-white font-black text-lg">{current}</span></div>
-      </div>
-      <p className="text-sm font-medium text-gray-700">
-        {improved ? `Grade improved from ${prev} to ${current}.` : same ? 'Same grade — try adjusting a specific number.' : `Grade dropped from ${prev} to ${current}.`}
-      </p>
-    </div>
-  );
+function getProUpsellCopy(analysis: AnalysisResult): string {
+  const keyTerms = [
+    { pattern: /money factor/i, label: 'money factor' },
+    { pattern: /\bAPR\b|interest rate/i, label: 'APR' },
+    { pattern: /selling price|cap cost/i, label: 'selling price' },
+    { pattern: /trade.?in/i, label: 'trade-in offer' },
+    { pattern: /doc fee/i, label: 'doc fee' },
+    { pattern: /residual/i, label: 'residual value' },
+    { pattern: /down payment/i, label: 'down payment' },
+  ];
+  for (const flag of analysis.redFlags) {
+    for (const term of keyTerms) {
+      if (term.pattern.test(flag.issue)) {
+        return `Your ${term.label} has real room to negotiate. A former dealership insider who's seen thousands of deals will email you exactly what to say. Built to help you save $500–$1,000.`;
+      }
+    }
+  }
+  for (const row of analysis.breakdown) {
+    if (row.status === 'bad') {
+      for (const term of keyTerms) {
+        if (term.pattern.test(row.label)) {
+          return `Your ${term.label} has real room to negotiate. A former dealership insider who's seen thousands of deals will email you exactly what to say. Built to help you save $500–$1,000.`;
+        }
+      }
+    }
+  }
+  return "This deal has real room to negotiate. A former dealership insider who's seen thousands of deals will email you exactly what to say. Built to help you save $500–$1,000.";
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
 
+type Phase = 'upload' | 'analyzing' | 'needs-fields' | 'results';
+
 export default function AnalyzePage() {
-  // Form state
-  const [dealType, setDealType] = useState<'lease' | 'finance'>('lease');
-  const [state, setState] = useState('');
-  const [lease, setLease] = useState<LeaseFormData>(LEASE_DEFAULTS);
-  const [finance, setFinance] = useState<FinanceFormData>(FINANCE_DEFAULTS);
+  const router = useRouter();
+
+  // Phase
+  const [phase, setPhase] = useState<Phase>('upload');
+
+  // Upload/form state
+  const [dealType, setDealType] = useState<DealType>('lease');
+  const [vehicleYMM, setVehicleYMM] = useState('');
+  const [msrp, setMsrp] = useState('');
+  const [sellingPrice, setSellingPrice] = useState('');
+  const [monthlyPayment, setMonthlyPayment] = useState('');
+  const [downPayment, setDownPayment] = useState('');
+  const [leaseTerm, setLeaseTerm] = useState('36');
+  const [apr, setApr] = useState('');
+  const [creditScore, setCreditScore] = useState('');
   const [showTradeIn, setShowTradeIn] = useState(false);
-  const [tradeIn, setTradeIn] = useState<TradeInData>(TRADEIN_DEFAULTS);
-  const [showBundled, setShowBundled] = useState(false);
-  const [bundled, setBundled] = useState<BundledCosts>(BUNDLED_DEFAULTS);
-  const [notes, setNotes] = useState('');
-  const [residualMode, setResidualMode] = useState<'percent' | 'dollar'>('percent');
-  const [usePaymentRange, setUsePaymentRange] = useState(false);
-  const [paymentRangeVal, setPaymentRangeVal] = useState({ low: '', high: '' });
-  const [showGuidance, setShowGuidance] = useState(false);
-  const [additionalFees, setAdditionalFees] = useState({ salesTax: '', titleReg: '', otherAmount: '', otherLabel: '' });
-  const [showAdditionalFees, setShowAdditionalFees] = useState(false);
+  const [tradeYMM, setTradeYMM] = useState('');
+  const [tradeOffer, setTradeOffer] = useState('');
+  const [tradeOwed, setTradeOwed] = useState('');
+  const [showManualForm, setShowManualForm] = useState(false);
 
-  // Autofill state
-  const [isExtractingDoc, setIsExtractingDoc] = useState(false);
-  const [docStatus, setDocStatus] = useState<{ type: 'idle' | 'success' | 'error'; msg: string }>({ type: 'idle', msg: '' });
-  const [autofillSummary, setAutofillSummary] = useState('');
-  const [autofillHighlight, setAutofillHighlight] = useState<Set<string>>(new Set());
-
-  // Analysis state
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [loaderVisible, setLoaderVisible] = useState(false);
-  const loaderHideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const [showForm, setShowForm] = useState(true);
-  const [isAdjustMode, setIsAdjustMode] = useState(false);
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [previousGrade, setPreviousGrade] = useState<string | null>(null);
+  // Upload/extraction state
+  const [isExtracting, setIsExtracting] = useState(false);
   const [error, setError] = useState('');
+
+  // Needs-fields state
+  const [needsVehicle, setNeedsVehicle] = useState(false);
+  const [needsPrice, setNeedsPrice] = useState(false);
+
+  // Results
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLDivElement>(null);
-  const formElementRef = useRef<HTMLFormElement>(null);
 
-  // Save full session data for /negotiation-support pre-fill and email
-  useEffect(() => {
-    if (!analysis) return;
-    const data = {
-      // Form identity
-      dealType,
-      state,
-      grade: analysis.grade,
-      headline: analysis.headline,
-      // Full lease or finance data
-      lease: dealType === 'lease' ? lease : null,
-      finance: dealType === 'finance' ? finance : null,
-      // Trade-in
-      hasTradeIn: showTradeIn,
-      tradeIn: showTradeIn ? tradeIn : null,
-      // Bundled costs
-      hasBundled: showBundled,
-      bundled: showBundled ? bundled : null,
-      // Notes & payment range
-      notes,
-      paymentRange: usePaymentRange ? paymentRangeVal : null,
-      // Legacy fields used for form pre-fill
-      vehicleYear: dealType === 'lease' ? lease.vehicleYear : finance.vehicleYear,
-      vehicleMake: dealType === 'lease' ? lease.vehicleMake : finance.vehicleMake,
-      vehicleModel: dealType === 'lease' ? lease.vehicleModel : finance.vehicleModel,
-      vehicleTrim: dealType === 'lease' ? lease.vehicleTrim : finance.vehicleTrim,
-      sellingPrice: dealType === 'lease' ? lease.sellingPrice : finance.negotiatedPrice,
-      monthlyPayment: dealType === 'lease' ? lease.monthlyPayment : finance.monthlyPayment,
-      tradeInVehicle: [tradeIn.year, tradeIn.make, tradeIn.model].filter(Boolean).join(' '),
-      tradeInOffer: tradeIn.dealerOffer,
-      tradeInPayoff: tradeIn.payoffAmount,
-      hasUploadedQuote: !!autofillSummary,
-    };
-    sessionStorage.setItem('sow_session', JSON.stringify(data));
-  }, [analysis]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ── Build helpers ────────────────────────────────────────────────────────────
 
-  // Show loader immediately; hide only after any in-flight fade completes
-  useEffect(() => {
-    if (isAnalyzing) {
-      clearTimeout(loaderHideTimer.current);
-      setLoaderVisible(true);
-    } else {
-      loaderHideTimer.current = setTimeout(() => setLoaderVisible(false), 400);
-    }
-    return () => clearTimeout(loaderHideTimer.current);
-  }, [isAnalyzing]);
-
-  // ── Derived values ───────────────────────────────────────────────────────────
-  const dealerOffer = parseFloat(tradeIn.dealerOffer || '0');
-  const payoffAmount = parseFloat(tradeIn.payoffAmount || '0');
-  const netTradeIn = showTradeIn && tradeIn.dealerOffer ? dealerOffer - payoffAmount : 0;
-  const isUpsideDown = showTradeIn && !!tradeIn.dealerOffer && netTradeIn < 0;
-  const hl = (k: string) => autofillHighlight.has(k);
-
-  // Payment math check
-  const paymentGap = useMemo<number | undefined>(() => {
-    if (dealType === 'lease') {
-      const mf = parseFloat(lease.moneyFactor || '0');
-      const msrp = parseFloat(lease.msrp || '0');
-      const sp = parseFloat(lease.sellingPrice || '0');
-      const acq = parseFloat(lease.acquisitionFee || '0');
-      const ccr = parseFloat(lease.capCostReduction || '0');
-      const resDol = residualMode === 'dollar'
-        ? parseFloat(lease.residualDollar || '0')
-        : msrp * parseFloat(lease.residualPercent || '0') / 100;
-      const term = parseFloat(lease.leaseTerm || '36');
-      const quoted = parseFloat(lease.monthlyPayment || '0');
-      if (!mf || !sp || !resDol || !term || !quoted) return undefined;
-      const adj = sp + acq - ccr - (showTradeIn ? Math.max(netTradeIn, 0) : 0);
-      return quoted - ((adj - resDol) / term + (adj + resDol) * mf);
-    }
-    if (dealType === 'finance') {
-      const price = parseFloat(finance.negotiatedPrice || '0');
-      const down = parseFloat(finance.downPayment || '0');
-      const doc = parseFloat(finance.docFee || '0');
-      const apr = parseFloat(finance.apr || '0');
-      const term = parseFloat(finance.loanTerm || '60');
-      const quoted = parseFloat(finance.monthlyPayment || '0');
-      if (!price || !apr || !term || !quoted) return undefined;
-      const loan = Math.max(price - down - (showTradeIn ? netTradeIn : 0) + doc, 0);
-      const r = apr / 100 / 12;
-      const calc = (loan * r * Math.pow(1 + r, term)) / (Math.pow(1 + r, term) - 1);
-      return quoted - calc;
-    }
-    return undefined;
-  }, [dealType, lease, finance, residualMode, showTradeIn, netTradeIn]);
-
-  // Calculated summaries for the receipt card
-  const taxInfo = state ? STATE_TAX_DATA[state] : null;
-
-  const financeSummary = useMemo(() => {
-    if (dealType !== 'finance') return null;
-    const price = parseFloat(finance.negotiatedPrice || '0');
-    const doc = parseFloat(finance.docFee || '0');
-    const down = parseFloat(finance.downPayment || '0');
-    const term = parseFloat(finance.loanTerm || '60');
-    const payment = parseFloat(finance.monthlyPayment || '0');
-    const tradeOffer = showTradeIn && tradeIn.dealerOffer ? dealerOffer : 0;
-    const netTrade = showTradeIn && tradeIn.dealerOffer ? netTradeIn : 0;
-
-    const enteredTax = parseFloat(additionalFees.salesTax || '0');
-    const enteredTitleReg = parseFloat(additionalFees.titleReg || '0');
-    const otherFees = parseFloat(additionalFees.otherAmount || '0');
-
-    const taxableBase = taxInfo?.tradeInCredit ? Math.max(price - tradeOffer, 0) : price;
-    const estTax = taxInfo ? taxableBase * (taxInfo.salesTaxRate / 100) : 0;
-    const estTitleReg = taxInfo?.avgTitleReg || 0;
-
-    const salesTax = enteredTax || estTax;
-    const titleReg = enteredTitleReg || estTitleReg;
-    const subtotal = price + doc + salesTax + titleReg + otherFees;
-    const calcAmtFinanced = Math.max(subtotal - down - netTrade, 0);
-    const amtFinancedFromContract = parseFloat(finance.amountFinanced || '0');
-
+  function buildTradeIn(): TradeInData {
+    const t = parseVehicle(tradeYMM);
     return {
-      price, doc, salesTax, titleReg, otherFees, subtotal,
-      down, tradeOffer, netTrade, payoff: payoffAmount,
-      amtFinanced: amtFinancedFromContract || calcAmtFinanced,
-      term, payment,
-      totalMonthly: payment * term,
-      totalPaid: payment * term + down,
-      isTaxEst: !enteredTax,
-      isTitleEst: !enteredTitleReg,
-      salesTaxRate: taxInfo?.salesTaxRate || 0,
+      year: t.year, make: t.make, model: t.model,
+      mileage: '', condition: 'Good',
+      dealerOffer: tradeOffer, payoffAmount: tradeOwed,
+      kbbEstimate: '', knownIssues: '',
     };
-  }, [dealType, finance, state, showTradeIn, tradeIn, dealerOffer, payoffAmount, netTradeIn, additionalFees, taxInfo]);
+  }
 
-  const leaseSummary = useMemo(() => {
-    if (dealType !== 'lease') return null;
-    const sp = parseFloat(lease.sellingPrice || '0');
-    const msrp = parseFloat(lease.msrp || '0');
-    const acq = parseFloat(lease.acquisitionFee || '0');
-    const doc = parseFloat(lease.docFee || '0');
-    const ccr = parseFloat(lease.capCostReduction || '0');
-    const driveOff = parseFloat(lease.driveOff || '0');
-    const term = parseFloat(lease.leaseTerm || '36');
-    const payment = parseFloat(lease.monthlyPayment || '0');
-    const resPct = parseFloat(lease.residualPercent || '0');
-    const resDol = residualMode === 'dollar'
-      ? parseFloat(lease.residualDollar || '0')
-      : (msrp * resPct / 100);
-    const tradeNetPositive = showTradeIn && tradeIn.dealerOffer ? Math.max(netTradeIn, 0) : 0;
+  function buildRequest(): AnalysisRequest {
+    const v = parseVehicle(vehicleYMM);
+    const notes = creditScore ? `Buyer credit score range: ${creditScore}` : '';
 
-    const capCost = sp > 0 ? sp + acq + doc : 0;
-    const adjCapCost = Math.max(capCost - ccr - tradeNetPositive, 0);
-    const totalMonthly = payment * term;
-    const totalPaid = totalMonthly + driveOff;
-
-    return { sp, msrp, acq, doc, ccr, driveOff, capCost, adjCapCost, tradeNetPositive, term, payment, totalMonthly, totalPaid, resDol };
-  }, [dealType, lease, residualMode, showTradeIn, tradeIn, netTradeIn]);
-
-  // ── Autofill ─────────────────────────────────────────────────────────────────
-  const applyExtracted = useCallback((raw: Record<string, unknown>) => {
-    const str = (v: unknown): string => (v != null && v !== '' && v !== 0) ? String(v) : '';
-    const filled = new Set<string>();
-
-    if (raw.dealType === 'lease' || raw.dealType === 'finance') setDealType(raw.dealType as 'lease' | 'finance');
-
-    if (raw.state && typeof raw.state === 'string') {
-      const code = raw.state.toUpperCase().trim().slice(0, 2);
-      if (STATE_TAX_DATA[code]) { setState(code); filled.add('state'); }
-    }
-
-    setLease(p => {
-      const n = { ...p };
-      const maybeSet = (f: keyof LeaseFormData, v: unknown) => {
-        const s = str(v);
-        if (s && !p[f]) { (n as Record<string, string>)[f] = s; filled.add(`lease.${f}`); }
+    if (dealType === 'lease') {
+      return {
+        dealType: 'lease',
+        state: '',
+        lease: {
+          vehicleYear: v.year, vehicleMake: v.make, vehicleModel: v.model, vehicleTrim: '',
+          msrp, sellingPrice, rebates: '', moneyFactor: '', residualPercent: '', residualDollar: '',
+          leaseTerm, monthlyPayment, driveOff: '', capCostReduction: downPayment,
+          acquisitionFee: '', dispositionFee: '', milesPerYear: '12000', docFee: '',
+        },
+        ...(showTradeIn && tradeOffer ? { tradeIn: buildTradeIn() } : {}),
+        ...(notes ? { notes } : {}),
       };
-      maybeSet('vehicleYear', raw.year);
-      maybeSet('vehicleMake', raw.make);
-      maybeSet('vehicleModel', raw.model);
-      maybeSet('vehicleTrim', raw.trim);
-      maybeSet('msrp', raw.msrp);
-      maybeSet('sellingPrice', raw.sellingPrice);
-      maybeSet('moneyFactor', raw.moneyFactor);
-      maybeSet('residualPercent', raw.residualPercent);
-      maybeSet('residualDollar', raw.residualValue);
-      maybeSet('monthlyPayment', raw.monthlyPayment);
-      maybeSet('driveOff', raw.dueAtSigning);
-      maybeSet('capCostReduction', raw.capCostReduction ?? raw.downPayment);
-      maybeSet('acquisitionFee', raw.acquisitionFee);
-      maybeSet('docFee', raw.docFee);
-      if (raw.leaseTerm) { const v = str(raw.leaseTerm); if (LEASE_TERM_OPTIONS.includes(v)) { n.leaseTerm = v; filled.add('lease.leaseTerm'); } }
-      if (raw.annualMiles) { const v = str(raw.annualMiles); if (LEASE_MILES_OPTIONS.includes(v)) { n.milesPerYear = v; filled.add('lease.milesPerYear'); } }
-      return n;
-    });
-
-    setFinance(p => {
-      const n = { ...p };
-      const maybeSet = (f: keyof FinanceFormData, v: unknown) => {
-        const s = str(v);
-        if (s && !p[f]) { (n as Record<string, string>)[f] = s; filled.add(`finance.${f}`); }
+    } else {
+      return {
+        dealType: 'finance',
+        state: '',
+        finance: {
+          vehicleYear: v.year, vehicleMake: v.make, vehicleModel: v.model, vehicleTrim: '',
+          msrp, negotiatedPrice: sellingPrice, rebates: '', downPayment, amountFinanced: '',
+          apr, loanTerm: '60', monthlyPayment, outTheDoorPrice: '', docFee: '', vehicleMileage: '',
+        },
+        ...(showTradeIn && tradeOffer ? { tradeIn: buildTradeIn() } : {}),
+        ...(notes ? { notes } : {}),
       };
-      maybeSet('vehicleYear', raw.year);
-      maybeSet('vehicleMake', raw.make);
-      maybeSet('vehicleModel', raw.model);
-      maybeSet('vehicleTrim', raw.trim);
-      maybeSet('msrp', raw.msrp);
-      maybeSet('negotiatedPrice', raw.sellingPrice);
-      maybeSet('downPayment', raw.downPayment);
-      maybeSet('amountFinanced', raw.amountFinanced);
-      maybeSet('apr', raw.apr);
-      maybeSet('monthlyPayment', raw.monthlyPayment);
-      maybeSet('docFee', raw.docFee);
-      maybeSet('vehicleMileage', raw.mileage);
-      maybeSet('outTheDoorPrice', raw.outTheDoor);
-      if (raw.loanTerm) { const v = str(raw.loanTerm); if (FINANCE_TERM_OPTIONS.includes(v)) { n.loanTerm = v; filled.add('finance.loanTerm'); } }
-      return n;
-    });
-
-    setAdditionalFees(p => {
-      const n = { ...p };
-      if (raw.salesTax && !p.salesTax) { n.salesTax = str(raw.salesTax); filled.add('salesTax'); }
-      if (raw.titleAndReg && !p.titleReg) { n.titleReg = str(raw.titleAndReg); filled.add('titleReg'); }
-      return n;
-    });
-
-    const hasBundled = raw.gapInsurance || raw.extendedWarranty || raw.tireAndWheel || raw.paintProtection;
-    if (hasBundled) {
-      setShowBundled(true);
-      setBundled(p => {
-        const n = { ...p };
-        if (raw.gapInsurance && !p.gapInsurance) { n.gapInsurance = str(raw.gapInsurance); filled.add('gapInsurance'); }
-        if (raw.extendedWarranty && !p.extendedWarranty) { n.extendedWarranty = str(raw.extendedWarranty); filled.add('extendedWarranty'); }
-        if (raw.tireAndWheel && !p.tireWheelProtection) { n.tireWheelProtection = str(raw.tireAndWheel); filled.add('tireWheel'); }
-        if (raw.paintProtection && !p.paintInteriorProtection) { n.paintInteriorProtection = str(raw.paintProtection); filled.add('paint'); }
-        return n;
-      });
     }
+  }
 
-    if (raw.tradeInValue || raw.tradeInPayoff) {
-      setShowTradeIn(true);
-      setTradeIn(p => {
-        const n = { ...p };
-        if (raw.tradeInValue && !p.dealerOffer) { n.dealerOffer = str(raw.tradeInValue); filled.add('trade.dealerOffer'); }
-        if (raw.tradeInPayoff && !p.payoffAmount) { n.payoffAmount = str(raw.tradeInPayoff); filled.add('trade.payoff'); }
-        return n;
+  // ── runAnalysis ──────────────────────────────────────────────────────────────
+
+  async function runAnalysis(overrideRequest?: AnalysisRequest) {
+    setError('');
+    setPhase('analyzing');
+
+    try {
+      const payload = overrideRequest ?? buildRequest();
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Analysis failed');
+      setAnalysis(data.analysis);
+
+      // Save session for negotiation-support
+      // Use overrideRequest fields when available (avoids stale state on auto-analysis from upload)
+      const effectiveLease = payload.lease;
+      const effectiveFinance = payload.finance;
+      const effectiveDealType = payload.dealType;
+      const vYear = effectiveLease?.vehicleYear || effectiveFinance?.vehicleYear || parseVehicle(vehicleYMM).year;
+      const vMake = effectiveLease?.vehicleMake || effectiveFinance?.vehicleMake || parseVehicle(vehicleYMM).make;
+      const vModel = effectiveLease?.vehicleModel || effectiveFinance?.vehicleModel || parseVehicle(vehicleYMM).model;
+      const effectiveSellingPrice = effectiveLease?.sellingPrice || effectiveFinance?.negotiatedPrice || sellingPrice;
+      const effectiveMonthlyPayment = effectiveLease?.monthlyPayment || effectiveFinance?.monthlyPayment || monthlyPayment;
+      const effectiveTradeIn = payload.tradeIn;
+      try {
+        localStorage.setItem('sow_session', JSON.stringify({
+          dealType: effectiveDealType, state: '', grade: data.analysis.grade, headline: data.analysis.headline,
+          vehicleYear: vYear, vehicleMake: vMake, vehicleModel: vModel, vehicleTrim: '',
+          sellingPrice: effectiveSellingPrice, monthlyPayment: effectiveMonthlyPayment,
+          hasTradeIn: !!effectiveTradeIn,
+          tradeInVehicle: effectiveTradeIn ? `${effectiveTradeIn.year} ${effectiveTradeIn.make} ${effectiveTradeIn.model}`.trim() : '',
+          tradeInOffer: effectiveTradeIn?.dealerOffer || '',
+          tradeInPayoff: effectiveTradeIn?.payoffAmount || '',
+          hasUploadedQuote: !!vMake,
+          lease: effectiveDealType === 'lease' ? effectiveLease : null,
+          finance: effectiveDealType === 'finance' ? effectiveFinance : null,
+        }));
+      } catch { /* ignore */ }
+
+      setPhase('results');
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setPhase('upload');
+      setShowManualForm(true);
     }
+  }
 
-    // Build summary banner
-    const parts: string[] = [];
-    if (raw.year || raw.make || raw.model) parts.push([raw.year, raw.make, raw.model].filter(Boolean).join(' '));
-    if (raw.dealType) parts.push(String(raw.dealType).charAt(0).toUpperCase() + String(raw.dealType).slice(1));
-    if (raw.monthlyPayment) parts.push(`$${Math.round(Number(raw.monthlyPayment))}/mo`);
-    if (raw.leaseTerm) parts.push(`${raw.leaseTerm} mo lease`);
-    else if (raw.loanTerm) parts.push(`${raw.loanTerm} mo loan`);
-    if (raw.msrp) parts.push(`$${Number(raw.msrp).toLocaleString()} MSRP`);
-    setAutofillSummary(parts.length > 0 ? `Found: ${parts.join(' · ')}` : 'Fields pre-filled');
-
-    setAutofillHighlight(new Set(filled));
-    setTimeout(() => setAutofillHighlight(new Set()), 8000);
-  }, []);
-
+  // ── handleFileChange ─────────────────────────────────────────────────────────
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setIsExtractingDoc(true);
-    setDocStatus({ type: 'idle', msg: '' });
-    setAutofillSummary('');
+    setIsExtracting(true);
+    setError('');
 
-    // Persist the file to sessionStorage so negotiation-support can attach it
+    // Save to localStorage for negotiation-support page
     if (file.size <= 3.5 * 1024 * 1024) {
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          sessionStorage.setItem('sow_quote_b64', JSON.stringify({
-            filename: file.name,
-            type: file.type,
-            data: reader.result as string,
+          localStorage.setItem('sow_quote_b64', JSON.stringify({
+            filename: file.name, type: file.type, data: reader.result,
           }));
-        } catch { /* sessionStorage full */ }
+        } catch { /* ignore */ }
       };
       reader.readAsDataURL(file);
     }
@@ -454,129 +237,167 @@ export default function AnalyzePage() {
       const res = await fetch('/api/extract-document', { method: 'POST', body: fd });
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
-      applyExtracted(data.data);
-      setDocStatus({ type: 'success', msg: 'Review all fields — amounts on quotes can be formatted differently than expected.' });
+
+      const extracted = data.data as Record<string, unknown>;
+      const str = (v: unknown) => v != null && v !== '' ? String(v) : '';
+
+      // Apply extracted values to form state
+      const extMake = str(extracted.make);
+      const extModel = str(extracted.model);
+      const extYear = str(extracted.year);
+      const extYMM = [extYear, extMake, extModel].filter(Boolean).join(' ');
+
+      if (extYMM) setVehicleYMM(extYMM);
+      if (extracted.msrp) setMsrp(str(extracted.msrp));
+      if (extracted.sellingPrice) setSellingPrice(str(extracted.sellingPrice));
+      if (extracted.monthlyPayment) setMonthlyPayment(str(extracted.monthlyPayment));
+      if (extracted.capCostReduction || extracted.downPayment)
+        setDownPayment(str(extracted.capCostReduction || extracted.downPayment));
+      if (extracted.apr) setApr(str(extracted.apr));
+      const extractedDealType: DealType = extracted.dealType === 'finance' ? 'finance' : 'lease';
+      setDealType(extractedDealType);
+      const termVal = str(extracted.leaseTerm);
+      if (['24', '36', '39', '42', '48'].includes(termVal)) setLeaseTerm(termVal);
+
+      // Handle trade-in from extraction
+      let extractedTradeOffer = '';
+      let extractedTradeOwed = '';
+      if (extracted.tradeInValue || extracted.tradeInPayoff) {
+        setShowTradeIn(true);
+        if (extracted.tradeInValue) {
+          extractedTradeOffer = str(extracted.tradeInValue);
+          setTradeOffer(extractedTradeOffer);
+        }
+        if (extracted.tradeInPayoff) {
+          extractedTradeOwed = str(extracted.tradeInPayoff);
+          setTradeOwed(extractedTradeOwed);
+        }
+      }
+
+      // Check minimums
+      const hasVehicle = !!(extMake && extModel);
+      const hasPrice = !!(str(extracted.sellingPrice) || str(extracted.monthlyPayment));
+
+      setNeedsVehicle(!hasVehicle);
+      setNeedsPrice(!hasPrice);
+
+      if (hasVehicle && hasPrice) {
+        // Build request directly from extracted values to avoid stale state
+        const v = parseVehicle(extYMM);
+        const notes = '';
+        const directRequest: AnalysisRequest = extractedDealType === 'lease' ? {
+          dealType: 'lease',
+          state: '',
+          lease: {
+            vehicleYear: v.year, vehicleMake: v.make, vehicleModel: v.model, vehicleTrim: '',
+            msrp: str(extracted.msrp), sellingPrice: str(extracted.sellingPrice),
+            rebates: '', moneyFactor: '', residualPercent: '', residualDollar: '',
+            leaseTerm: termVal && ['24', '36', '39', '42', '48'].includes(termVal) ? termVal : '36',
+            monthlyPayment: str(extracted.monthlyPayment), driveOff: '',
+            capCostReduction: str(extracted.capCostReduction || extracted.downPayment),
+            acquisitionFee: '', dispositionFee: '', milesPerYear: '12000', docFee: '',
+          },
+          ...(extractedTradeOffer ? {
+            tradeIn: {
+              year: '', make: '', model: '', mileage: '', condition: 'Good',
+              dealerOffer: extractedTradeOffer, payoffAmount: extractedTradeOwed,
+              kbbEstimate: '', knownIssues: '',
+            },
+          } : {}),
+          ...(notes ? { notes } : {}),
+        } : {
+          dealType: 'finance',
+          state: '',
+          finance: {
+            vehicleYear: v.year, vehicleMake: v.make, vehicleModel: v.model, vehicleTrim: '',
+            msrp: str(extracted.msrp), negotiatedPrice: str(extracted.sellingPrice),
+            rebates: '', downPayment: str(extracted.downPayment), amountFinanced: '',
+            apr: str(extracted.apr), loanTerm: '60',
+            monthlyPayment: str(extracted.monthlyPayment),
+            outTheDoorPrice: '', docFee: '', vehicleMileage: '',
+          },
+          ...(extractedTradeOffer ? {
+            tradeIn: {
+              year: '', make: '', model: '', mileage: '', condition: 'Good',
+              dealerOffer: extractedTradeOffer, payoffAmount: extractedTradeOwed,
+              kbbEstimate: '', knownIssues: '',
+            },
+          } : {}),
+          ...(notes ? { notes } : {}),
+        };
+        setIsExtracting(false);
+        await runAnalysis(directRequest);
+      } else {
+        setPhase('needs-fields');
+        setIsExtracting(false);
+      }
     } catch (err) {
-      setDocStatus({ type: 'error', msg: err instanceof Error ? err.message : 'Could not read that document.' });
+      setError(err instanceof Error ? err.message : 'Could not read that document. Try a clearer photo or enter manually.');
+      setIsExtracting(false);
     }
-    setIsExtractingDoc(false);
   }
 
-  function handleClear() {
-    setDealType('lease'); setState('');
-    setLease(LEASE_DEFAULTS); setFinance(FINANCE_DEFAULTS);
-    setTradeIn(TRADEIN_DEFAULTS); setShowTradeIn(false);
-    setBundled(BUNDLED_DEFAULTS); setShowBundled(false);
-    setNotes('');
-    setDocStatus({ type: 'idle', msg: '' });
-    setAutofillSummary(''); setAutofillHighlight(new Set());
-    setResidualMode('percent'); setUsePaymentRange(false);
-    setPaymentRangeVal({ low: '', high: '' }); setError('');
-    setAdditionalFees({ salesTax: '', titleReg: '', otherAmount: '', otherLabel: '' });
-    setShowAdditionalFees(false);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    sessionStorage.removeItem('sow_quote_b64');
+  // ── handleNeedsFieldsSubmit ──────────────────────────────────────────────────
+
+  async function handleNeedsFieldsSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!sellingPrice && !monthlyPayment) {
+      setError('Please enter at least a selling price or monthly payment.');
+      return;
+    }
+    await runAnalysis();
   }
 
-  const updateLease = (f: keyof LeaseFormData, v: string) => setLease(p => ({ ...p, [f]: v }));
-  const updateFinance = (f: keyof FinanceFormData, v: string) => setFinance(p => ({ ...p, [f]: v }));
+  // ── handleCorrectFields ──────────────────────────────────────────────────────
 
-  function handleDealTypeChange(newType: 'lease' | 'finance') {
-    if (newType === dealType) return;
-    if (newType === 'finance') {
-      setFinance(p => ({
-        ...p,
-        vehicleYear: lease.vehicleYear,
-        vehicleMake: lease.vehicleMake,
-        vehicleModel: lease.vehicleModel,
-        vehicleTrim: lease.vehicleTrim,
-        msrp: lease.msrp,
-        negotiatedPrice: lease.sellingPrice,
-        rebates: lease.rebates,
-        downPayment: lease.capCostReduction,
-        docFee: lease.docFee,
-      }));
-    } else {
-      setLease(p => ({
-        ...p,
-        vehicleYear: finance.vehicleYear,
-        vehicleMake: finance.vehicleMake,
-        vehicleModel: finance.vehicleModel,
-        vehicleTrim: finance.vehicleTrim,
-        msrp: finance.msrp,
-        sellingPrice: finance.negotiatedPrice,
-        rebates: finance.rebates,
-        capCostReduction: finance.downPayment,
-        docFee: finance.docFee,
-      }));
-    }
+  function handleCorrectFields() {
+    const v = parseVehicle(vehicleYMM);
+    const t = showTradeIn ? parseVehicle(tradeYMM) : null;
+    const prefill = {
+      dealType,
+      state: '',
+      lease: dealType === 'lease' ? {
+        vehicleYear: v.year, vehicleMake: v.make, vehicleModel: v.model, vehicleTrim: '',
+        msrp, sellingPrice, rebates: '', moneyFactor: '', residualPercent: '', residualDollar: '',
+        leaseTerm, monthlyPayment, driveOff: '', capCostReduction: downPayment,
+        acquisitionFee: '', dispositionFee: '', milesPerYear: '12000', docFee: '',
+      } : null,
+      finance: dealType === 'finance' ? {
+        vehicleYear: v.year, vehicleMake: v.make, vehicleModel: v.model, vehicleTrim: '',
+        msrp, negotiatedPrice: sellingPrice, rebates: '', downPayment, amountFinanced: '',
+        apr, loanTerm: '60', monthlyPayment, outTheDoorPrice: '', docFee: '', vehicleMileage: '',
+      } : null,
+      tradeIn: showTradeIn && t ? {
+        year: t.year, make: t.make, model: t.model, mileage: '', condition: 'Good',
+        dealerOffer: tradeOffer, payoffAmount: tradeOwed, kbbEstimate: '', knownIssues: '',
+      } : null,
+    };
+    try { sessionStorage.setItem('sow_prefill', JSON.stringify(prefill)); } catch { /* ignore */ }
+    router.push('/analyze/advanced');
+  }
+
+  // ── handleDealTypeToggle ─────────────────────────────────────────────────────
+
+  function handleDealTypeToggle(newType: DealType) {
+    // Preserve shared values when switching
     setDealType(newType);
   }
-  const updateTradeIn = (f: keyof TradeInData, v: string) => setTradeIn(p => ({ ...p, [f]: v }));
-  const updateBundled = (f: keyof BundledCosts, v: string) => setBundled(p => ({ ...p, [f]: v }));
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setIsAnalyzing(true);
-    if (analysis) setPreviousGrade(analysis.grade);
+  // ── Phase: analyzing ─────────────────────────────────────────────────────────
 
-    // Compute OTD for finance if not explicitly entered
-    const computedOtd = financeSummary ? Math.round(financeSummary.subtotal - financeSummary.netTrade).toString() : '';
-
-    const payload: AnalysisRequest = {
-      dealType, state,
-      ...(dealType === 'lease' ? { lease } : {
-        finance: {
-          ...finance,
-          outTheDoorPrice: finance.outTheDoorPrice || computedOtd,
-        },
-      }),
-      ...(showTradeIn && tradeIn.dealerOffer ? { tradeIn } : {}),
-      ...(showBundled ? { bundledCosts: bundled } : {}),
-      ...(paymentGap !== undefined ? { paymentGap } : {}),
-      ...(usePaymentRange && paymentRangeVal.low && paymentRangeVal.high ? { paymentRange: paymentRangeVal } : {}),
-      ...(notes.trim() ? { notes: notes.trim() } : {}),
-    };
-
-    try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Analysis failed');
-      setAnalysis(data.analysis);
-      setShowForm(false);
-      setIsAdjustMode(false);
-      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
-    }
-    setIsAnalyzing(false);
-  }
-
-  function handleAdjust() {
-    setIsAdjustMode(true);
-    setShowForm(true);
-    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-  }
-
-  // ── Loading ──────────────────────────────────────────────────────────────────
-  if (loaderVisible) {
+  if (phase === 'analyzing') {
     return <AnalyzingOverlay />;
   }
 
-  // ── Results ──────────────────────────────────────────────────────────────────
-  if (!showForm && analysis) {
+  // ── Phase: results ───────────────────────────────────────────────────────────
+
+  if (phase === 'results' && analysis) {
     const colors = gradeColor(analysis.grade);
     const rec = recStyle(analysis.recommendation);
-    return (
-      <>
-      <div ref={resultsRef} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-3 print-page">
-        {previousGrade && <GradeComparison prev={previousGrade} current={analysis.grade} />}
+    const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
 
+    return (
+      <div ref={resultsRef} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-3 print-page">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-7 print-card">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <GradeCircle grade={analysis.grade} size="lg" />
@@ -593,36 +414,38 @@ export default function AnalyzePage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 no-print">
-          <button onClick={handleAdjust} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 transition">
+          <button
+            onClick={handleCorrectFields}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 transition"
+          >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-            What if I negotiate?
+            Correct missing or wrong fields
           </button>
           <button onClick={() => window.print()} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 transition">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             Save as PDF
           </button>
-          {(['B', 'C', 'D', 'F'] as string[]).includes(analysis.grade) && (() => {
-            const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
-            return (
-              <button
-                onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
-              >
-                Ask a Pro — $39
-              </button>
-            );
-          })()}
+          {(['B', 'C', 'D', 'F'] as string[]).includes(analysis.grade) && (
+            <button
+              onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
+            >
+              Ask a Pro — $19
+            </button>
+          )}
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
-          <h2 className="font-bold text-gray-900 text-sm mb-2">Lease vs. Buy</h2>
-          <div className="flex items-start gap-3">
-            <span className={`px-2.5 py-1 rounded-full text-xs font-bold flex-shrink-0 ${analysis.leaseVsBuy.recommendation === 'lease' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
-              {analysis.leaseVsBuy.recommendation === 'lease' ? 'Lease' : 'Buy'}
-            </span>
-            <p className="text-sm text-gray-600 leading-relaxed">{analysis.leaseVsBuy.reasoning}</p>
+        {!(dealType === 'finance' && parseInt(parseVehicle(vehicleYMM).year || '9999') <= 2023) && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
+            <h2 className="font-bold text-gray-900 text-sm mb-2">Lease vs. Buy</h2>
+            <div className="flex items-start gap-3">
+              <span className={`px-2.5 py-1 rounded-full text-xs font-bold flex-shrink-0 ${analysis.leaseVsBuy.recommendation === 'lease' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                {analysis.leaseVsBuy.recommendation === 'lease' ? 'Lease' : 'Buy'}
+              </span>
+              <p className="text-sm text-gray-600 leading-relaxed">{analysis.leaseVsBuy.reasoning}</p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
           <h2 className="font-bold text-gray-900 text-sm mb-3">Deal Breakdown</h2>
@@ -645,6 +468,26 @@ export default function AnalyzePage() {
           </div>
         </div>
 
+        {(['B', 'C', 'D', 'F'] as string[]).includes(analysis.grade) && (() => {
+          const upsellCopy = getProUpsellCopy(analysis);
+          const heading = analysis.grade === 'B' ? "Looks like a decent deal. Want to talk to a pro to verify and see if there's room for improvement?" :
+            analysis.grade === 'C' ? "Want an insider's read on this deal?" :
+            analysis.grade === 'D' ? "This deal has problems — get a dealership insider in your corner." :
+            "Walk away — or get an insider's honest read before you do.";
+          return (
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 no-print">
+              <h2 className="font-bold text-gray-900 text-base mb-2">{heading}</h2>
+              {analysis.grade !== 'B' && <p className="text-sm text-gray-500 mb-4">{upsellCopy}</p>}
+              <button
+                onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all shadow-sm"
+              >
+                Ask a Pro — $19 →
+              </button>
+            </div>
+          );
+        })()}
+
         {analysis.paymentGapExplanation && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 print-card">
             <div className="flex items-start gap-2.5">
@@ -656,24 +499,6 @@ export default function AnalyzePage() {
             </div>
           </div>
         )}
-
-        {analysis.tradeIn && (
-          <div className={`rounded-2xl border p-6 print-card ${analysis.tradeIn.assessment === 'good' ? 'bg-green-50 border-green-200' : analysis.tradeIn.assessment === 'warn' ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200'}`}>
-            <h2 className="font-bold text-gray-900 text-base mb-1">Trade-In Verdict</h2>
-            <p className={`text-sm font-semibold mb-2 ${analysis.tradeIn.assessment === 'good' ? 'text-green-700' : analysis.tradeIn.assessment === 'warn' ? 'text-amber-700' : 'text-red-700'}`}>{analysis.tradeIn.headline}</p>
-            <p className="text-sm text-gray-600 leading-relaxed">{analysis.tradeIn.details}</p>
-          </div>
-        )}
-
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 print-card">
-          <div className="flex items-start gap-3">
-            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${analysis.stateTaxCredit.hasCredit ? 'bg-green-500' : 'bg-gray-300'}`} />
-            <div>
-              <p className="text-xs font-semibold text-gray-700 mb-0.5">State Trade-In Tax Credit</p>
-              <p className="text-xs text-gray-500 leading-relaxed">{analysis.stateTaxCredit.details}</p>
-            </div>
-          </div>
-        </div>
 
         {analysis.redFlags.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
@@ -701,58 +526,6 @@ export default function AnalyzePage() {
           </div>
         )}
 
-        {(['B', 'C', 'D', 'F'] as string[]).includes(analysis.grade) && (() => {
-          const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
-          const isB = analysis.grade === 'B';
-          const heading = {
-            B: 'Good deal — want to confirm there\'s nothing left on the table?',
-            C: 'Want a pro to handle this?',
-            D: 'This deal needs work — get a pro in your corner.',
-            F: "Walk away, or get a pro's honest take first.",
-          }[analysis.grade as 'B' | 'C' | 'D' | 'F'];
-          const bullets = isB ? [
-            'Confirm whether any wiggle room remains on price or rate',
-            'Identify the 1–2 asks most likely to land with this dealer',
-            'Word-for-word script for each ask',
-            'One follow-up question answered after your visit',
-          ] : [
-            'Your 3 strongest negotiation points, in priority order',
-            'Word-for-word scripts for each',
-            'How to handle the dealer\'s likely responses',
-            'Your walk-away number',
-            'One follow-up question answered after your visit',
-          ];
-          return (
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 no-print">
-              <h2 className="font-bold text-gray-900 text-base mb-2">{heading}</h2>
-              <p className="text-sm text-gray-500 mb-2">
-                {isB
-                  ? 'A former car industry pro reviews your numbers and tells you exactly what — if anything — is still worth pushing on.'
-                  : 'A former car industry pro personally reads your deal and emails you a custom strategy within 24 hours.'}
-              </p>
-              <ul className="space-y-1 mb-3">
-                {bullets.map(item => (
-                  <li key={item} className="flex items-start gap-1.5 text-sm text-gray-500">
-                    <span className="text-gray-300 select-none">—</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="text-xs text-gray-400 mb-4">
-                {isB
-                  ? 'Sometimes the answer is "you\'re done." That\'s worth knowing too. Results vary — every deal and dealer is different.'
-                  : 'Goal: save you $500–$2,500. Results vary — every deal and dealer is different.'}
-              </p>
-              <button
-                onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all shadow-sm"
-              >
-                {isB ? 'Get my final check — $39' : 'Get my strategy — $39'}
-              </button>
-            </div>
-          );
-        })()}
-
         {analysis.counterOfferScript && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
             <h2 className="font-bold text-gray-900 text-sm mb-3">Counter-Offer Script</h2>
@@ -764,529 +537,428 @@ export default function AnalyzePage() {
           <strong className="text-gray-500">Disclaimer:</strong> This analysis is AI-generated for informational purposes only and is not financial or legal advice. All figures are estimates based on the data you entered. Verify all numbers with your dealer and lender before signing any contract.
         </div>
       </div>
-      </>
     );
   }
 
-  // ── Form ─────────────────────────────────────────────────────────────────────
-  const fmt = (n: number) => n > 0 ? n.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0';
+  // ── Phase: needs-fields ──────────────────────────────────────────────────────
 
-  return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-      {!isAdjustMode && (
-        <div className="text-center mb-10">
-          <h1 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight mb-3">Grade My Deal</h1>
-          <p className="text-lg text-gray-500 max-w-xl mx-auto">Enter your numbers and get an honest grade, every red flag, and a word-for-word negotiation script. Free.</p>
-        </div>
-      )}
+  if (phase === 'needs-fields') {
+    return (
+      <div className="max-w-lg mx-auto px-4 sm:px-6 py-10">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h1 className="text-xl font-bold text-gray-900 mb-1">We read your quote — just need a couple more details</h1>
+          <p className="text-sm text-gray-500 mb-6">Fill in the missing info below and we&apos;ll finish your grade.</p>
 
-      {isAdjustMode && previousGrade && (
-        <div ref={formRef} className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <GradeCircle grade={previousGrade} size="sm" />
+          <form onSubmit={handleNeedsFieldsSubmit} className="space-y-4">
+            {/* Deal type confirmation */}
             <div>
-              <p className="font-semibold text-gray-900 text-sm">Adjust your numbers</p>
-              <p className="text-gray-500 text-xs">Previous grade: <strong>{previousGrade}</strong>. Change any field and re-run.</p>
-            </div>
-          </div>
-          <button onClick={() => { setShowForm(false); setIsAdjustMode(false); }} className="text-gray-400 hover:text-gray-600 transition">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-      )}
-
-      {/* Autofill tools */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        {autofillSummary && (
-          <div className="px-5 pt-4">
-            <div className="flex items-start gap-2.5 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
-              <svg className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              <div>
-                <p className="text-sm font-semibold text-yellow-800">{autofillSummary}</p>
-                <p className="text-xs text-yellow-700 mt-0.5">Highlighted fields were auto-filled. Review all values before submitting.</p>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Deal type</label>
+              <div className="flex gap-1.5 p-1 bg-gray-100 rounded-xl w-fit">
+                {(['lease', 'finance'] as const).map(type => (
+                  <button key={type} type="button" onClick={() => handleDealTypeToggle(type)}
+                    className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${dealType === type ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                    {type === 'lease' ? 'Lease' : 'Finance / Buy'}
+                  </button>
+                ))}
               </div>
             </div>
-          </div>
-        )}
-        <div className="p-5 flex flex-col items-center text-center">
-          <p className="text-sm font-semibold text-gray-700 mb-1">One-click quote upload</p>
-          <p className="text-xs text-gray-400 mb-4">Photo or PDF of your dealer quote — we&apos;ll read it and fill your form automatically</p>
-          <label className={`cursor-pointer inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${isExtractingDoc ? 'bg-blue-300 text-white cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-400 text-white'}`}>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-            {isExtractingDoc ? 'Extracting…' : 'Upload your quote'}
-            <input ref={fileInputRef} type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} disabled={isExtractingDoc} />
-          </label>
-          <p className="text-xs text-gray-400 mt-3">JPG, PNG, HEIC or PDF</p>
-          {docStatus.type !== 'idle' && (
-            <p className={`text-xs mt-2 ${docStatus.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{docStatus.msg}</p>
-          )}
+
+            {needsVehicle && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Year, Make &amp; Model</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 2025 Honda CR-V"
+                  value={vehicleYMM}
+                  onChange={e => setVehicleYMM(e.target.value)}
+                  required
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                />
+              </div>
+            )}
+
+            {needsPrice && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Enter at least one price</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Selling price ($)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                      <input
+                        type="number"
+                        placeholder="35,500"
+                        value={sellingPrice}
+                        onChange={e => setSellingPrice(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Monthly payment ($)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                      <input
+                        type="number"
+                        placeholder="399"
+                        value={monthlyPayment}
+                        onChange={e => setMonthlyPayment(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{error}</div>}
+
+            <button type="submit" className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl text-sm transition-all shadow-sm">
+              Grade my deal →
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Phase: upload ────────────────────────────────────────────────────────────
+
+  const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
+
+  return (
+    <div className="max-w-lg mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      {/* Trust pill */}
+      <div className="flex justify-center mb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-500">
+          <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+          No email required · Free always · Grade in 30 seconds
         </div>
       </div>
 
-      {/* Quick grade shortcut — shown after successful upload */}
-      {autofillSummary && (
-        <div className="mb-4 flex flex-col items-center text-center">
-          <p className="text-xs text-gray-400 mb-2">We filled in what we found — or scroll down to review and adjust any fields</p>
+      {/* Heading */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight mb-3">Grade My Deal</h1>
+        <p className="text-base text-gray-500">Upload your dealer quote and get your full grade in 30 seconds.</p>
+      </div>
+
+      {/* Upload button */}
+      <div className="flex flex-col items-center mb-2">
+        <label className={`cursor-pointer inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl text-base font-bold transition-all shadow-sm ${isExtracting ? 'bg-blue-300 text-white cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}>
+          {isExtracting ? (
+            <>
+              <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              Reading your quote…
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+              Upload your quote
+            </>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,.pdf"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={isExtracting}
+          />
+        </label>
+        <p className="text-xs text-gray-400 mt-2">JPG, PNG, HEIC or PDF</p>
+        {error && <p className="text-sm text-red-600 mt-2 text-center max-w-xs">{error}</p>}
+      </div>
+
+      {/* Manual entry toggle */}
+      <div className="text-center mt-4 mb-6 space-y-2">
+        <div>
           <button
             type="button"
-            onClick={() => formElementRef.current?.requestSubmit()}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl transition-all"
+            onClick={() => setShowManualForm(v => !v)}
+            className="text-sm text-blue-600 hover:text-blue-700 underline underline-offset-2"
           >
-            Grade my deal →
+            {showManualForm ? 'Hide manual entry' : "Don't have a quote? Enter manually — 6 quick fields →"}
           </button>
         </div>
-      )}
+        <div>
+          <Link href="/analyze/advanced" className="text-xs text-gray-400 hover:text-gray-500 transition">
+            Need every field? Advanced manual →
+          </Link>
+        </div>
+      </div>
 
-      {/* Main form */}
-      <div ref={!isAdjustMode ? formRef : undefined} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <form ref={formElementRef} onSubmit={handleSubmit}>
-          <div className="p-6 pb-0">
-            <p className="text-xs text-gray-400 mb-5">Enter what you can — the more you fill in, the better the analysis.</p>
-            {/* Deal type toggle */}
-            <div className="flex gap-1.5 p-1 bg-gray-100 rounded-xl w-fit">
-              {(['lease', 'finance'] as const).map(type => (
-                <button key={type} type="button" onClick={() => handleDealTypeChange(type)}
-                  className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${dealType === type ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-                  {type === 'lease' ? 'Lease' : 'Finance / Buy'}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-gray-400 mt-2 mb-6">Your information is saved if you switch modes</p>
-
-            {/* Vehicle */}
-            <SectionLabel>Vehicle</SectionLabel>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-              {dealType === 'lease' ? (
-                <>
-                  <Field label="Year" placeholder="2025" isHighlighted={hl('lease.vehicleYear')} value={lease.vehicleYear} onChange={e => updateLease('vehicleYear', e.target.value)} />
-                  <Field label="Make" placeholder="Honda" isHighlighted={hl('lease.vehicleMake')} value={lease.vehicleMake} onChange={e => updateLease('vehicleMake', e.target.value)} />
-                  <Field label="Model" placeholder="CR-V" isHighlighted={hl('lease.vehicleModel')} value={lease.vehicleModel} onChange={e => updateLease('vehicleModel', e.target.value)} />
-                  <Field label="Trim" placeholder="EX-L (opt.)" isHighlighted={hl('lease.vehicleTrim')} value={lease.vehicleTrim} onChange={e => updateLease('vehicleTrim', e.target.value)} />
-                </>
-              ) : (
-                <>
-                  <Field label="Year" placeholder="2025" isHighlighted={hl('finance.vehicleYear')} value={finance.vehicleYear} onChange={e => updateFinance('vehicleYear', e.target.value)} />
-                  <Field label="Make" placeholder="Toyota" isHighlighted={hl('finance.vehicleMake')} value={finance.vehicleMake} onChange={e => updateFinance('vehicleMake', e.target.value)} />
-                  <Field label="Model" placeholder="Camry" isHighlighted={hl('finance.vehicleModel')} value={finance.vehicleModel} onChange={e => updateFinance('vehicleModel', e.target.value)} />
-                  <Field label="Trim" placeholder="XSE (opt.)" isHighlighted={hl('finance.vehicleTrim')} value={finance.vehicleTrim} onChange={e => updateFinance('vehicleTrim', e.target.value)} />
-                </>
-              )}
-            </div>
-            {dealType === 'finance' && (
-              <div className="mb-6">
-                <Field label="Current Mileage (used vehicles only)" placeholder="e.g. 28000" type="number" isHighlighted={hl('finance.vehicleMileage')} hint="Skip for new vehicles" value={finance.vehicleMileage} onChange={e => updateFinance('vehicleMileage', e.target.value)} />
-              </div>
-            )}
+      {/* Streamlined manual form */}
+      {showManualForm && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+          {/* Deal type toggle */}
+          <div className="flex gap-1.5 p-1 bg-gray-100 rounded-xl w-fit mb-5">
+            {(['lease', 'finance'] as const).map(type => (
+              <button key={type} type="button" onClick={() => handleDealTypeToggle(type)}
+                className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${dealType === type ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+                {type === 'lease' ? 'Lease' : 'Finance / Buy'}
+              </button>
+            ))}
           </div>
 
-          <div className="px-6 pb-6 space-y-5">
-            {/* ── DEAL DETAILS — new field order ── */}
+          <div className="space-y-4">
+            {/* Field 1: Year, Make & Model */}
             <div>
-              <SectionLabel>Deal Details</SectionLabel>
-              <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Year, Make &amp; Model</label>
+              <input
+                type="text"
+                placeholder="e.g. 2025 Honda CR-V"
+                value={vehicleYMM}
+                onChange={e => setVehicleYMM(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              />
+            </div>
 
-                {/* 1. Selling price — LEAD */}
-                {dealType === 'lease' ? (
-                  <Field
-                    label="Selling price (what they're charging for the car)"
-                    prefix="$" placeholder="40,500" type="number"
-                    isHighlighted={hl('lease.sellingPrice')}
-                    value={lease.sellingPrice} onChange={e => updateLease('sellingPrice', e.target.value)}
-                    hint="The negotiated cap cost — this IS negotiable, push below MSRP"
-                  />
-                ) : (
-                  <Field
-                    label="Selling price (what they're charging for the car)"
-                    prefix="$" placeholder="35,500" type="number"
-                    isHighlighted={hl('finance.negotiatedPrice')}
-                    value={finance.negotiatedPrice} onChange={e => updateFinance('negotiatedPrice', e.target.value)}
-                    hint="The negotiated price — always agree on this before discussing monthly payments"
-                  />
-                )}
+            {/* Field 2: MSRP */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">MSRP ($)</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                <input
+                  type="number"
+                  placeholder="43,000"
+                  value={msrp}
+                  onChange={e => setMsrp(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                />
+              </div>
+            </div>
 
-                {/* 1b. Rebates */}
-                {dealType === 'lease' ? (
-                  <Field label="Manufacturer rebates / incentives" prefix="$" placeholder="1,500" type="number"
-                    value={lease.rebates} onChange={e => updateLease('rebates', e.target.value)}
-                    hint="Cash back, loyalty, conquest, military, college grad, etc. Leave blank if none." />
-                ) : (
-                  <Field label="Manufacturer rebates / incentives" prefix="$" placeholder="1,500" type="number"
-                    value={finance.rebates} onChange={e => updateFinance('rebates', e.target.value)}
-                    hint="Cash back, loyalty, conquest, military, college grad, etc. Leave blank if none." />
-                )}
+            {/* Field 3: Selling price */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Selling price ($)</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                <input
+                  type="number"
+                  placeholder={dealType === 'lease' ? '40,500' : '35,500'}
+                  value={sellingPrice}
+                  onChange={e => setSellingPrice(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Include any rebates or incentives reflected in this price</p>
+            </div>
 
-                {/* 2. MSRP */}
-                {dealType === 'lease' ? (
-                  <Field label="MSRP / sticker price" prefix="$" placeholder="43,000" type="number"
-                    isHighlighted={hl('lease.msrp')} value={lease.msrp} onChange={e => updateLease('msrp', e.target.value)} />
-                ) : (
-                  <Field label="MSRP / sticker price" prefix="$" placeholder="38,000" type="number"
-                    isHighlighted={hl('finance.msrp')} value={finance.msrp} onChange={e => updateFinance('msrp', e.target.value)} />
-                )}
-
-                {/* 3. Monthly payment */}
+            {dealType === 'lease' ? (
+              <>
+                {/* Lease Field 4: Monthly payment */}
                 <div>
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">Monthly payment quoted</p>
-                      <p className="text-xs text-gray-400">Focus on total cost, not the monthly payment</p>
-                    </div>
-                    <button type="button" onClick={() => setUsePaymentRange(!usePaymentRange)} className="text-xs text-blue-600 hover:text-blue-700 flex-shrink-0 ml-3 mt-0.5">
-                      {usePaymentRange ? 'Enter exact amount' : 'Have a range?'}
-                    </button>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Monthly payment ($)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                    <input
+                      type="number"
+                      placeholder="399"
+                      value={monthlyPayment}
+                      onChange={e => setMonthlyPayment(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
                   </div>
-                  {usePaymentRange ? (
-                    <div className="flex items-center gap-2">
-                      {['low', 'high'].map((k, i) => (
-                        <div key={k} className="relative flex-1">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                          <input type="number" placeholder={i === 0 ? '380' : '420'}
-                            value={paymentRangeVal[k as 'low' | 'high']}
-                            onChange={e => setPaymentRangeVal(p => ({ ...p, [k]: e.target.value }))}
-                            className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-                          {i === 0 && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm z-10">–</span>}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm select-none">$</span>
-                      {dealType === 'lease'
-                        ? <input type="number" placeholder="399" value={lease.monthlyPayment}
-                            onChange={e => updateLease('monthlyPayment', e.target.value)}
-                            className={`w-full border rounded-lg pl-7 pr-16 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${hl('lease.monthlyPayment') ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'}`} />
-                        : <input type="number" placeholder="520" value={finance.monthlyPayment}
-                            onChange={e => updateFinance('monthlyPayment', e.target.value)}
-                            className={`w-full border rounded-lg pl-7 pr-16 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${hl('finance.monthlyPayment') ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'}`} />
-                      }
-                      {paymentGap !== undefined && (
-                        <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold ${Math.abs(paymentGap) <= 25 ? 'text-green-600' : Math.abs(paymentGap) <= 75 ? 'text-amber-600' : 'text-red-600'}`}>
-                          {Math.abs(paymentGap) <= 25 ? '✓ checks out' : `${paymentGap > 0 ? '+' : ''}$${Math.round(paymentGap)} gap`}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  {paymentGap !== undefined && Math.abs(paymentGap) > 75 && !usePaymentRange && (
-                    <p className="text-xs text-red-600 mt-1">Large gap vs. calculated payment — the AI will explain what&apos;s likely causing this.</p>
-                  )}
                 </div>
 
-                {/* 4. Deal-type specific fields */}
-                {dealType === 'lease' ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    <Field label="Money factor" placeholder="0.00189" type="number" step="0.00001"
-                      isHighlighted={hl('lease.moneyFactor')} value={lease.moneyFactor} onChange={e => updateLease('moneyFactor', e.target.value)}
-                      hint="× 2400 = APR equivalent" />
-
-                    {/* Residual toggle */}
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-sm font-medium text-gray-700">Residual value</label>
-                        <div className="flex text-xs rounded-lg overflow-hidden border border-gray-200">
-                          <button type="button" onClick={() => setResidualMode('percent')} className={`px-2.5 py-1 font-medium transition ${residualMode === 'percent' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500'}`}>%</button>
-                          <button type="button" onClick={() => setResidualMode('dollar')} className={`px-2.5 py-1 font-medium transition ${residualMode === 'dollar' ? 'bg-gray-900 text-white' : 'bg-white text-gray-500'}`}>$</button>
-                        </div>
-                      </div>
-                      {residualMode === 'percent'
-                        ? <Field label="" suffix="%" placeholder="52" type="number" isHighlighted={hl('lease.residualPercent')} value={lease.residualPercent} onChange={e => updateLease('residualPercent', e.target.value)} hint="% of MSRP — higher is better" />
-                        : <Field label="" prefix="$" placeholder="22360" type="number" isHighlighted={hl('lease.residualDollar')} value={lease.residualDollar} onChange={e => updateLease('residualDollar', e.target.value)} hint="Dollar amount from lease worksheet" />
-                      }
-                    </div>
-
-                    <SelectField label="Lease term" isHighlighted={hl('lease.leaseTerm')} value={lease.leaseTerm} onChange={e => updateLease('leaseTerm', e.target.value)}>
-                      {LEASE_TERM_OPTIONS.map(m => <option key={m} value={m}>{m} months</option>)}
-                    </SelectField>
-                    <SelectField label="Annual miles" isHighlighted={hl('lease.milesPerYear')} value={lease.milesPerYear} onChange={e => updateLease('milesPerYear', e.target.value)}>
-                      {LEASE_MILES_OPTIONS.map(m => <option key={m} value={m}>{parseInt(m).toLocaleString()} mi/yr</option>)}
-                    </SelectField>
-                    <Field label="Due at signing (total on day 1)" prefix="$" placeholder="3,500" type="number"
-                      isHighlighted={hl('lease.driveOff')} value={lease.driveOff} onChange={e => updateLease('driveOff', e.target.value)}
-                      hint="Everything paid at signing: first month + taxes + fees + down payment" />
-                    <Field label="Acquisition fee" prefix="$" placeholder="650" type="number"
-                      isHighlighted={hl('lease.acquisitionFee')} value={lease.acquisitionFee} onChange={e => updateLease('acquisitionFee', e.target.value)}
-                      hint="Bank fee — $595–$925 is normal" />
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    <Field label="Amount financed" prefix="$" placeholder="27,000" type="number"
-                      isHighlighted={hl('finance.amountFinanced')} value={finance.amountFinanced} onChange={e => updateFinance('amountFinanced', e.target.value)}
-                      hint="From the contract — selling price minus down payment plus any rolled-in fees" />
-                    <div />
-                    <Field label="APR" suffix="%" placeholder="6.9" type="number" step="0.01"
-                      isHighlighted={hl('finance.apr')} value={finance.apr} onChange={e => updateFinance('apr', e.target.value)} />
-                    <SelectField label="Loan term" isHighlighted={hl('finance.loanTerm')} value={finance.loanTerm} onChange={e => updateFinance('loanTerm', e.target.value)}>
-                      {FINANCE_TERM_OPTIONS.map(m => <option key={m} value={m}>{m} months</option>)}
-                    </SelectField>
-                  </div>
-                )}
-
-                {/* 5. Down payment / cap cost reduction */}
-                {dealType === 'lease' ? (
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <label className="text-sm font-medium text-gray-700">Down payment / cap cost reduction</label>
-                      <span className="relative group cursor-help">
-                        <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span className="absolute bottom-5 left-0 w-56 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none z-10 transition">
-                          Putting money down on a lease rarely makes financial sense — you lose it if the car is totaled. Keep this $0 if possible.
-                        </span>
-                      </span>
-                    </div>
-                    <Field label="" prefix="$" placeholder="0" type="number"
-                      isHighlighted={hl('lease.capCostReduction')} value={lease.capCostReduction} onChange={e => updateLease('capCostReduction', e.target.value)} />
-                  </div>
-                ) : (
-                  <Field label="Down payment" prefix="$" placeholder="3,000" type="number"
-                    isHighlighted={hl('finance.downPayment')} value={finance.downPayment} onChange={e => updateFinance('downPayment', e.target.value)}
-                    hint="Cash from your pocket at signing" />
-                )}
-
-                {/* 6. Doc fee */}
-                {dealType === 'lease' ? (
-                  <Field label="Doc fee" prefix="$" placeholder="399" type="number"
-                    isHighlighted={hl('lease.docFee')} value={lease.docFee} onChange={e => updateLease('docFee', e.target.value)}
-                    hint="Average $150–500. Above $500 is mostly profit — ask them to reduce it." />
-                ) : (
-                  <Field label="Doc fee" prefix="$" placeholder="399" type="number"
-                    isHighlighted={hl('finance.docFee')} value={finance.docFee} onChange={e => updateFinance('docFee', e.target.value)}
-                    hint="Average $150–500. Above $500 is mostly profit — ask them to reduce it." />
-                )}
-
-                {/* 7. Additional fees (collapsible) */}
+                {/* Lease Field 5: Down payment */}
                 <div>
-                  <button type="button" onClick={() => setShowAdditionalFees(!showAdditionalFees)}
-                    className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition">
-                    <svg className={`w-4 h-4 transition-transform ${showAdditionalFees ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                    Additional fees <span className="text-gray-400">(optional but helps the calculation)</span>
-                  </button>
-                  {showAdditionalFees && (
-                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                      <Field label="Sales tax ($)" prefix="$" placeholder="auto-estimated from state" type="number"
-                        isHighlighted={hl('salesTax')} value={additionalFees.salesTax}
-                        onChange={e => setAdditionalFees(p => ({ ...p, salesTax: e.target.value }))}
-                        hint={taxInfo ? `${taxInfo.salesTaxRate}% in ${state} — leave blank to use estimate` : 'Leave blank to estimate from state'} />
-                      <Field label="Title & registration ($)" prefix="$" placeholder="auto-estimated from state" type="number"
-                        isHighlighted={hl('titleReg')} value={additionalFees.titleReg}
-                        onChange={e => setAdditionalFees(p => ({ ...p, titleReg: e.target.value }))}
-                        hint={taxInfo ? `~$${taxInfo.avgTitleReg} estimated for ${state}` : 'Leave blank to estimate from state'} />
-                      <Field label="Other fees label" placeholder="VIN etching, LoJack…"
-                        value={additionalFees.otherLabel} onChange={e => setAdditionalFees(p => ({ ...p, otherLabel: e.target.value }))} />
-                      <Field label="Other fees ($)" prefix="$" placeholder="0" type="number"
-                        value={additionalFees.otherAmount} onChange={e => setAdditionalFees(p => ({ ...p, otherAmount: e.target.value }))} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* ── CALCULATED SUMMARY CARD ── */}
-            {(financeSummary?.price || leaseSummary?.sp) ? (
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 font-mono text-xs">
-                {dealType === 'finance' && financeSummary && financeSummary.price > 0 ? (
-                  <>
-                    <p className="font-bold text-gray-700 text-xs uppercase tracking-wide mb-3 font-sans">Estimated Out-the-Door</p>
-                    <div className="space-y-1.5 text-gray-600">
-                      <div className="flex justify-between"><span>Selling price</span><span>${fmt(financeSummary.price)}</span></div>
-                      {financeSummary.doc > 0 && <div className="flex justify-between"><span>Doc fee</span><span>${fmt(financeSummary.doc)}</span></div>}
-                      <div className="flex justify-between">
-                        <span>Sales tax ({financeSummary.salesTaxRate}%){financeSummary.isTaxEst ? <span className="text-gray-400"> *est.</span> : null}</span>
-                        <span>${fmt(financeSummary.salesTax)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Title &amp; reg{financeSummary.isTitleEst ? <span className="text-gray-400"> *est.</span> : null}</span>
-                        <span>${fmt(financeSummary.titleReg)}</span>
-                      </div>
-                      {financeSummary.otherFees > 0 && <div className="flex justify-between"><span>Other fees</span><span>${fmt(financeSummary.otherFees)}</span></div>}
-                      <div className="flex justify-between font-bold text-gray-800 border-t border-slate-300 pt-1.5 mt-0.5"><span>Subtotal</span><span>${fmt(financeSummary.subtotal)}</span></div>
-                      {financeSummary.down > 0 && <div className="flex justify-between text-gray-500"><span>Less down payment</span><span>−${fmt(financeSummary.down)}</span></div>}
-                      {financeSummary.netTrade !== 0 && (
-                        <div className={`flex justify-between ${financeSummary.netTrade < 0 ? 'text-red-600' : 'text-gray-500'}`}>
-                          <span>{financeSummary.netTrade < 0 ? 'Plus negative trade equity' : 'Less net trade-in'}</span>
-                          <span>{financeSummary.netTrade < 0 ? '+' : '−'}${fmt(Math.abs(financeSummary.netTrade))}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between font-bold text-gray-900 border-t border-slate-300 pt-1.5"><span>Amount financed</span><span>${fmt(financeSummary.amtFinanced)}</span></div>
-                    </div>
-                    {financeSummary.payment > 0 && financeSummary.term > 0 && (
-                      <>
-                        <div className="border-t border-slate-300 my-3" />
-                        <p className="font-bold text-gray-700 text-xs uppercase tracking-wide mb-2 font-sans">Total Cost of Ownership</p>
-                        <div className="space-y-1.5 text-gray-600">
-                          <div className="flex justify-between"><span>{finance.loanTerm} payments × ${fmt(financeSummary.payment)}</span><span>${fmt(financeSummary.totalMonthly)}</span></div>
-                          {financeSummary.down > 0 && <div className="flex justify-between"><span>+ Down payment</span><span>${fmt(financeSummary.down)}</span></div>}
-                          <div className="flex justify-between font-bold text-gray-900 border-t border-slate-300 pt-1.5"><span>Total paid</span><span>${fmt(financeSummary.totalPaid)}</span></div>
-                          {financeSummary.amtFinanced > 0 && financeSummary.totalMonthly > 0 && (
-                            <div className="flex justify-between text-gray-500"><span>Interest paid</span><span>${fmt(Math.max(financeSummary.totalMonthly - financeSummary.amtFinanced, 0))}</span></div>
-                          )}
-                        </div>
-                      </>
-                    )}
-                    {(financeSummary.isTaxEst || financeSummary.isTitleEst) && (
-                      <p className="text-gray-400 text-xs mt-3 font-sans">* Estimated from {state || 'state'} averages. Enter actual amounts above for precision.</p>
-                    )}
-                  </>
-                ) : dealType === 'lease' && leaseSummary && leaseSummary.sp > 0 ? (
-                  <>
-                    <p className="font-bold text-gray-700 text-xs uppercase tracking-wide mb-3 font-sans">Lease Cost Summary</p>
-                    <div className="space-y-1.5 text-gray-600">
-                      <div className="flex justify-between"><span>Selling price (cap cost)</span><span>${fmt(leaseSummary.sp)}</span></div>
-                      {leaseSummary.acq > 0 && <div className="flex justify-between"><span>+ Acquisition fee</span><span>${fmt(leaseSummary.acq)}</span></div>}
-                      {leaseSummary.doc > 0 && <div className="flex justify-between"><span>+ Doc fee</span><span>${fmt(leaseSummary.doc)}</span></div>}
-                      {leaseSummary.capCost > 0 && <div className="flex justify-between font-bold text-gray-800 border-t border-slate-300 pt-1.5 mt-0.5"><span>Cap cost</span><span>${fmt(leaseSummary.capCost)}</span></div>}
-                      {leaseSummary.ccr > 0 && <div className="flex justify-between text-gray-500"><span>- Cap cost reduction</span><span>−${fmt(leaseSummary.ccr)}</span></div>}
-                      {leaseSummary.tradeNetPositive > 0 && <div className="flex justify-between text-gray-500"><span>- Trade-in (net)</span><span>−${fmt(leaseSummary.tradeNetPositive)}</span></div>}
-                      {leaseSummary.adjCapCost > 0 && <div className="flex justify-between font-bold text-gray-900 border-t border-slate-300 pt-1.5"><span>Adjusted cap cost</span><span>${fmt(leaseSummary.adjCapCost)}</span></div>}
-                    </div>
-                    {leaseSummary.payment > 0 && leaseSummary.term > 0 && (
-                      <>
-                        <div className="border-t border-slate-300 my-3" />
-                        <p className="font-bold text-gray-700 text-xs uppercase tracking-wide mb-2 font-sans">Total Paid to Lease</p>
-                        <div className="space-y-1.5 text-gray-600">
-                          <div className="flex justify-between"><span>{lease.leaseTerm} payments × ${fmt(leaseSummary.payment)}</span><span>${fmt(leaseSummary.totalMonthly)}</span></div>
-                          {leaseSummary.driveOff > 0 && <div className="flex justify-between"><span>+ Due at signing</span><span>${fmt(leaseSummary.driveOff)}</span></div>}
-                          <div className="flex justify-between font-bold text-gray-900 border-t border-slate-300 pt-1.5"><span>Total paid to lease</span><span>${fmt(leaseSummary.totalPaid)}</span></div>
-                        </div>
-                        <p className="text-gray-500 mt-2 font-sans">At end of lease, you own nothing.</p>
-                        {leaseSummary.resDol > 0 && (
-                          <div className="flex justify-between mt-1 text-gray-600 font-sans">
-                            <span>Residual to buy out:</span><span className="font-bold">${fmt(leaseSummary.resDol)}</span>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </>
-                ) : null}
-              </div>
-            ) : null}
-
-            {/* Location */}
-            <div>
-              <SectionLabel>Location</SectionLabel>
-              <div className="max-w-xs">
-                <SelectField label="Your State" isHighlighted={hl('state')} value={state} onChange={e => setState(e.target.value)} required>
-                  <option value="">Select state…</option>
-                  {US_STATES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                </SelectField>
-              </div>
-            </div>
-
-            {/* Dealer add-ons */}
-            <div>
-              <button type="button" onClick={() => setShowBundled(!showBundled)} className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition mb-3">
-                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition ${showBundled ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
-                  {showBundled && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                </div>
-                Dealer add-ons / bundled products
-              </button>
-              {showBundled && (
-                <div className="p-4 bg-orange-50 rounded-xl border border-orange-100 space-y-3">
-                  <SectionLabel>Bundled Products</SectionLabel>
-                  <p className="text-xs text-gray-500 -mt-2">Enter what&apos;s been bundled into your deal. We&apos;ll assess each one for fair value.</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Field label="Extended warranty" prefix="$" placeholder="1200" type="number" isHighlighted={hl('extendedWarranty')} value={bundled.extendedWarranty} onChange={e => updateBundled('extendedWarranty', e.target.value)} />
-                    <Field label="GAP insurance" prefix="$" placeholder="650" type="number" isHighlighted={hl('gapInsurance')} value={bundled.gapInsurance} onChange={e => updateBundled('gapInsurance', e.target.value)} hint="Your insurer offers this for ~$20-60/yr" />
-                    <Field label="Tire & wheel protection" prefix="$" placeholder="395" type="number" isHighlighted={hl('tireWheel')} value={bundled.tireWheelProtection} onChange={e => updateBundled('tireWheelProtection', e.target.value)} />
-                    <Field label="Paint / interior protection" prefix="$" placeholder="495" type="number" isHighlighted={hl('paint')} value={bundled.paintInteriorProtection} onChange={e => updateBundled('paintInteriorProtection', e.target.value)} />
-                    <Field label="Other (label)" placeholder="VIN etching…" value={bundled.otherLabel} onChange={e => updateBundled('otherLabel', e.target.value)} />
-                    <Field label="Other (amount)" prefix="$" placeholder="199" type="number" value={bundled.otherAmount} onChange={e => updateBundled('otherAmount', e.target.value)} />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Down payment ($)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      value={downPayment}
+                      onChange={e => setDownPayment(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Trade-in */}
+                {/* Lease Field 6: Term */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Term</label>
+                  <select
+                    value={leaseTerm}
+                    onChange={e => setLeaseTerm(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none"
+                  >
+                    {['24', '36', '39', '42', '48'].map(m => (
+                      <option key={m} value={m}>{m} months</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Finance Field 4: Down payment */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Down payment ($)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                    <input
+                      type="number"
+                      placeholder="3,000"
+                      value={downPayment}
+                      onChange={e => setDownPayment(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
+                  </div>
+                </div>
+
+                {/* Finance Field 5: Monthly payment */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Monthly payment ($)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                    <input
+                      type="number"
+                      placeholder="520"
+                      value={monthlyPayment}
+                      onChange={e => setMonthlyPayment(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
+                  </div>
+                </div>
+
+                {/* Finance Field 6: APR + credit score */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">APR (%)</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="6.9"
+                      value={apr}
+                      onChange={e => setApr(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <label className="block text-xs text-gray-500 mb-1">Credit score range (optional)</label>
+                    <select
+                      value={creditScore}
+                      onChange={e => setCreditScore(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none"
+                    >
+                      <option value="">Select range…</option>
+                      <option value="750+">750+</option>
+                      <option value="700–749">700–749</option>
+                      <option value="650–699">650–699</option>
+                      <option value="Below 650">Below 650</option>
+                    </select>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Trade-in section */}
             <div>
-              <button type="button" onClick={() => setShowTradeIn(!showTradeIn)} className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition mb-3">
+              <button
+                type="button"
+                onClick={() => setShowTradeIn(v => !v)}
+                className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+              >
                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition ${showTradeIn ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}>
                   {showTradeIn && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                 </div>
                 I have a trade-in
               </button>
+              <p className="text-xs text-gray-400 mt-1 ml-7">Optional but recommended — trade-in details significantly improve your grade accuracy</p>
+
               {showTradeIn && (
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-                  <SectionLabel>Trade-In Details</SectionLabel>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <Field label="Year" placeholder="2019" type="number" value={tradeIn.year} onChange={e => updateTradeIn('year', e.target.value)} />
-                    <Field label="Make" placeholder="Ford" value={tradeIn.make} onChange={e => updateTradeIn('make', e.target.value)} />
-                    <Field label="Model" placeholder="F-150" value={tradeIn.model} onChange={e => updateTradeIn('model', e.target.value)} />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Field label="Mileage" placeholder="62000" type="number" value={tradeIn.mileage} onChange={e => updateTradeIn('mileage', e.target.value)} />
-                    <SelectField label="Condition" value={tradeIn.condition} onChange={e => updateTradeIn('condition', e.target.value)}>
-                      {['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'].map(c => <option key={c} value={c}>{c}</option>)}
-                    </SelectField>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Field label="Dealer offer" prefix="$" placeholder="14000" type="number" isHighlighted={hl('trade.dealerOffer')} value={tradeIn.dealerOffer} onChange={e => updateTradeIn('dealerOffer', e.target.value)} />
-                    <Field label="Payoff amount owed" prefix="$" placeholder="3500" type="number" isHighlighted={hl('trade.payoff')} value={tradeIn.payoffAmount} onChange={e => updateTradeIn('payoffAmount', e.target.value)} hint="$0 if paid off" />
-                  </div>
-                  {tradeIn.dealerOffer && (
-                    <div className={`p-3 rounded-lg border text-sm space-y-1.5 ${isUpsideDown ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200'}`}>
-                      <div className="flex justify-between text-gray-600"><span>Dealer offer</span><span>${dealerOffer.toLocaleString()}</span></div>
-                      {tradeIn.payoffAmount && <div className="flex justify-between text-gray-600"><span>Payoff</span><span>−${payoffAmount.toLocaleString()}</span></div>}
-                      <div className={`flex justify-between font-bold border-t pt-1.5 ${isUpsideDown ? 'text-red-700 border-red-200' : 'text-gray-900 border-gray-200'}`}>
-                        <span>Net trade-in</span><span>${netTradeIn.toLocaleString()}</span>
-                      </div>
-                      {isUpsideDown && <p className="text-red-600 text-xs font-medium">⚠ Upside down by ${Math.abs(netTradeIn).toLocaleString()} — rolls into loan</p>}
-                    </div>
-                  )}
-                  <Field label="KBB / Carmax estimate" prefix="$" placeholder="16500" type="number" value={tradeIn.kbbEstimate} onChange={e => updateTradeIn('kbbEstimate', e.target.value)} hint="Get this from kbb.com or carmax.com first" />
+                <div className="mt-3 space-y-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Known issues</label>
-                    <textarea rows={2} placeholder="Cracked windshield, high miles, needs tires…" value={tradeIn.knownIssues} onChange={e => updateTradeIn('knownIssues', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none" />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Year, Make &amp; Model</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 2019 Ford F-150"
+                      value={tradeYMM}
+                      onChange={e => setTradeYMM(e.target.value)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Dealer offer ($)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                      <input
+                        type="number"
+                        placeholder="14,000"
+                        value={tradeOffer}
+                        onChange={e => setTradeOffer(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount owed on trade ($)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                      <input
+                        type="number"
+                        placeholder="0"
+                        value={tradeOwed}
+                        onChange={e => setTradeOwed(e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg pl-7 pr-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">$0 if paid off</p>
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Guidance */}
-            <div>
-              <button type="button" onClick={() => setShowGuidance(!showGuidance)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition">
-                <svg className={`w-4 h-4 transition-transform ${showGuidance ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                How to get this information from your dealer
-              </button>
-              {showGuidance && (
-                <div className="mt-3 p-5 bg-blue-50 rounded-xl border border-blue-100 space-y-4 text-sm text-gray-700">
-                  {dealType === 'lease' ? (
-                    <>
-                      <div><p className="font-semibold text-gray-900 mb-1">Money Factor</p><p>Ask: &ldquo;What is the base money factor?&rdquo; It&apos;s a 5-digit decimal like 0.00189. Multiply by 2,400 to get the APR equivalent. The dealer may mark it up — compare to the manufacturer&apos;s published rate.</p></div>
-                      <div><p className="font-semibold text-gray-900 mb-1">Residual Value</p><p>Ask: &ldquo;What is the residual as a percentage of MSRP?&rdquo; This is set by the manufacturer and is not negotiable. Higher is better.</p></div>
-                      <div><p className="font-semibold text-gray-900 mb-1">Selling Price / Cap Cost</p><p>This IS negotiable. Push for invoice or below. The selling price before fees is called the &ldquo;gross capitalized cost&rdquo; on the lease worksheet.</p></div>
-                    </>
-                  ) : (
-                    <>
-                      <div><p className="font-semibold text-gray-900 mb-1">Negotiated Price</p><p>Agree on this number first, before discussing monthly payment. Get it in writing.</p></div>
-                      <div><p className="font-semibold text-gray-900 mb-1">APR</p><p>Check your bank or credit union before going in — you can often beat the dealer&apos;s rate. Use it as leverage.</p></div>
-                      <div><p className="font-semibold text-gray-900 mb-1">Out-the-Door Price</p><p>Ask for a full itemized breakdown: vehicle price + tax + title/reg + doc fee + add-ons.</p></div>
-                    </>
-                  )}
-                  <div><p className="font-semibold text-gray-900 mb-1">Trade-In</p><p>Get offers from KBB Instant Cash Offer, Carmax, and Carvana before the dealer. This is your leverage.</p></div>
-                </div>
-              )}
-            </div>
-
-            {/* Notes */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Notes <span className="text-gray-400 font-normal">(optional)</span></label>
-              <textarea rows={3} placeholder="Anything the AI should know — e.g. dealer says price is non-negotiable, you need low monthly payment, you plan to buy out at lease end…"
-                value={notes} onChange={e => setNotes(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none" />
             </div>
 
             {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{error}</div>}
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <button type="submit" className="px-10 py-3.5 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl text-sm transition-all shadow-sm">
-                {isAdjustMode ? 'Re-run Analysis' : 'Grade My Deal'}
-              </button>
-              <button type="button" onClick={handleClear} className="px-5 py-3.5 border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium rounded-xl text-sm transition">
-                Clear Form
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => runAnalysis()}
+              className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl text-sm transition-all shadow-sm"
+            >
+              Grade my deal →
+            </button>
 
-            <p className="text-xs text-gray-400">Analysis is AI-generated for informational purposes only. Not financial advice.</p>
+            <p className="text-center text-xs text-gray-400">
+              Need more fields?{' '}
+              <Link href="/analyze/advanced" className="text-blue-600 hover:text-blue-700 underline underline-offset-2">
+                Try advanced manual →
+              </Link>
+            </p>
           </div>
-        </form>
+        </div>
+      )}
+
+      {/* Divider */}
+      <div className="flex items-center gap-3 my-6">
+        <div className="h-px flex-1 bg-gray-200" />
+        <span className="text-xs text-gray-400 font-medium">or</span>
+        <div className="h-px flex-1 bg-gray-200" />
+      </div>
+
+      {/* Bottom Ask a Pro card — always visible */}
+      <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-5">
+        <div className="flex items-center gap-2.5 mb-3">
+          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-bold text-gray-900 leading-tight">Skip the form — talk to an insider.</p>
+            <p className="text-xs text-gray-400">40 years of deals · reply within 24 hrs</p>
+          </div>
+        </div>
+        <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+          Get a personalized negotiation strategy from someone who's been on the other side of the desk.
+        </p>
+        <button
+          onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
+          className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl transition-all shadow-sm"
+        >
+          Ask a Pro — $19 →
+        </button>
       </div>
     </div>
   );

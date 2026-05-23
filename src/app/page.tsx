@@ -42,6 +42,54 @@ export default function LandingPage() {
         <p className="text-gray-400 text-sm mt-3">Works for lease and finance deals. Free, always.</p>
       </section>
 
+      {/* Testimonials */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-2 pb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            { quote: 'Wow this is an incredible tool! Thank you.', attr: 'Reddit user' },
+            { quote: 'Super cool tool', attr: 'Reddit user' },
+            { quote: 'Great tool!! Very easy to use and I like the grading system and how informative it is.', attr: 'Reddit user' },
+          ].map((t, i) => (
+            <div key={i} className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3.5">
+              <p className="text-sm text-gray-600 italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+              <p className="text-xs text-gray-400 mt-2">— {t.attr}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Example report */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-14">
+        <div className="text-center mb-6">
+          <p className="text-xs font-semibold text-blue-600 uppercase tracking-widest mb-2">See it in action</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-gray-900">What your report looks like</h2>
+          <p className="text-gray-500 text-sm mt-2">A real deal graded D — every red flag, spelled out.</p>
+        </div>
+        <div className="relative rounded-3xl overflow-hidden border border-gray-200 shadow-2xl ring-1 ring-black/5 bg-white">
+          <img
+            src="/example-report.png"
+            alt="Example Sign or Walk deal analysis showing grade, red flags, and negotiation script"
+            className="w-full h-auto block"
+          />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+        </div>
+        <div className="mt-5 text-center max-w-lg mx-auto">
+          <p className="text-sm text-gray-500 leading-relaxed">
+            <span className="font-semibold text-gray-700">This is just the top of the report.</span> Scan your deal to unlock the full breakdown — red flags, your negotiation leverage, and more.{' '}
+            <span className="font-semibold text-gray-900">Free. Always.</span>
+          </p>
+          <Link
+            href="/analyze"
+            className="inline-flex items-center gap-2 mt-4 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+          >
+            Grade My Deal — Free
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
+        </div>
+      </section>
+
       {/* What you get */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -88,7 +136,7 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 border border-gray-200 rounded-2xl bg-white">
           <div className="flex-1">
             <p className="text-sm font-bold text-gray-900 mb-1">Deal come back a C, D, or F?</p>
-            <p className="text-sm text-gray-500 leading-snug">A former car industry pro personally reviews your deal and emails you exactly what to say — within 24 hours. $39.</p>
+            <p className="text-sm text-gray-500 leading-snug">A former dealership insider who's seen thousands of deals reviews your numbers and emails you exactly what to say — within 24 hours. $19.</p>
           </div>
           <a
             href={process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK}
@@ -98,28 +146,6 @@ export default function LandingPage() {
           >
             Get expert help →
           </a>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        <h2 className="text-2xl font-black text-gray-900 mb-6 text-center">How it works</h2>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50">
-          {[
-            { step: '1', title: 'Enter your numbers', desc: 'MSRP, selling price, money factor or APR, monthly payment — whatever your dealer gave you. You can also paste a listing URL or upload a quote photo.' },
-            { step: '2', title: 'AI grades every detail', desc: 'We check your payment math, flag inflated rates and add-ons, assess your trade-in, and compare everything against real market benchmarks.' },
-            { step: '3', title: 'Walk in with confidence', desc: 'You get a grade, a breakdown of every number, specific red flags with fixes, and a counter-offer script — ready to use.' },
-          ].map(item => (
-            <div key={item.step} className="flex items-start gap-5 p-6">
-              <div className="w-8 h-8 bg-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-white font-bold text-sm">{item.step}</span>
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900 mb-1">{item.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 

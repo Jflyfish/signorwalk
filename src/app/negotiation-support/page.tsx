@@ -67,7 +67,7 @@ export default function NegotiationSupportPage() {
   // Pre-fill from Sign or Walk session
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem('sow_session');
+      const raw = localStorage.getItem('sow_session');
       if (raw) {
         const data: SessionData = JSON.parse(raw);
         if (data.vehicleYear) setYear(data.vehicleYear);
@@ -85,7 +85,7 @@ export default function NegotiationSupportPage() {
       }
 
       // Restore uploaded quote file from analyze step
-      const stored = sessionStorage.getItem('sow_quote_b64');
+      const stored = localStorage.getItem('sow_quote_b64');
       if (stored) {
         const { filename, type, data: dataUrl } = JSON.parse(stored);
         const base64 = dataUrl.split(',')[1];
@@ -97,7 +97,7 @@ export default function NegotiationSupportPage() {
         setHasExistingQuote(true);
       }
     } catch {
-      // session data unavailable
+      // storage unavailable
     }
   }, []);
 
@@ -131,9 +131,9 @@ export default function NegotiationSupportPage() {
 
     // Attach full calculator data from session
     try {
-      const raw = sessionStorage.getItem('sow_session');
+      const raw = localStorage.getItem('sow_session');
       if (raw) fd.append('dealData', raw);
-    } catch { /* sessionStorage unavailable */ }
+    } catch { /* storage unavailable */ }
 
     try {
       const res = await fetch('/api/negotiation-support', { method: 'POST', body: fd });
@@ -165,7 +165,7 @@ export default function NegotiationSupportPage() {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
       <div className="mb-8">
         <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight mb-2">You&apos;re in — let&apos;s get you a better deal.</h1>
-        <p className="text-gray-500">Fill this out and a former car industry professional will email your personalized negotiation strategy within 24 hours.</p>
+        <p className="text-gray-500">Fill this out and a former dealership insider who's seen thousands of deals will email your personalized negotiation strategy within 24 hours.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
