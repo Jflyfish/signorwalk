@@ -397,8 +397,8 @@ export default function AnalyzePage() {
     const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
 
     return (
-      <div ref={resultsRef} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-3 print-page">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-7 print-card">
+      <div ref={resultsRef} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-3 print-page overflow-x-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-7 print-card overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <GradeCircle grade={analysis.grade} size="lg" />
             <div className="flex-1">
@@ -447,7 +447,7 @@ export default function AnalyzePage() {
           </div>
         )}
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 print-card overflow-hidden">
           <h2 className="font-bold text-gray-900 text-sm mb-3">Deal Breakdown</h2>
           <div className="space-y-0">
             {analysis.breakdown.map((row, i) => {
@@ -456,9 +456,9 @@ export default function AnalyzePage() {
                 <div key={i} className="flex items-start gap-3 py-2.5 border-b border-gray-50 last:border-0">
                   <div className={`w-2.5 h-2.5 rounded-full ${s.dot} mt-1.5 flex-shrink-0`} />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2 mb-1">
                       <span className="text-sm font-medium text-gray-800">{row.label}</span>
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full border flex-shrink-0 ${s.badge}`}>{row.value}</span>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full border self-start break-words ${s.badge}`}>{row.value}</span>
                     </div>
                     <p className="text-xs text-gray-500 leading-relaxed">{row.explanation}</p>
                   </div>
