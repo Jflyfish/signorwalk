@@ -458,7 +458,7 @@ export default function AnalyzePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2 mb-1">
                       <span className="text-sm font-medium text-gray-800">{row.label}</span>
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full border self-start break-words ${s.badge}`}>{row.value}</span>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-lg border self-start break-words max-w-full ${s.badge}`}>{row.value}</span>
                     </div>
                     <p className="text-xs text-gray-500 leading-relaxed">{row.explanation}</p>
                   </div>
