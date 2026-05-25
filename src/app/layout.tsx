@@ -47,6 +47,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/analyze" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition">
                 Grade My Deal
               </Link>
+              <Link href="/ask-a-pro" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden sm:block">
+                Ask a Pro
+              </Link>
+              <Link href="/blog" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden sm:block">
+                Blog
+              </Link>
               <Link href="/about" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden sm:block">
                 About
               </Link>
@@ -78,6 +84,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <nav className="flex items-center gap-4">
                 <Link href="/" className="text-gray-500 hover:text-gray-300 text-sm transition">Home</Link>
                 <Link href="/analyze" className="text-gray-500 hover:text-gray-300 text-sm transition">Grade My Deal</Link>
+                <Link href="/ask-a-pro" className="text-gray-500 hover:text-gray-300 text-sm transition">Ask a Pro</Link>
+                <Link href="/blog" className="text-gray-500 hover:text-gray-300 text-sm transition">Blog</Link>
                 <Link href="/about" className="text-gray-500 hover:text-gray-300 text-sm transition">About</Link>
                 <Link href="/contact" className="text-gray-500 hover:text-gray-300 text-sm transition">Contact</Link>
               </nav>

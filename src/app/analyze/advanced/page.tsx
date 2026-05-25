@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { US_STATES } from '@/lib/states';
 import { STATE_TAX_DATA } from '@/lib/stateTaxData';
@@ -649,12 +650,15 @@ export default function AdvancedAnalyzePage() {
           {(['B', 'C', 'D', 'F'] as string[]).includes(analysis.grade) && (() => {
             const stripeLink = process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK ?? '';
             return (
-              <button
-                onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
-              >
-                Ask a Pro — $19
-              </button>
+              <div className="flex flex-col items-start gap-1">
+                <button
+                  onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
+                >
+                  Ask a Pro — $19
+                </button>
+                <p className="text-xs text-gray-400">Save $250+ or your money back · <Link href="/ask-a-pro" className="text-blue-500 hover:underline">Learn more</Link></p>
+              </div>
             );
           })()}
         </div>
@@ -709,6 +713,7 @@ export default function AdvancedAnalyzePage() {
               >
                 Ask a Pro — $19 →
               </button>
+              <p className="text-xs text-gray-400 mt-2.5">Save $250+ or your money back · <Link href="/ask-a-pro" className="text-blue-500 hover:underline">Learn more</Link></p>
             </div>
           );
         })()}

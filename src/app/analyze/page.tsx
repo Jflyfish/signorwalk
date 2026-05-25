@@ -404,7 +404,7 @@ export default function AnalyzePage() {
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${rec.cls}`}>{rec.label}</span>
-                <span className="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2 py-1 rounded-full">Free Analysis</span>
+                <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-2 py-1 rounded-full">Free Analysis</span>
               </div>
               <h1 className="text-2xl font-bold text-gray-900 leading-snug mb-1">{analysis.headline}</h1>
               <p className={`text-sm font-medium ${colors.text} mb-3`}>{analysis.gradeExplanation}</p>
@@ -426,12 +426,18 @@ export default function AnalyzePage() {
             Save as PDF
           </button>
           {(['B', 'C', 'D', 'F'] as string[]).includes(analysis.grade) && (
-            <button
-              onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
-            >
-              Ask a Pro — $19
-            </button>
+            <div className="flex flex-col items-start gap-1.5">
+              <button
+                onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white transition"
+              >
+                Ask a Pro — $19
+              </button>
+              <p className="text-xs font-semibold text-blue-600 flex items-center gap-1">
+                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                Save $250+ or your money back · <Link href="/ask-a-pro" className="underline hover:text-blue-800">Learn more</Link>
+              </p>
+            </div>
           )}
         </div>
 
@@ -475,15 +481,27 @@ export default function AnalyzePage() {
             analysis.grade === 'D' ? "This deal has problems — get a dealership insider in your corner." :
             "Walk away — or get an insider's honest read before you do.";
           return (
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 no-print">
+            <div className="no-print">
+              <div className="flex items-center gap-2 mb-2 px-1">
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Optional upgrade · $19</span>
+              </div>
+            <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                </div>
+                <p className="text-sm font-bold text-blue-800">Save $250+ or your money back — guaranteed</p>
+              </div>
               <h2 className="font-bold text-gray-900 text-base mb-2">{heading}</h2>
               {analysis.grade !== 'B' && <p className="text-sm text-gray-500 mb-4">{upsellCopy}</p>}
               <button
                 onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all shadow-sm mt-2"
               >
                 Ask a Pro — $19 →
               </button>
+              <p className="text-xs text-gray-400 mt-2.5"><Link href="/ask-a-pro" className="text-blue-500 hover:underline">How it works →</Link></p>
+            </div>
             </div>
           );
         })()}
@@ -630,9 +648,9 @@ export default function AnalyzePage() {
     <div className="max-w-lg mx-auto px-4 sm:px-6 py-10 sm:py-14">
       {/* Trust pill */}
       <div className="flex justify-center mb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-500">
-          <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
-          No email required · Free always · Grade in 30 seconds
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-full text-xs font-semibold text-blue-700">
+          <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+          100% Free · No signup · Grade in 30 seconds
         </div>
       </div>
 
@@ -653,7 +671,7 @@ export default function AnalyzePage() {
           ) : (
             <>
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-              Upload your quote
+              Upload your quote — Free
             </>
           )}
           <input
@@ -665,7 +683,7 @@ export default function AnalyzePage() {
             disabled={isExtracting}
           />
         </label>
-        <p className="text-xs text-gray-400 mt-2">JPG, PNG, HEIC or PDF</p>
+        <p className="text-xs text-gray-400 mt-2">JPG, PNG, HEIC or PDF · No credit card needed</p>
         {error && <p className="text-sm text-red-600 mt-2 text-center max-w-xs">{error}</p>}
       </div>
 
@@ -938,27 +956,26 @@ export default function AnalyzePage() {
       </div>
 
       {/* Bottom Ask a Pro card — always visible */}
-      <div className="rounded-2xl border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-5">
-        <div className="flex items-center gap-2.5 mb-3">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <div>
-            <p className="text-sm font-bold text-gray-900 leading-tight">Skip the form — talk to an insider.</p>
-            <p className="text-xs text-gray-400">40 years of deals · reply within 24 hrs</p>
-          </div>
+          <p className="text-sm font-bold text-blue-800">Save $250+ or your money back — guaranteed</p>
         </div>
+        <p className="text-sm font-bold text-gray-900 mb-1">Skip the form — talk to an insider.</p>
         <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-          Get a personalized negotiation strategy from someone who's been on the other side of the desk.
+          A former dealership pro reviews your deal and emails you exactly what to say. We respond as quickly as possible.
         </p>
         <button
           onClick={() => stripeLink && window.open(stripeLink, 'stripe-payment', 'width=640,height=720,scrollbars=yes,resizable=yes')}
-          className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl transition-all shadow-sm"
+          className="w-full py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl transition-all shadow-sm"
         >
           Ask a Pro — $19 →
         </button>
+        <p className="text-center text-xs text-gray-400 mt-2"><Link href="/ask-a-pro" className="text-blue-500 hover:underline">How it works →</Link></p>
       </div>
     </div>
   );
