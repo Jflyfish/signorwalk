@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/next';
+import MobileNav from '@/components/MobileNav';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -63,7 +64,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </nav>
 
-        <main>{children}</main>
+        <main className="pb-16 sm:pb-0">{children}</main>
+
+        <MobileNav />
 
         <footer className="bg-gray-900 border-t border-gray-800 mt-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
