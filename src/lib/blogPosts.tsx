@@ -192,9 +192,6 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get the full deal sheet in writing before you pay any fee, including money factor, residual, and all incentives.</span></li>
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Confirm the broker is licensed in your state if your state requires it, otherwise the deal can fall apart.</span></li>
         </ul>
-        <h2 className="text-2xl font-bold text-gray-900 pt-4">The One-Pay Lease Trick</h2>
-        <p className="text-base sm:text-lg text-gray-700 leading-loose">Here&apos;s an advanced move. If you pay the entire lease upfront in one shot, many manufacturers drop the money factor significantly. Sometimes to near zero.</p>
-        <p className="text-base sm:text-lg text-gray-700 leading-loose">On a 36-month lease, this can save hundreds, sometimes over a thousand dollars in interest. The catch: if the car gets totaled early, getting your prepaid money back through gap insurance can be messy. Read the fine print.</p>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you sign anything, run the numbers through Sign or Walk&apos;s free Grade My Deal tool. It catches inflated money factors, junk fees, and tells you if your lease hacking effort actually paid off compared to what others are signing right now. Five minutes of checking beats three years of overpaying.</p>
       </div>
