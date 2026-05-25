@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState, useRef } from 'react';
 
 const links = [
   {
@@ -36,8 +37,7 @@ const links = [
     label: 'Blog',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v10a2 2 0 01-2 2z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 4v6h6" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v10a2 2 0 01-2 2zM13 4v6h6" />
       </svg>
     ),
   },
@@ -54,10 +54,39 @@ const links = [
 
 export default function MobileNav() {
   const pathname = usePathname();
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const ticking = useRef(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (ticking.current) return;
+      ticking.current = true;
+      requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        const diff = currentY - lastScrollY.current;
+        // Hide when scrolling down more than 8px, show when scrolling up
+        if (diff > 8 && currentY > 80) {
+          setVisible(false);
+        } else if (diff < -8) {
+          setVisible(true);
+        }
+        lastScrollY.current = currentY;
+        ticking.current = false;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-50 bg-gray-900 border-t border-gray-800 sm:hidden">
-      <div className="flex items-stretch h-16">
+    <div
+      className={`fixed bottom-5 inset-x-0 flex justify-center z-50 sm:hidden transition-transform duration-300 ease-in-out ${
+        visible ? 'translate-y-0' : 'translate-y-28'
+      }`}
+    >
+      <nav className="flex items-center gap-1 bg-gray-900/95 backdrop-blur-md border border-gray-700/60 rounded-full px-3 py-2.5 shadow-2xl shadow-black/40">
         {links.map(link => {
           const isActive = link.href === '/'
             ? pathname === '/'
@@ -66,20 +95,18 @@ export default function MobileNav() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors ${
-                isActive ? 'text-blue-400' : 'text-gray-500 hover:text-gray-300'
+              aria-label={link.label}
+              className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-all duration-200 ${
+                isActive
+                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/60'
               }`}
             >
-              <span className={isActive ? 'text-blue-400' : 'text-gray-500'}>
-                {link.icon}
-              </span>
-              {link.label}
+              {link.icon}
             </Link>
           );
         })}
-      </div>
-      {/* Safe area for phones with home indicator */}
-      <div className="h-safe-area-inset-bottom bg-gray-900" />
-    </nav>
+      </nav>
+    </div>
   );
 }
