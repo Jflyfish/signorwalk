@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden sm:block">
                 Home
               </Link>
-              <Link href="/analyze" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition">
+              <Link href="/analyze" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden sm:block">
                 Grade My Deal
               </Link>
               <Link href="/ask-a-pro" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden sm:block">
@@ -60,13 +60,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/contact" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden sm:block">
                 Contact
               </Link>
+              <MobileNav />
             </div>
           </div>
         </nav>
 
-        <main className="pb-16 sm:pb-0">{children}</main>
-
-        <MobileNav />
+        <main>{children}</main>
 
         <footer className="bg-gray-900 border-t border-gray-800 mt-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
