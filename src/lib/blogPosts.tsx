@@ -197,6 +197,183 @@ export const blogPosts: BlogPost[] = [
       </div>
     ),
   },
+  {
+    slug: 'how-much-car-can-i-afford-salary-rule',
+    title: 'How Much Car Can You Actually Afford? The Salary Rule Explained',
+    date: '2026-05-27',
+    excerpt: 'The 15% salary rule, the 20/4/10 framework, and the real math behind how much car you can afford without wrecking your budget.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=75" alt="person reviewing car finance documents" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">The dealer will happily sell you a car you cannot afford. That is not cynicism, it is their job. Knowing how much car you can actually afford before you walk in is the single most protective thing you can do for your finances.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The 15% Rule</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The simplest guideline: your total monthly car costs should not exceed 15% of your take-home pay. That includes the payment, insurance, fuel, and estimated maintenance. Most people only think about the payment and get blindsided when insurance runs $200 a month on top of it.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you take home $4,500 a month, your total car budget is $675. If insurance runs $180 and fuel runs $120, that leaves $375 for your actual payment. A $375 payment at 6% APR over 60 months finances roughly $19,300. That is your number, not the $40,000 SUV the salesperson walked you toward.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The 20/4/10 Framework</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">A more structured version: put 20% down, finance for no more than 4 years, and keep total car costs under 10% of gross income. It is a tighter standard and a smarter one, especially if you plan to own the car long-term.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>20% down reduces your loan balance, your interest cost, and your risk of going upside down on the loan.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>4-year terms mean you pay less total interest and own the car outright while it still has useful life left.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>10% of gross income keeps your car from crowding out retirement savings, an emergency fund, and everything else that matters.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=75" alt="budgeting and financial planning" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Why Dealers Push 72 and 84 Month Loans</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Stretching to a 72 or 84 month loan is how you buy a $45,000 truck on a $50,000 salary and convince yourself it's affordable. The monthly number looks fine. The total interest does not. An $8,000 interest bill over 84 months on a car that loses $15,000 in value by year three is a financial hole that is hard to climb out of.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you need an 84 month term to make the payment work, that is the car telling you it is too expensive. Listen to it.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The Real Affordability Question</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you decide how much car you can afford, figure out what you are optimizing for. Lower payment usually means longer term and more interest. Lower total cost means a shorter term and a higher payment. Lowest risk means buying something cheaper than you qualify for and keeping it for ten years. Pick your priority before you walk in, not after the salesperson has spent two hours building rapport.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Calculate total cost of ownership, not just the sticker price. Include taxes, fees, insurance, fuel, and maintenance for the full term.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Use an amortization calculator to see how much of each payment is interest versus principal, especially in the first year.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get insurance quotes on any car before you agree to buy it. A sports car or large SUV can add $150 or more per month that you never planned for.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Once you know your number, run any deal you're considering through Sign or Walk's free Grade My Deal tool. Paste in the price, APR, term, and down payment and get an instant verdict on whether the deal is fair and whether the payment fits what you can actually afford. Knowing your budget is step one. Knowing whether the dealer respected it is step two.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'how-to-negotiate-car-price-word-for-word-script',
+    title: 'How to Negotiate a Car Price: The Word-for-Word Script',
+    date: '2026-05-27',
+    excerpt: 'Exactly what to say at every stage of a car negotiation, from the first offer to the finance office. A former dealer insider\'s playbook.',
+    readTime: '6 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=75" alt="two people negotiating across a desk" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Most car buyers lose the negotiation before they say a word, because they do not have a script. Dealers run the same plays on every customer. Here is how to counter each one, word for word, so you stop improvising and start winning.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Before You Walk In</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Preparation is where most of the negotiation actually happens. Arrive with a pre-approval from a credit union, a Carmax or Carvana offer on your trade, and a target price based on what others have paid for the same car. TrueCar, Edmunds, and LeaserHackr forums all show real transaction prices.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Know your walk-away number before you go. Write it down. If the deal does not get there, you leave. That is not a tactic, it is a commitment.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When They Ask About Your Payment</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The first thing most salespeople ask is what monthly payment you are looking for. Do not answer this. It lets them hide profit in the term length.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Say: &quot;I prefer to negotiate the out-the-door price first, then figure out financing separately.&quot;</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they push: &quot;The payment matters less to me than the total I&apos;m paying. Can we agree on the selling price first?&quot;</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Making Your First Offer</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Come in below your target price so there is room to move. A 5 to 8% discount off MSRP is realistic on most non-scarce models. On a $40,000 vehicle, that is $2,000 to $3,200 off sticker.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Say: &quot;Based on what similar vehicles are selling for in the area, I&apos;d like to start at $X. Is that something you can work with?&quot;</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they counter with a small discount: &quot;I appreciate that. Can you get closer to $Y? That&apos;s where I need to be to move forward today.&quot;</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Silence is your friend. After you name your number, stop talking and let them respond.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=75" alt="signing a contract" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When They Pull the &quot;Let Me Talk to My Manager&quot; Move</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">This is theater. The manager usually already knows the floor. The salesperson is gone for ten minutes to let pressure build. When they come back with a counter, do not celebrate and do not panic.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Say: &quot;I appreciate you checking. I think we&apos;re still a bit apart. Is there anything else you can do on the price or on the doc fee?&quot;</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they are firm: &quot;Let me think about it. I&apos;m going to check another dealer today and I&apos;ll let you know.&quot; Then actually leave.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">In the Finance Office</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The finance manager is the most profitable person in the building. Their job is to layer products onto the deal after you are emotionally committed to the car. Extended warranties, gap insurance, paint protection — all of it marked up 200 to 400 percent.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Say at the start: &quot;I&apos;m just here to sign for the car. I&apos;ve already decided I won&apos;t be adding any products today.&quot;</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they push the extended warranty: &quot;I&apos;ll consider it after the factory warranty expires. I can always buy it later.&quot; (You usually can.)</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>On gap insurance: only consider it if you financed more than 80% of the car's value. Otherwise you probably don't need it.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you hand over any signatures, run the full deal through Sign or Walk's free Grade My Deal tool. It will grade your price, flag junk fees, check your rate, and give you a word-for-word counter-offer script if the deal still needs work. Most people who use it find at least one thing worth pushing back on. That one thing is usually worth more than the 60 seconds it takes.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'lease-vs-finance-which-saves-more-money',
+    title: 'Lease vs. Finance: Which One Actually Saves You More Money?',
+    date: '2026-05-27',
+    excerpt: 'Leasing and financing are completely different financial products. Here\'s the honest math on which one wins for your situation — and when the other one is the trap.',
+    readTime: '6 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=900&q=75" alt="car keys and contract documents" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Leasing and financing are not the same choice with different names. They are completely different financial products that make sense in completely different situations. Here is the honest math on each, without the dealer spin.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What You Are Actually Paying For</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">When you finance, you are buying the car. You pay the full purchase price over time plus interest. At the end you own an asset, even if that asset has lost most of its value.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">When you lease, you are renting the car for a set period. You pay for the depreciation that happens during your lease term, plus a finance charge, plus fees. At the end you give the car back and own nothing. That sounds bad until you run the actual numbers.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When Leasing Wins</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Leasing tends to beat financing when the residual value is high, the money factor is low, and the manufacturer is running incentives. In these conditions you are only paying for modest depreciation over 36 months, and the payment can be dramatically lower than a finance deal on the same car.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>You drive a lot of car for less money each month, freeing cash for investments that grow faster than a depreciating asset.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>You are almost always in warranty, so large repair bills are rare.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If you use the car for business, you can often deduct lease payments in a way that purchase depreciation does not allow.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=75" alt="car on open road" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When Financing Wins</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Financing wins when you plan to keep the car long term, drive a lot of miles, or the lease terms are unfavorable. Once you own the car outright you have zero payment. That free payment period at the end of a loan is one of the best financial positions you can be in.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If you drive more than 15,000 miles a year, excess mileage penalties on a lease can easily run $1,500 to $3,000 at turn-in.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If you tend to have dents, scratches, or wear that goes beyond normal, disposition and excess wear charges will follow you off every lease.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Buying and holding for 10 years is almost always the cheapest total cost of transportation if you can live without a new car every 3 years.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The Perpetual Lease Trap</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The danger of leasing is not any single lease. It is chaining leases together forever and never escaping a car payment. Over 20 years, a perpetual leaser can easily spend $30,000 to $50,000 more than someone who buys and holds. The leaser has newer cars and zero equity. The buyer eventually has a paid off car and the payment money back in their pocket.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Neither path is wrong. But the perpetual lease trap only works if the cars you are leasing are good value leases. The moment you get lazy and sign a bad money factor or skip a negotiation, the math falls apart fast.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Run your specific numbers through Sign or Walk's free Grade My Deal tool. It handles both lease and finance deals, grades the total transaction, and gives you a lease versus buy recommendation based on the numbers you entered. Deciding between leasing and financing in the abstract is theory. Grading the actual deal in front of you is how you make money.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'best-time-to-buy-a-car-end-of-month-year',
+    title: 'Best Time to Buy a Car: End of Month, Quarter, or Year?',
+    date: '2026-05-27',
+    excerpt: 'Dealers have real monthly quotas. Here\'s exactly when the math shifts in your favor — and the specific windows where buyers routinely save $1,000 to $3,000.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1471444928343-74173b9900b0?w=900&q=75" alt="car lot at dusk" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referrer" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Timing a car purchase is not a myth. Dealers have real monthly sales quotas. Manufacturers issue real bonus money when stores hit targets. When you show up matters, and knowing when the math shifts in your favor can save you $1,000 to $3,000 with no extra negotiating required.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Why End of Month Works</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Most dealerships operate on monthly sales targets set by the manufacturer. Hit the target and the store earns bonus money, sometimes tens of thousands of dollars. Miss it and that money evaporates.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">On the last two to three days of the month, a dealer sitting one or two units short of their bonus threshold will take deals they would have walked from on the 15th. A $500 discount that would have cost them real profit earlier in the month is suddenly cheap insurance for a $20,000 bonus payout.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Shop on the last 2 to 3 days of the month, especially Monday through Wednesday when traffic is lowest and urgency is highest.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Say you are ready to buy today if the numbers work. Dealers prioritize buyers who will close immediately when they need units.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Avoid weekends at the end of the month. Foot traffic is high and the store has less pressure to discount for any single buyer.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">End of Quarter Is Even Better</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Quarter-end bonuses from manufacturers are often larger than monthly bonuses. March, June, September, and December all tend to be stronger buying windows than other month-ends. The combination of monthly and quarterly pressure gives you more leverage than any other time of year.</p>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=900&q=75" alt="dealership row of cars" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">End of Year: Model Clearance Is Real</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">When next year's models arrive, dealers need to move the outgoing inventory. A car sitting on a lot costs the dealer money every day in flooring costs, which are essentially interest payments to the bank that financed the inventory. The older the car on the lot, the more motivated they are to get rid of it.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">This is often where you see the biggest cash-back offers from manufacturers paired with already motivated dealers. The downside is you are buying a car that is technically a year old the moment you drive off the lot, which affects resale value. For buyers who keep cars long term, that trade-off is almost always worth it.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Target outgoing model years in August through October when new models start arriving. Discounts are often at their deepest.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Stack year-end clearance with end-of-month timing for maximum leverage. Late December is the best single month to buy a car in most years.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Watch for manufacturer cash-back offers that run in November and December. These stack on top of your negotiated price and can add $1,500 to $4,000 in savings you do not have to fight for.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When Timing Does Not Matter Much</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Timing helps most on models with normal supply. If you are shopping a car that is selling over MSRP due to short supply, month-end pressure means almost nothing. The dealer does not need your deal. Come back when inventory normalizes or find a model that is not scarce.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Timing gets you to a better starting point. Sign or Walk makes sure you do not give it all back in the finance office. Run your deal through the free Grade My Deal tool before you sign anything. It takes 60 seconds to find out whether the timing advantage you earned actually made it into the contract — or whether the dealer quietly took it back in fees and rate markup.</p>
+      </div>
+    ),
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

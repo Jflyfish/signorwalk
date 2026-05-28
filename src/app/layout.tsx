@@ -24,11 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }
         <script type="text/javascript" dangerouslySetInnerHTML={{ __html: `(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7326631-016a-4fce-96e4-0cd9e935d1861.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');` }} />
       </head>
-      <body className="min-h-screen bg-slate-50">
+      <body className="min-h-screen bg-white">
         <nav className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition">
-              <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-1" />
                   <circle cx="7.5" cy="17.5" r="2.5" />
@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center flex-shrink-0">
+                  <div className="w-6 h-6 bg-amber-500 rounded flex items-center justify-center flex-shrink-0">
                     <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5 text-white" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-1" />
                       <circle cx="7.5" cy="17.5" r="2.5" />
