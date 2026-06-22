@@ -14,6 +14,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${post.title} — Sign or Walk`,
     description: post.excerpt,
+    alternates: { canonical: `https://signorwalk.com/blog/${post.slug}` },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: 'article',
+      url: `https://signorwalk.com/blog/${post.slug}`,
+      publishedTime: post.date,
+      siteName: 'Sign or Walk',
+    },
   };
 }
 
@@ -22,8 +31,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const post = getPost(slug);
   if (!post) notFound();
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { '@type': 'Organization', name: 'Sign or Walk', url: 'https://signorwalk.com' },
+    publisher: { '@type': 'Organization', name: 'Sign or Walk', url: 'https://signorwalk.com' },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://signorwalk.com/blog/${post.slug}` },
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-5 sm:px-6 py-10 sm:py-16">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition mb-8">
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

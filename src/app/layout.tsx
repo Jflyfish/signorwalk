@@ -5,12 +5,14 @@ import MobileNav from '@/components/MobileNav';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://signorwalk.com'),
   title: 'Sign or Walk — Know Before You Sign',
   description: 'Free AI-powered car deal grader. Get an honest grade on your lease or finance deal — every red flag, every number, word-for-word negotiation script.',
   openGraph: {
     title: 'Sign or Walk — Know Before You Sign',
     description: 'Free AI-powered car deal grader. Grade your lease or finance deal in seconds.',
     type: 'website',
+    url: 'https://signorwalk.com',
   },
 };
 
