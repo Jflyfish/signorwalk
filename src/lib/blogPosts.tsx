@@ -1618,6 +1618,742 @@ export const blogPosts: BlogPost[] = [
       </div>
     ),
   },
+  {
+    slug: 'car-dealer-destination-charge-explained',
+    title: 'Car Dealer Destination Charge: Can You Negotiate It?',
+    date: '2026-06-22',
+    excerpt: 'What is a car dealer destination charge? Learn what it covers, why it\'s on every new car sticker, and whether you can actually negotiate it down.',
+    readTime: '4 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwY2FyJTIwY2FyfGVufDB8MHx8fDE3ODIxNTU0NTB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="running black Porsche sedan" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@campful?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Campbell</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You&apos;re staring at a new car window sticker and spot a line called the destination charge. It can run anywhere from around $1,000 to over $2,000. So what is a car dealer destination charge, and can you negotiate it? Here&apos;s the straight answer most salespeople won&apos;t give you.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What the destination charge actually covers</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The destination charge is the fee the automaker charges to ship the car from the factory to the dealership. It covers trucking, rail, and handling. Every buyer pays it, no matter how close they live to the plant.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The key thing to know: this fee is set by the manufacturer, not the dealer. Ford, Toyota, and the rest publish one flat destination fee per model. The dealer just passes it along.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Can you negotiate the destination charge?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Short answer: no, not directly. The destination charge is baked into the price of every new car and is non-negotiable by federal labeling rules. A dealer can&apos;t legally remove it or shrink it.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">But here&apos;s the trick. You can still get the dealer to eat the cost by negotiating a bigger discount on the vehicle price itself. If you knock $1,500 off the MSRP, you&apos;ve effectively wiped out the destination fee.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the dealer for an out-the-door price in writing, with destination, taxes, and all fees included.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Compare that total against quotes from at least two other dealers selling the same trim.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Push for a discount off MSRP that matches or beats the destination charge amount.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If the dealer adds a second &apos;delivery&apos; or &apos;dealer prep&apos; fee on top, refuse it. That&apos;s a duplicate charge.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwY2FyJTIwY2FyfGVufDB8MHx8fDE3ODIxNTU0NTB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="shallow focus photography of orange Volkswagen Beetle" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@danielcgold?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Dan Gold</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Red flags to watch for</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Some dealers try to charge a second shipping or handling fee on top of the factory destination charge. That&apos;s a markup, not a real cost. You can and should push back on anything that looks like a duplicate.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Also be careful with used cars. Destination charges only apply to new vehicles. If you see one on a used car contract, ask the dealer to remove it immediately.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">How to check the real destination fee</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you walk into the showroom, look up the official destination charge for your exact model. The number is listed on the manufacturer&apos;s website and on the Monroney sticker, which is the federally required window sticker.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If the dealer&apos;s number is higher than what the automaker publishes, that&apos;s a problem. Bring a printout. A real fee will match to the dollar.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to do next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Stop trying to argue the car dealer destination charge off the contract. You won&apos;t win that fight. Instead, focus your energy on the selling price, the trade-in value, and any add-ons in the finance office. That&apos;s where real money is saved. Get an out-the-door quote, compare it to other dealers, and let the lowest total price win.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'use-carmax-carvana-offers-negotiate-dealers',
+    title: 'Use CarMax and Carvana Offers to Negotiate With Dealers',
+    date: '2026-06-22',
+    excerpt: 'Learn how to use CarMax and Carvana offers as leverage to negotiate a better trade-in price at any dealership. Step-by-step playbook inside.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Dealers count on you not knowing what your car is worth. That&apos;s where CarMax and Carvana offers come in. Use them right, and you can walk into any showroom with real numbers that force the dealer to pay you fairly for your trade. Here&apos;s how to use CarMax and Carvana offers to negotiate with dealers without getting played.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Why these offers carry weight</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">CarMax and Carvana are the two biggest used car buyers in the country. When they give you a written offer, it&apos;s a real check they&apos;ll cut you on the spot. Dealers know this.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">That makes their offers the closest thing you&apos;ll get to a true cash value for your car. A dealer can&apos;t easily lowball you when you&apos;ve got proof of what someone else will pay today.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">How to get both offers fast</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Both sites take about 5 minutes. You enter your VIN or license plate, answer questions about condition, and upload a few photos. You&apos;ll have written offers good for about 7 days.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Go to carmax.com/sell-my-car and complete the online appraisal with honest condition answers.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Do the same at carvana.com/sell-my-car using the exact same condition details so the offers are comparable.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Save both offer PDFs or screenshots to your phone with the expiration dates clearly visible.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check one more source like Kelley Blue Book Instant Cash Offer to confirm you&apos;re in the right range.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The trade-in negotiation playbook</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Never mention your trade until after you&apos;ve agreed on the new car&apos;s price. Dealers love to mix the two numbers together so you can&apos;t tell where they&apos;re making money.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Once the new car price is locked in, then bring up the trade. Show them your highest offer and ask if they can beat it.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Say exactly this: &apos;Carvana offered me $18,400 in writing. Can you beat that number?&apos;</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they say no, take the deal at Carvana and buy the new car separately at the dealer.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they offer the same number, ask for a tax savings credit on top, since most states only tax the difference between trade and new car.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get any agreed trade number written on the deal sheet before talking about financing or add-ons.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The tax credit angle most buyers miss</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">In most states, trading your car in at the dealer reduces the sales tax on the new car. Selling to Carvana doesn&apos;t. That tax savings can be worth real money.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Here&apos;s the math. If your state charges 7% sales tax and your trade is worth $18,000, trading it at the dealer saves you about $1,260 in tax. So the dealer can offer $1,260 less than Carvana and you still come out even.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Check your state&apos;s rules before you negotiate. A few states like California and Virginia don&apos;t give this credit, so always take the highest cash offer there.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What dealers will try on you</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Expect pushback. Some dealers will claim the CarMax offer is fake, or that the car needs work they didn&apos;t see. Stay calm and stick to the written number.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they say &apos;that offer won&apos;t hold up in person,&apos; tell them you&apos;ve already booked the CarMax appointment as a backup.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they bundle the trade and new car price together, ask for them on separate lines in writing.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they pressure you to decide now, leave. The offers are good for a week and the car will still be there tomorrow.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If they lowball by more than the tax credit, walk out and sell to whoever made the highest offer.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to do next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you set foot on a lot, get your CarMax and Carvana offers in hand. Print them or save them to your phone. Then use those numbers as your floor, not your ceiling, when you negotiate with dealers. That&apos;s how regular buyers turn the trade-in game in their favor and stop leaving money on the table.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'what-is-a-salvage-title-car-should-you-buy-one',
+    title: 'What Is a Salvage Title Car? Should You Buy One?',
+    date: '2026-06-22',
+    excerpt: 'A salvage title car can save you thousands or cost you everything. Here\'s what a salvage title really means and when buying one actually makes sense.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1680395855021-79d18eec7da0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwc2FsdmFnZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NjYwfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="an old blue car is parked in a field" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@ka1ju_?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">andry star</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You spotted a 2020 SUV for half the price of every other one on the lot. The catch? It has a salvage title. So what is a salvage title car, and is the deal too good to be true? Short answer: usually yes, but not always. Let&apos;s break down what you&apos;re actually buying.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What a Salvage Title Actually Means</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">A salvage title means an insurance company declared the car a total loss. That usually happens when repair costs hit 70 to 90 percent of the car&apos;s value, depending on your state.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The damage could be from a crash, flood, fire, hail, or even theft. The title gets branded so future buyers know. That brand follows the car forever.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Here&apos;s the kicker. Once a car is fixed and passes a state inspection, the title often gets changed to &quot;rebuilt&quot; or &quot;reconstructed.&quot; That&apos;s the version you&apos;ll usually see for sale.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The Real Risks of Buying One</h2>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get a full pre-purchase inspection from an independent mechanic who has seen salvage work before. Expect to pay 100 to 200 dollars and bring the report to the negotiation.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Pull a vehicle history report from Carfax or AutoCheck and look for the original damage type. Flood and frame damage are deal breakers. Hail and minor collision are workable.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Call three insurance companies before you buy. Some won&apos;t insure salvage cars at all, and others only offer liability, not collision or comprehensive.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Expect to lose 20 to 40 percent of resale value compared to a clean title version. Plan to keep the car long term, not flip it.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the seller for repair receipts, photos of the damage, and the name of the shop that did the work. No paperwork means walk away.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1642276075121-3ac7d959a9f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwc2FsdmFnZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NjYwfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="an old vw bug is parked in front of a building" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@roonz_nl?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">RoonZ nl</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When a Salvage Car Can Be a Smart Buy</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Salvage cars aren&apos;t all junk. A car totaled for cosmetic hail damage can be a steal. Same goes for a low speed rear end hit that bent a bumper and tweaked a quarter panel.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Mechanics, body shop owners, and handy DIY folks often buy salvage cars on purpose. They know how to spot honest repairs and they don&apos;t care about resale.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you&apos;re financing, stop right there. Most banks and credit unions won&apos;t lend on a salvage or rebuilt title. You&apos;ll need cash or a specialty lender with higher rates.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Red Flags That Should Send You Running</h2>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Flood damage of any kind. Electrical gremlins will haunt you for years and corrosion keeps spreading.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Airbag deployment with no proof the airbags and sensors were properly replaced. A bad airbag repair can kill you in the next crash.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Frame or unibody damage, even if &quot;straightened.&quot; Crash safety is never the same.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>A seller who won&apos;t let you take it to your own mechanic. That&apos;s a hard no, every time.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Mismatched paint, uneven panel gaps, or fresh undercoating hiding the floor pan.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you&apos;re still considering a salvage title car, do three things today. Get the VIN and run a history report. Call your insurance company and ask if they&apos;ll cover it. Then book an independent inspection before you hand over a dollar. The savings can be real, but only if you go in with both eyes open and a mechanic on your side.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'how-to-check-car-history-report-vin-before-buying',
+    title: 'How to Check a Car History Report by VIN Before Buying',
+    date: '2026-06-22',
+    excerpt: 'Learn how to check a car history report by VIN before buying. Spot accidents, title fraud, and odometer rollbacks in minutes with these expert steps.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGNoZWNrJTIwYSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NzkzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man in white shirt standing beside black car" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@kateibragimova?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Kate Ibragimova</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Buying a used car without checking the VIN is like marrying someone after one date. You need the backstory. Learning how to check a car history report by VIN before buying takes about 10 minutes and can save you thousands. Here&apos;s exactly how to do it right.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What a VIN Actually Tells You</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">A VIN is the 17-character code that acts as a car&apos;s fingerprint. Every accident, title change, and service record gets tied to it. Pull the right report and you&apos;ll see the car&apos;s real past.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">You can find the VIN on the lower corner of the windshield on the driver&apos;s side. It&apos;s also on the driver&apos;s door jamb sticker and the title. Snap a clear photo so you can type it without errors.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Where to Run the VIN</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Not all reports are equal. Some are free and give you the basics. Others cost money but show much more detail. Smart buyers use both.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Start with NICB&apos;s VINCheck at vincheck.nicb.org. It&apos;s free and flags stolen or salvage records.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Run the VIN through NHTSA&apos;s recall lookup at nhtsa.gov/recalls to see open safety recalls.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Pull a paid Carfax or AutoCheck report for accident history, ownership count, and service records.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the dealer for a free Carfax. Many provide one if you just ask.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check your state DMV&apos;s title check tool if available, since some states offer free brand history.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1613214150132-9606e332d68e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGNoZWNrJTIwYSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NzkzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black car in grayscale photography" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@ben_brunner?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Benjamin Brunner</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Red Flags to Look For</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Once you have the report, scan it like a detective. You&apos;re looking for patterns that don&apos;t add up. A clean report isn&apos;t always clean if you know what to question.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Title brands like salvage, rebuilt, flood, or lemon. Walk away unless the price reflects it.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Odometer readings that drop or stall between service entries. That&apos;s a rollback signal.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Multiple owners in a short window. Cars get dumped for a reason.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Gaps of two or more years with zero records. The car may have been parked broken or registered out of country.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Accidents listed as structural or airbag deployment. Get a mechanic to inspect frame damage.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Cross-Check the Report Against the Car</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Reports miss things. Body shops that don&apos;t file claims, private accidents, and cash repairs never show up. That&apos;s why you verify in person.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Match the VIN on the dash to the VIN on the door jamb and the title. If any digit is different, stop the deal. Mismatched VINs often mean stolen parts or title washing.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Then pay a local mechanic 100 to 150 dollars for a pre-purchase inspection. They&apos;ll catch frame welds, paint overspray, and flood damage the report missed.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you sign anything, check the car history report by VIN, run it through at least two sources, and book an independent inspection. If the seller refuses any of these steps, that&apos;s your answer. Get the VIN, do the work, and buy with confidence instead of crossed fingers.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'pre-qualified-vs-pre-approved-car-loan',
+    title: 'Pre-Qualified vs Pre-Approved Car Loan: What\'s the Difference?',
+    date: '2026-06-22',
+    excerpt: 'Pre-qualified and pre-approved sound the same but mean very different things for your car loan. Here\'s what each one gets you at the dealership.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjB0aGUlMjBkaWZmZXJlbmNlJTIwY2FyfGVufDB8MHx8fDE3ODIxNTc4NjV8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">If you&apos;ve shopped for a car loan, you&apos;ve seen both terms thrown around like they mean the same thing. They don&apos;t. Knowing the difference between pre-qualified and pre-approved for a car loan can save you thousands and stop a dealer from playing games with your rate.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Pre-Qualified: A Soft Guess</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Pre-qualified means a lender took a quick look at basic info you gave them. Things like your income, credit score range, and how much you want to borrow. They didn&apos;t pull a hard credit report, and they didn&apos;t verify anything.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">It&apos;s an estimate. Nothing more. The rate and amount they show you can change once they actually check your credit and documents.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Use pre-qualification early to see ballpark rates without hurting your credit score</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Treat the offer as a starting point, not a promise</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Compare pre-qualified offers from at least three lenders to spot the best range</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Pre-Approved: A Real Commitment</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Pre-approval is the real deal. The lender pulls your credit, verifies your income, and gives you a specific loan amount, rate, and term. You usually get a letter or check you can take to the dealership.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">This puts you in the driver&apos;s seat. You walk in knowing exactly what you can spend and what you&apos;ll pay. The dealer either beats your rate or you use the one you&apos;ve got.</p>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1502158895-0d817974dfaf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjB0aGUlMjBkaWZmZXJlbmNlJTIwY2FyfGVufDB8MHx8fDE3ODIxNTc4NjV8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="white Nissan GT-R and white Mitsubishi Lancer Evolution 10" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@connorlunsford?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Connor Lunsford</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Why the Difference Matters at the Dealership</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Dealers love buyers who walk in with no financing lined up. That&apos;s how they make money on the loan markup. A pre-qualified letter doesn&apos;t scare them. A pre-approval check does.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">With a pre-approval in hand, the finance office has to compete. They&apos;ll often try to beat your rate to win your business. That&apos;s a win for you either way.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Does Pre-Approval Hurt Your Credit?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Yes, but barely. A hard inquiry typically drops your score a few points and fades within a few months. Here&apos;s the trick: if you apply for multiple auto loans within a 14 day window, credit bureaus usually count them as one inquiry.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">So rate shop in a tight window. You get the benefit of comparing real offers without taking multiple hits.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Which One Should You Get?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Start with pre-qualification when you&apos;re months away from buying. It helps you set a budget without any credit impact. Then get pre-approved once you&apos;re ready to shop seriously, usually within 30 days of buying.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get pre-qualified through your bank or credit union to see your rough rate</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Two to four weeks before buying, apply for pre-approval with three lenders in the same week</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Bring the best pre-approval offer to the dealer and let them try to beat it</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Never tell the dealer your monthly budget, only the total price you&apos;ll pay</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Don&apos;t let the pre-qualified vs pre-approved confusion cost you money on your next car loan. Start with a soft pre-qualification today to set your budget. Then get real pre-approvals from a credit union, a bank, and an online lender before you ever step on a lot. Walking in with a locked rate is the single best move you can make.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'how-to-avoid-yo-yo-financing-scam',
+    title: 'How to Avoid the Yo-Yo Financing Scam at Dealerships',
+    date: '2026-06-22',
+    excerpt: 'Learn how to avoid the yo-yo financing scam at car dealerships with simple steps that protect your wallet, your credit, and your new ride from shady tactics.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1515086828834-023d61380316?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGF2b2lkJTIweW8teW8lMjBjYXJ8ZW58MHwwfHx8MTc4MjE1Nzg5OXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="person driving Toyota car" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@jessicamaephotographyga?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Jessica Furtney</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You sign the papers, drive home in your new car, and feel great. Then a week later the dealer calls and says your financing fell through. That&apos;s the yo-yo financing scam, and learning how to avoid it at car dealerships can save you thousands and a massive headache.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What Is Yo-Yo Financing?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Yo-yo financing happens when a dealer lets you drive off before the loan is fully approved. Days or weeks later, they claim the bank backed out. Then they pressure you to sign a new deal with a worse rate, bigger down payment, or longer term.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">It&apos;s called yo-yo because they reel you back in. By then you&apos;ve told everyone about the car, maybe traded in your old one, and feel stuck. That emotional pressure is exactly what the scam relies on.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Warning Signs Before You Sign</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Most yo-yo deals start with a few red flags at the dealership. Spot them early and you can walk away clean.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>The contract says &apos;subject to financing approval&apos; or &apos;conditional delivery&apos;. That phrase means the deal isn&apos;t final.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>The finance manager rushes you out the door late at night or on a weekend when banks are closed.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>They can&apos;t tell you which lender approved you or what the exact APR is.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>They ask you to sign a &apos;spot delivery agreement&apos; that lets them unwind the deal later.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Your down payment check hasn&apos;t been cashed yet, which often means funding isn&apos;t locked in.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1518803331006-b3d0aca60d2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGF2b2lkJTIweW8teW8lMjBjYXJ8ZW58MHwwfHx8MTc4MjE1Nzg5OXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="woman holding steering wheel sitting inside car" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@williamk?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">William Krause</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">How to Protect Yourself Before You Drive Off</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The best defense is getting your own financing first. Walk into the dealer with a pre-approval from your bank or credit union in hand. Now the dealer has to beat that rate, not invent one.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get pre-approved by your bank or credit union before you shop. Take the approval letter with you.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Refuse to take delivery until the contract says &apos;final&apos; and lists the exact lender, APR, and term.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the finance manager point blank: &apos;Is this loan fully funded today?&apos; Get the answer in writing.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Don&apos;t trade in your old car the same day. Hold it for at least 10 days until funding clears.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Photograph or scan every page you sign, including the back sides, before you leave the lot.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do If the Dealer Calls You Back</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you get the dreaded call, don&apos;t panic and don&apos;t rush back. You have more power than they want you to think. Ask them to put the cancellation in writing and state which lender denied you.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Then tell them you&apos;ll return the car and want your down payment and trade-in back in full. In many states, if they can&apos;t honor the original contract, the deal is void. They often suddenly find financing once you say that.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Know Your Legal Backup</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Yo-yo financing is illegal or heavily restricted in several states. The Federal Trade Commission and your state attorney general both take complaints. Filing one is free and often gets results fast.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>File a complaint at reportfraud.ftc.gov if you feel pressured into a worse deal.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Contact your state attorney general&apos;s consumer protection office.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Post a factual review on Google and the Better Business Bureau. Dealers respond quickly to public pressure.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Talk to a consumer attorney. Many offer free first consultations for auto fraud cases.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">To avoid the yo-yo financing scam at car dealerships, lock in your own loan first, read every line of the contract, and never drive off until the deal is final and funded. If something feels off, walk. There&apos;s always another car, but your money and credit are harder to get back.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'dealer-market-adjustments-how-to-avoid',
+    title: 'Dealer Market Adjustments: How to Avoid Paying Them',
+    date: '2026-06-22',
+    excerpt: 'Dealer market adjustments can add thousands to your car\'s price. Here\'s what they are, why dealers charge them, and how to avoid paying a cent.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Dealer market adjustments are extra fees tacked onto a car&apos;s sticker price, often for hot or hard to find models. They can add anywhere from $1,000 to $20,000 to your bill. The good news? You almost never have to pay them. Here&apos;s how to spot a market adjustment and walk away with the real price.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What is a dealer market adjustment?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">A market adjustment is a markup the dealer adds on top of MSRP. You&apos;ll see it on the window sticker or buyer&apos;s order, usually labeled ADM (Additional Dealer Markup), market adjustment, or supply premium.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Dealers use these when demand is high and inventory is low. Popular trucks, new model launches, and limited edition trims are the usual targets. It&apos;s legal in most states, but it&apos;s also negotiable.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Why dealers charge them</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Simple: because some buyers pay them. If a dealer has one Bronco Raptor and three people want it, they&apos;ll charge the person willing to fork over an extra $10,000. It&apos;s not personal. It&apos;s leverage.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Manufacturers like Ford, Toyota, and GM have publicly told dealers to knock it off. Some have threatened to cut allocations. But until that actually happens, the practice continues at plenty of stores.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">How to spot a market adjustment on your deal</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Always read every line of the window sticker and the buyer&apos;s order before you sign anything. Market adjustments hide in plain sight, sometimes printed on a second sticker next to the official Monroney label.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Look for any line item labeled ADM, market adjustment, dealer markup, or supply and demand fee.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Compare the final sale price to the MSRP printed on the official Monroney sticker. Any gap above tax, title, and reasonable doc fees is a markup.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the salesperson directly: &apos;Are you selling this at MSRP or above?&apos; Get the answer in writing before you test drive.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check the dealer&apos;s online price against the in store quote. Some bait with MSRP online and add the markup at the desk.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">How to avoid paying a market adjustment</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">You have more power than you think. The cars getting marked up today often sit on lots six months from now. Patience is your best weapon.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Email 5 to 10 dealers within a 300 mile radius and ask for an out the door price in writing. Cheaper dealers exist if you&apos;re willing to look.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Use sites like CarGurus, Edmunds, and AutoTrader to filter for listings at or below MSRP. They&apos;re out there.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Order the car from the factory through a no markup dealer. Stores like those listed on the CarEdge or r/askcarsales community lists openly advertise MSRP only pricing.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Tell the dealer you&apos;ll pay MSRP and not a dollar more, then leave your number. If they have a cancellation, you&apos;ll get a call.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Wait 60 to 90 days. Markups shrink fast once the initial hype dies down or interest rates climb.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Consider a similar model without the hype. A Mazda CX-50 drives great and has zero markup. A loaded Tundra often sells at sticker while the 4Runner gets marked up $5,000.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What if the dealer won&apos;t budge?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Walk. That&apos;s it. There&apos;s no magic phrase that forces a dealer to drop a markup if they have another buyer lined up. But the second you leave, you become leverage for the next shopper, and you free yourself up to find a fair deal elsewhere.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Report shady markups to the manufacturer too. Ford, Hyundai, and others have customer hotlines and online forms. It won&apos;t always work, but it builds pressure on dealers who abuse the system.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to do next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you sign anything, run your offer through Sign or Walk to see if a dealer market adjustment or other junk fees are buried in your numbers. Get the out the door price in writing, compare it to MSRP, and never feel rushed. The right car at the right price is always worth waiting for.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'how-to-buy-car-end-of-model-year-best-deal',
+    title: 'How to Buy a Car at End of Model Year for the Best Deal',
+    date: '2026-06-22',
+    excerpt: 'Learn how to buy a car at end of model year and score thousands off. Insider timing, scripts, and tactics that get dealers to drop the price fast.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Want to buy a car at end of model year and actually save real money? You&apos;re in the right spot. Dealers are sitting on last year&apos;s inventory while the new models roll in, and they need that old stock gone. That pressure is your leverage, and this guide shows you exactly how to use it.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When does the model year actually end?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Most automakers start shipping next year&apos;s models between July and October. By August, dealer lots are usually full of outgoing units. That&apos;s when the discounts get serious.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The sweet spot is typically late August through October. By December, the best leftover deals are often gone or the selection is picked over.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Why dealers slash prices on outgoing models</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Every car on the lot costs the dealer money in floor plan interest. The longer a unit sits, the more it bleeds. Old model year inventory also hurts trade-in values and makes the lot look stale to new shoppers.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Manufacturers help by pushing extra rebates, low APR offers, and dealer cash on outgoing units. Stack those incentives and you can save thousands over a brand new model year version of the same car.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Steps to get the best end of model year deal</h2>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Search dealer inventory online and filter by the outgoing model year only. Note the VINs of three to five matches within 100 miles.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check the manufacturer&apos;s website for current cash rebates, loyalty offers, and special APR deals tied to the outgoing year.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Email or text the internet sales manager at each dealer. Ask for an out the door price on the specific VIN, including all fees and taxes.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Tell each dealer you have quotes from the others and ask if they can beat the lowest one. Forward the best quote as proof.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Shop on the last weekend of the month for extra urgency. Dealers chasing monthly bonuses get more flexible.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get pre-approved at your bank or credit union before you walk in so the finance office can&apos;t pad the rate.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Watch out for these traps</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">A leftover car is technically a year older the second you drive it off the lot. That means depreciation hits faster on paper. If you keep cars for five years or more, this barely matters. If you trade every two years, do the math first.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Also check the build date on the door jamb sticker. A car built early in the prior year has been sitting longer, which can mean a tired battery or flat-spotted tires. Ask the dealer to replace anything that&apos;s degraded as part of the deal.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Leasing vs buying at end of model year</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Buying outright is where leftover deals shine brightest. Lease deals on outgoing models can be hit or miss because the residual value drops along with the model year. Always compare the lease money factor and residual to a current year version before signing.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you&apos;re financing, prioritize the lowest out the door price first, then negotiate the APR. Don&apos;t let the dealer mash both numbers together to confuse you.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to do next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you want to buy a car at end of model year, start tonight. Pull up three local dealer websites, filter to the outgoing year, and send a short email asking for an out the door price on a specific VIN. Then run the quote through Sign or Walk to see if it&apos;s actually a deal worth signing, or if you should walk and push harder.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'what-is-a-lease-pull-ahead-program',
+    title: 'Lease Pull-Ahead Programs: Should You Take the Deal?',
+    date: '2026-06-22',
+    excerpt: 'A lease pull-ahead program lets you end your lease early with no penalty. Here\'s how it really works and when it\'s actually worth saying yes.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwbGVhc2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjE2MDA5Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@obionyeador?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Obi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Got a letter from your dealer offering to end your lease early? That&apos;s a lease pull-ahead program, and it sounds like free money. Sometimes it is. Sometimes it&apos;s a clever way to get you into a more expensive car. Here&apos;s how to tell the difference before you sign anything.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What is a lease pull-ahead program?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">A lease pull-ahead lets you turn in your leased car before the contract ends. The automaker waives your last few payments, usually two to six months worth.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">In exchange, you lease or buy another car from the same brand. Honda, Toyota, BMW, and most others run these offers when they want used inventory or to keep loyal customers.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The catch? You only get the waived payments if you stick with that brand. Walk away to a different make and you owe every remaining payment.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When a pull-ahead actually saves you money</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The math works in your favor in a few specific situations. Check if any of these apply before you say yes.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>You&apos;re over your mileage allowance and facing per-mile charges at lease end. Turning in early stops the meter.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Your car has wear and tear that will cost more to fix than the remaining payments.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>The new lease payment is the same or lower than your current one, with similar terms.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>You were already planning to get a new car within the next 6 months anyway.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>The dealer is offering extra incentives on top, like loyalty cash or a lower money factor.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwbGVhc2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjE2MDA5Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When to walk away from the offer</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Dealers push pull-aheads hard because they need your trade-in and they get a fresh sale. That doesn&apos;t mean it&apos;s a bad deal, but watch for these red flags.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>The new monthly payment jumps by $50 or more for a similar vehicle.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Your current car has equity, meaning it&apos;s worth more than the buyout price. You could sell it yourself and pocket the difference.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>The new lease has a higher money factor or shorter term that hides the real cost.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>You&apos;re being pushed into a pricier trim or model you didn&apos;t want.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Acquisition fees and other add-ons wipe out the value of the waived payments.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Check for equity before you decide</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">This is the step most people skip. Call your leasing company and ask for the payoff amount on your car. Then check the trade-in value on Kelley Blue Book or get a quote from Carvana or CarMax.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If the market value is higher than the payoff, you have equity. You can sell the car to a third party, pay off the lease, and keep the cash. That&apos;s often a better move than rolling into a new lease.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">How to negotiate a pull-ahead deal</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Treat the new lease like any other negotiation. The waived payments are a discount, not a reason to skip the haggling.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get the full breakdown in writing: selling price, money factor, residual, and fees.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Compare the new lease offer to current ads from other dealers for the same model.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask if any loyalty rebates or conquest cash can stack on top of the pull-ahead.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Run the numbers without the waived payments included. The new deal should still make sense on its own.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Don&apos;t trade in your current car at the dealer if it has equity. Sell it separately for more cash.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to do next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you accept any lease pull-ahead program, do three things today. Pull your current lease contract and check the remaining payments and mileage. Get an instant offer from an online buyer to see if you have equity. Then ask the dealer for a written quote on the new lease with all numbers spelled out. If the deal still looks good after that, you&apos;ve found a real win. If not, you just dodged a sales pitch dressed up as a favor.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'how-to-get-out-of-a-car-loan-you-cant-afford',
+    title: 'How to Get Out of a Car Loan You Can\'t Afford',
+    date: '2026-06-22',
+    excerpt: 'Stuck with a car payment that\'s wrecking your budget? Here\'s how to get out of a car loan you can no longer afford without trashing your credit.',
+    readTime: '6 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1441148345475-03a2e82f9719?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMTQzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black BMW car surrounded by grass field" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@bchild311?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Benjamin Child</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">If your car payment is eating your paycheck, you&apos;re not alone. Millions of Americans are upside down on their loans or just stretched too thin. The good news? You have real options to get out of a car loan you can no longer afford, and most of them are better than waiting for the repo truck.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">First, figure out where you stand</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you make any moves, you need two numbers. Your loan payoff amount and your car&apos;s current market value. The gap between them decides everything.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Call your lender and ask for a 10-day payoff quote in writing.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check your car&apos;s trade-in and private-party value on KBB, Edmunds, and Carvana for an instant offer.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Subtract payoff from value. If value is higher, you have equity. If payoff is higher, you&apos;re underwater by that amount.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 1: Sell the car yourself</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Selling private party almost always gets you more cash than a trade-in. If you have equity, this is the cleanest exit. Use the buyer&apos;s payment to pay off the lender, pocket the difference, and walk away.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you&apos;re underwater, you&apos;ll need to cover the gap out of pocket before the title transfers. Even putting $2,000 of your own money in can be cheaper than another year of payments you can&apos;t make.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 2: Trade down to a cheaper car</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you need a car but can&apos;t afford this one, trade it in on something much cheaper. Be careful here. Dealers love to roll negative equity into a new loan, which just buries you deeper.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Only trade down if the new payment is at least 30% lower than your current one.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Refuse to roll more than $2,000 of negative equity into a new loan.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Aim for a used car under $15,000 with a loan term of 48 months or less.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1529369623266-f5264b696110?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMTQzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man standing beside white SUV near concrete road under blue sky at daytime" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@jamie452?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Jamie Street</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 3: Refinance for a lower payment</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If the car is fine but the payment is the problem, refinancing can buy you breathing room. Credit unions usually offer the best rates. A longer term lowers your monthly payment but costs more in interest overall.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Refinancing works best if your credit score has gone up since you bought the car, or if rates have dropped. Get quotes from two or three credit unions before signing anything.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 4: Ask your lender for help</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Lenders would rather work with you than repossess your car. Call them before you miss a payment, not after. Ask about deferment, a loan modification, or a payment extension.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Request a one or two month payment deferral if you&apos;ve had a job loss or medical issue.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask if they&apos;ll re-amortize the loan over a longer term to drop your monthly cost.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get any agreement in writing before you skip or change a payment.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to avoid</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Voluntary repossession sounds easier than it is. Yes, you hand the keys back. But you still owe the difference between what the car sells for at auction and your loan balance. That bill can be thousands, and it hits your credit just as hard as a regular repo.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Lease transfers and loan assumptions sound smart but rarely work for standard auto loans. Most lenders don&apos;t allow someone else to take over your loan. Don&apos;t waste weeks chasing this.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to do next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Today, pull your payoff quote and check your car&apos;s value. Tomorrow, pick the option that fits your situation and start making calls. Getting out of a car loan you can no longer afford is stressful, but the longer you wait, the fewer choices you have. Move now while you still have leverage.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'what-is-acquisition-fee-car-lease',
+    title: 'Acquisition Fee on a Car Lease: What It Is & How to Cut It',
+    date: '2026-06-22',
+    excerpt: 'Learn what an acquisition fee on a car lease really is, how much you should expect to pay, and smart ways to lower or avoid it before signing.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhY3F1aXNpdGlvbiUyMGZlZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMjYyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@obionyeador?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Obi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">If you&apos;ve ever read a lease contract and spotted a charge you didn&apos;t expect, you&apos;re not alone. The acquisition fee on a car lease is one of those sneaky line items that can add hundreds to your deal. Here&apos;s what it actually is, why dealers charge it, and how to push back.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What is an acquisition fee on a car lease?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">An acquisition fee is what the bank or leasing company charges to set up your lease. It covers paperwork, credit checks, and processing. Think of it like an origination fee on a mortgage.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Most acquisition fees run between $595 and $1,095. Luxury brands like BMW and Audi sit at the higher end. Honda, Toyota, and Hyundai usually charge less.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The fee goes to the lender, not the dealer. That&apos;s an important point. Your salesperson can&apos;t waive it, but the math around it is still negotiable.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Where does the acquisition fee show up?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">You&apos;ll see it in one of two places on your lease worksheet. Either it&apos;s rolled into your monthly payment, or it&apos;s paid upfront at signing as part of your drive off amount.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check the &apos;capitalized cost&apos; line on your lease worksheet to see if the fee was rolled in.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Look at the &apos;amount due at signing&apos; section for an upfront acquisition charge.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the finance manager to point to the exact line item, in writing, before you sign.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhY3F1aXNpdGlvbiUyMGZlZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMjYyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Can you negotiate the acquisition fee?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Directly? Usually not. The lender sets the fee and it&apos;s the same for every customer using that bank. But you have two real ways to fight back.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">First, shop lenders. If you&apos;re leasing a Toyota, you might have the option of Toyota Financial or a credit union. Compare both. Credit union acquisition fees are often $300 to $500 lower.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Second, ask the dealer to discount the price of the car by the amount of the fee. They won&apos;t call it that, but a $700 price cut offsets a $700 fee. Same result for your wallet.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">How to minimize the acquisition fee</h2>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get quotes from at least three dealers and ask each one for the captive lender&apos;s acquisition fee in writing.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Call your local credit union and ask if they lease vehicles and what their fee is.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Negotiate the selling price of the car down by the amount of the fee to cancel it out.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Pay the fee upfront instead of rolling it in, so you don&apos;t pay rent charge (interest) on top of it.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Avoid lease specials that hide a high acquisition fee behind a low monthly payment.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Watch out for the disposition fee too</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Acquisition fees have a cousin called the disposition fee. That one hits at the end of the lease when you turn the car in. It usually runs $300 to $500.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you lease again with the same brand, many lenders waive the disposition fee. Worth knowing before you switch loyalties at lease end.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to do next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you sign anything, pull up the lease worksheet and find the acquisition fee on your car lease. Compare it to at least one outside lender. Then ask the dealer to discount the car price to offset it. Run your final numbers through Sign or Walk to see if the deal is actually fair, or if you should walk away.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'real-monthly-cost-to-own-a-car',
+    title: 'How Much Does It Really Cost to Own a Car Per Month?',
+    date: '2026-06-22',
+    excerpt: 'The real monthly cost to own a car is way more than your payment. Here\'s how to add up every hidden expense before you sign.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1589819292643-a78fba5aa0b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjBtdWNoJTIwZG9lcyUyMGl0JTIwY2FyfGVufDB8MHx8fDE3ODIxNjAyOTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="text" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@joegunawan_?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Jonathan Gunawan</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Most people think the monthly cost to own a car is just the loan payment. It isn&apos;t. By the time you add fuel, insurance, repairs, and a few things you probably forgot, the real number can be double what&apos;s on the contract. Here&apos;s how to figure out what your car actually costs you every month, before you sign anything.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The Six Costs That Make Up Your Real Payment</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Your true monthly car cost is six things stacked together. Skip one and your budget breaks. Add them all up and you get the honest number.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Loan payment: the amount your lender pulls each month from your account.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Full coverage insurance: often $150 to $250 per month, more if you&apos;re under 25 or had a recent claim.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Fuel: divide your monthly miles by your car&apos;s real MPG, then multiply by local gas prices.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Maintenance: oil changes, tires, brakes, and fluids. Budget around $100 a month even on a new car.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Registration and taxes: spread the annual cost across 12 months so it doesn&apos;t surprise you.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Repairs after warranty: set aside $50 to $100 a month once your factory coverage ends.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">A Real Example: The $400 Payment That&apos;s Actually $850</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Say you finance a used SUV with a $400 monthly payment. Looks affordable, right? Add $180 for insurance, $200 for gas if you drive 1,200 miles a month, $80 for maintenance, and $40 for registration spread out.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">That&apos;s $900 a month. The payment was less than half the real cost. This is why so many buyers feel broke two months after the dealership hands them the keys.</p>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1713825034563-146dd9f503a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjBtdWNoJTIwZG9lcyUyMGl0JTIwY2FyfGVufDB8MHx8fDE3ODIxNjAyOTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a person wearing a hoodie with the words it&apos;s not always in the" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">How to Calculate Your Own Number Before You Buy</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">You don&apos;t need a spreadsheet wizard to do this. Grab your phone and a notepad. Ten minutes is all it takes.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get a real insurance quote for the exact car you want before signing. Use the VIN if the dealer will share it.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Look up the car&apos;s combined MPG on fueleconomy.gov, then plug in your monthly miles and local gas price.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check the maintenance schedule in the owner&apos;s manual to see what services hit in the first three years.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the dealer for the out-the-door price, then divide registration and taxes by 12 if you&apos;re paying separately.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Add a $75 cushion for the random stuff: a flat tire, a new wiper, a parking ticket.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">New vs Used: Which One Actually Costs Less Per Month?</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">New cars have higher payments but lower repair costs and often better fuel economy. Used cars have smaller payments but bigger repair risk and sometimes higher interest rates.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">The sweet spot for most buyers is a two to four year old car with one owner and full service records. You skip the steepest depreciation and still get years of reliable use.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Ways to Cut Your Monthly Cost Right Now</h2>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Shop insurance every 12 months. Loyalty discounts rarely beat switching carriers.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Refinance your auto loan if rates drop or your credit score jumps 40 points or more.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Stretch oil changes to the manufacturer&apos;s actual interval, not the sticker on your windshield.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Buy tires online and have a local shop mount them. You&apos;ll often save $200 a set.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Drop full coverage once your car is worth less than about $4,000 and you have savings to replace it.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you walk into a dealership, write down the real monthly cost to own a car using the six categories above. If the total scares you, that&apos;s the point. Adjust the car, the loan term, or the down payment until the full number fits your life, not just the payment. Then run the final deal through a tool like Sign or Walk to make sure the dealer&apos;s numbers match yours.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'lease-or-buy-electric-vehicle-2026',
+    title: 'Should You Lease or Buy an Electric Vehicle in 2026?',
+    date: '2026-06-22',
+    excerpt: 'Lease or buy an electric vehicle in 2026? Here\'s how to decide based on tax credits, battery tech, and your driving habits before signing anything.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1707779491283-4989f727825f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxTaG91bGQlMjB5b3UlMjBsZWFzZSUyMG9yJTIwY2FyfGVufDB8MHx8fDE3ODIxNjAzMzB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a yellow car parked in front of a blue wall" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@mirzaie?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Mehdi Mirzaie</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Trying to decide whether to lease or buy an electric vehicle in 2026? You&apos;re not alone. EV prices, tax credits, and battery tech are all moving fast right now, and the wrong choice can cost you thousands. Here&apos;s a straight answer based on how you actually drive and what makes financial sense today.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The Short Answer for Most Buyers</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Leasing usually wins for first time EV drivers. Buying usually wins if you plan to keep the car past 5 years and you can charge at home.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Why? EV tech is improving every model year. A 2026 lease lets you swap into better range and faster charging in 2029. Buying locks you in, but you build equity and skip the mileage caps.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When Leasing an EV Makes Sense in 2026</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Leasing an electric vehicle in 2026 has one huge advantage: the commercial clean vehicle tax credit. Leasing companies often pass this $7,500 credit to you as a capitalized cost reduction, even on cars that don&apos;t qualify for the purchase credit.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the dealer in writing how much of the $7,500 EV lease credit is applied to your cap cost.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Drive under 12,000 miles a year so you don&apos;t pay overage fees of 15 to 25 cents per mile at lease end.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Pick a 24 or 36 month term so you can jump to better battery tech sooner.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get gap coverage included since EVs depreciate fast in the first two years.</span></li>
+        </ul>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1673187139181-795761a40ca1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxTaG91bGQlMjB5b3UlMjBsZWFzZSUyMG9yJTIwY2FyfGVufDB8MHx8fDE3ODIxNjAzMzB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="two cars parked next to each other in a parking lot" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@usmanbim94?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Usman Malik</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">When Buying an EV Makes Sense</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Buying wins if you drive a lot, charge at home, and keep cars for the long haul. Once you pay off an EV, your cost per mile drops to almost nothing. No oil changes, no transmission service, just tires and wipers.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Battery warranties run 8 years or 100,000 miles on most EVs, so the scary repair bills people worry about are covered for a long time. If you keep the car 7 to 10 years, buying almost always beats leasing on total cost.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check if the model qualifies for the federal purchase tax credit at fueleconomy.gov before you shop.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get pre-approved at your credit union to beat the dealer&apos;s finance rate by 1 to 2 percent.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Install a Level 2 home charger before delivery so you actually use the savings.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Run the numbers at 7 years of ownership, not 3, to see the real savings.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">The Hidden Math People Miss</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">EV resale values have been unpredictable. Some models have dropped 40 percent or more in two years as new versions arrived. That hurts buyers and helps lessees, because the leasing company eats the depreciation, not you.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Flip side: if you finance for 72 months and the car loses value fast, you could be underwater for years. Put at least 10 percent down or lease instead.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Quick Decision Checklist</h2>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Lease if this is your first EV or you drive under 12,000 miles a year.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Buy if you can charge at home and plan to keep it past 5 years.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Lease if the model you want doesn&apos;t qualify for the $7,500 purchase credit but the lease deal applies it.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Buy used (2 to 3 years old) if you want the best value of all, since someone else ate the steep first depreciation hit.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you sign anything, get both a lease quote and a purchase quote on the same car, same day. Compare the total out of pocket cost over 3 years for the lease versus 3 years of loan payments plus the car&apos;s projected trade in value. Whichever number is lower wins. That&apos;s how you actually decide to lease or buy an electric vehicle in 2026, instead of guessing on the showroom floor.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'owe-more-than-car-is-worth-trade-in',
+    title: 'Trading In a Car With Negative Equity: What to Do',
+    date: '2026-06-22',
+    excerpt: 'Owe more than your car is worth at trade-in? Here\'s how to handle negative equity without rolling thousands into your next loan.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1526583038916-f138f908476b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIxNjA0NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="two men fixing up blue car" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@marcst84?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Marc St</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">So you want to trade in your car, but you owe the bank more than the car is worth. That&apos;s called negative equity, and it&apos;s more common than you think. If you owe more than your car is worth when trading in, you have real options, and most of them are better than what the dealer will suggest first.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">First, Figure Out How Upside Down You Really Are</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Before you do anything, get two numbers. Call your lender for the exact 10-day payoff amount. Then check the car&apos;s real trade-in value on Kelley Blue Book, Edmunds, and Carvana&apos;s instant offer tool.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Subtract the trade value from the payoff. That gap is your negative equity. If you owe $22,000 and the car trades for $17,000, you&apos;re $5,000 upside down. Now you know what you&apos;re working with.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Call your lender and ask for the 10-day payoff amount in writing.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get at least three trade-in offers: KBB Instant Cash Offer, Carvana, and CarMax.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Use the highest of those three offers as your baseline when talking to a dealer.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 1: Pay the Difference in Cash</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">This is the cleanest move. If you can write a check for the gap, do it. You walk into the next deal with a clean slate and a smaller loan.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Even paying part of the gap in cash helps. Every dollar you don&apos;t roll into the next loan is a dollar you won&apos;t pay interest on for the next six years.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 2: Keep Driving and Wait It Out</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Nobody wants to hear this, but it&apos;s often the smartest play. Keep the car. Make extra principal payments. Wait until you have equity or at least break even.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If your car still runs fine, six to twelve more months of payments can flip the math completely. Patience is free. Rolling $5,000 into a new 72-month loan is not.</p>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1777013371332-c325bf12d613?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIxNjA0NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="White sedan parked outside a building with sign" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@chiuchuuu?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Heng Chiu</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 3: Sell It Yourself</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Private party sales almost always beat trade-in offers, sometimes by $2,000 or more. List it on Facebook Marketplace, Craigslist, or Autotrader. Use the proceeds to pay off the loan and pocket whatever&apos;s left.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If the sale price doesn&apos;t quite cover the loan, you&apos;ll still owe less than you would after a trade-in. Your lender can walk you through how to handle the title transfer when there&apos;s a lien.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Avoid: Rolling Negative Equity Into a New Loan</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">This is what most dealers will push you toward. They&apos;ll say things like &quot;don&apos;t worry, we&apos;ll take care of the payoff.&quot; What they mean is they&apos;re adding your old debt to your new loan.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">You&apos;ll start the new car already upside down. If you total it or need to sell early, you&apos;re stuck paying for two cars at once. Avoid this unless you have no other choice.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">If You Must Roll It Over, Do This</h2>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Buy a car you can keep for at least 6 years so you have time to build equity.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Put down enough cash to cover the negative equity, even if it means a smaller car.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get gap insurance so you&apos;re not destroyed if the new car is totaled.</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Keep the loan term at 60 months or less to avoid digging the hole deeper.</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to Do Next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">If you owe more than your car is worth when trading in, your move today is simple. Get your payoff number, get three real trade offers, and do the math. Then pick the option that keeps the most money in your pocket, not the one the dealer suggests. Most of the time, that&apos;s paying the gap in cash, selling private, or waiting six more months.</p>
+      </div>
+    ),
+  },
+  {
+    slug: 'buy-car-no-credit-history-no-cosigner',
+    title: 'How to Buy a Car With No Credit and No Cosigner',
+    date: '2026-06-22',
+    excerpt: 'Want to buy a car with no credit history and no cosigner? Here\'s the exact playbook to get approved without overpaying or getting stuck in a bad loan.',
+    readTime: '5 min read',
+    Content: () => (
+      <div className="space-y-6">
+        <figure>
+          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Trying to buy a car with no credit history and no cosigner feels like showing up to a party where everyone knows the rules but you. Lenders want proof you&apos;ll pay them back. You don&apos;t have any. The good news? You have more options than dealers will tell you, and a few smart moves can get you approved without a sky-high interest rate.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Why lenders treat no credit like bad credit</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">When you have no credit file, lenders can&apos;t predict how you&apos;ll behave. To them, that&apos;s risky. They often lump you in with people who have low scores, which means higher rates and tougher terms.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Your job is to give them other proof you&apos;re reliable. Steady income, money in the bank, and a solid down payment all help close that trust gap.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Save a real down payment first</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Cash talks louder than a credit score. Putting 10% to 20% down shrinks the loan, lowers the lender&apos;s risk, and often unlocks better rates. It also keeps you from going underwater on the car the day you drive off the lot.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Aim for at least 10% down on a used car and 20% on new</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Keep a separate emergency fund so you don&apos;t drain savings at signing</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Bring proof of the down payment as recent bank statements, not just a verbal promise</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Start with a credit union, not a dealership</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Credit unions are the single best move for no-credit buyers. Many have first-time buyer programs designed for people with thin files. Rates are usually lower than dealer financing, and approval is based partly on your relationship with the bank.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Open an account, set up direct deposit, and let it sit for 60 to 90 days before you apply. Then ask specifically about their first-time auto buyer program.</p>
+        <figure>
+          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
+        </figure>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Get preapproved before you shop</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Walking into a dealership with a preapproval letter changes everything. You know your real rate, your real budget, and you can ignore the finance manager&apos;s pitch. Dealers will still try to beat it, which is fine. Just make them prove it in writing.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Apply at one credit union and one online lender that works with no-credit buyers</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Do all applications within a 14-day window so they count as one credit pull</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Bring the preapproval letter to every dealer visit</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Bring documents that prove you&apos;re a safe bet</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Lenders love paperwork. The more you bring, the easier it is to say yes. Stack the deck before you walk in.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Last two pay stubs and your most recent W-2 or tax return</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Two to three months of bank statements showing steady deposits</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Proof of residence like a utility bill or lease agreement</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>A valid driver&apos;s license and proof of insurance</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Skip manufacturer first-time buyer programs? Not so fast</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Brands like Toyota, Honda, Hyundai, and Kia run college grad or first-time buyer programs. These can work, but the rates are often higher than a credit union. Use them as a backup, not your first stop.</p>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Always compare the total cost of the loan, not just the monthly payment. A low payment over 72 or 84 months usually means you&apos;re paying thousands extra in interest.</p>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">Avoid the traps built for first-time buyers</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Buy here pay here lots and subprime dealers target people with no credit. Rates can run above 20%, and the cars are often marked up far beyond their value. If a dealer won&apos;t show you the out-the-door price in writing, walk.</p>
+        <ul className="space-y-3 pl-1">
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Reject any loan longer than 60 months on a used car</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Say no to add-ons like VIN etching, paint protection, and extended warranties at signing</span></li>
+          <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Never agree to a payment without seeing the full breakdown of price, fees, and interest rate</span></li>
+        </ul>
+        <h2 className="text-2xl font-bold text-gray-900 pt-4">What to do next</h2>
+        <p className="text-base sm:text-lg text-gray-700 leading-loose">Buying a car with no credit history and no cosigner is absolutely doable if you go in prepared. Open a credit union account this week, save toward a real down payment, and get preapproved before you visit a single dealer. Then run any offer you get through Sign or Walk to see if the deal is fair, or if you should walk away and try again.</p>
+      </div>
+    ),
+  },
 ];
 
 export function getPost(slug: string): BlogPost | undefined {
