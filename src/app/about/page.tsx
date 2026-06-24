@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'About — Sign or Walk',
   description: 'Sign or Walk is a free AI car deal grader built to protect everyday buyers from bad lease and finance deals.',
+  alternates: { canonical: 'https://signorwalk.com/about' },
 };
 
 export default function AboutPage() {

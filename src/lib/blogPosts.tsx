@@ -8,6 +8,7 @@ export interface BlogPost {
 }
 
 import React from 'react';
+import Image from 'next/image';
 
 export const blogPosts: BlogPost[] = [
   {
@@ -19,7 +20,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1699542108806-45c55ead18bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxJcyUyMDclMjUlMjBBUFIlMjBHb29kJTIwY2FyfGVufDB8MHx8fDE3Nzk3NDU2MTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a blue and yellow sports car parked in a garage" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1699542108806-45c55ead18bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxJcyUyMDclMjUlMjBBUFIlMjBHb29kJTIwY2FyfGVufDB8MHx8fDE3Nzk3NDU2MTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a blue and yellow sports car parked in a garage" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@jeffcooperdesign?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Jeff Cooper</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">So you&apos;re sitting in the finance office and the manager just slid a contract across the desk with 7% APR on a used car. Is that a steal, or are you about to get fleeced? In 2026, the honest answer is: it depends on your credit, the car&apos;s age, and what you could&apos;ve gotten on a new vehicle instead. Let&apos;s break down whether 7% APR on a used car is actually a good deal right now, and the age tipping point where buying new quietly becomes the smarter financial move.</p>
@@ -36,7 +37,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Compare total interest cost, not just monthly payment, when weighing new versus used.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1566241256739-06313081ea13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxJcyUyMDclMjUlMjBBUFIlMjBHb29kJTIwY2FyfGVufDB8MHx8fDE3Nzk3NDU2MTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="grayscale photography of 5-door hatchback on road" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1566241256739-06313081ea13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxJcyUyMDclMjUlMjBBUFIlMjBHb29kJTIwY2FyfGVufDB8MHx8fDE3Nzk3NDU2MTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="grayscale photography of 5-door hatchback on road" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@ggiqueaux?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Geronimo Giqueaux</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">The Age Tipping Point: When New Beats Used</h2>
@@ -56,7 +57,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMFRlbGwlMjBpZiUyMGNhcnxlbnwwfDB8fHwxNzc5NzQ2MjI1fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMFRlbGwlMjBpZiUyMGNhcnxlbnwwfDB8fHwxNzc5NzQ2MjI1fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Here&apos;s the truth nobody at the dealership will tell you. Every part of the car buying process is built to move money from your pocket into theirs. Once you accept that, you stop feeling tricked and start playing the game. This is how to tell if a car dealer is ripping you off, written from the other side of the desk.</p>
@@ -80,7 +81,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If the doc fee is over $500, push back hard or walk.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1441148345475-03a2e82f9719?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMFRlbGwlMjBpZiUyMGNhcnxlbnwwfDB8fHwxNzc5NzQ2MjI1fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black BMW car surrounded by grass field" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1441148345475-03a2e82f9719?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMFRlbGwlMjBpZiUyMGNhcnxlbnwwfDB8fHwxNzc5NzQ2MjI1fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black BMW car surrounded by grass field" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@bchild311?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Benjamin Child</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Be Willing to Walk, and Actually Mean It</h2>
@@ -113,7 +114,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1604282742321-6daf4752c324?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxEZWFsZXIlMjBBZGRlZCUyMCUyNDIlMkMwMDAlMjBpbiUyMGNhcnxlbnwwfDB8fHwxNzc5NzQ2NTIyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="yellow porsche 911 parked beside white and black store" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1604282742321-6daf4752c324?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxEZWFsZXIlMjBBZGRlZCUyMCUyNDIlMkMwMDAlMjBpbiUyMGNhcnxlbnwwfDB8fHwxNzc5NzQ2NTIyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="yellow porsche 911 parked beside white and black store" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You sit down to sign paperwork and suddenly there&apos;s an extra $2,000 stacked onto your car deal. Where did it come from? Most of it lives in the fine print, and a big chunk of those dealer fees you can negotiate or kill outright. Here&apos;s the insider breakdown of what&apos;s real and what&apos;s pure profit padding.</p>
@@ -136,7 +137,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Pulse braking modules and theft packages: These are accessories you never requested. Strike them off.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1610429196503-bd6a44252ba2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxEZWFsZXIlMjBBZGRlZCUyMCUyNDIlMkMwMDAlMjBpbiUyMGNhcnxlbnwwfDB8fHwxNzc5NzQ2NTIyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="woman in black and white shirt and orange shorts leaning on white car during daytime" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1610429196503-bd6a44252ba2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxEZWFsZXIlMjBBZGRlZCUyMCUyNDIlMkMwMDAlMjBpbiUyMGNhcnxlbnwwfDB8fHwxNzc5NzQ2NTIyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="woman in black and white shirt and orange shorts leaning on white car during daytime" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@ismaelparamo?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Ismael Paramo</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Why You Have More Power Than You Think</h2>
@@ -159,7 +160,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBMZWFzZSUyMEhhY2tpbmclM0YlMjBjYXJ8ZW58MHwwfHx8MTc3OTc0NzEwNXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBMZWFzZSUyMEhhY2tpbmclM0YlMjBjYXJ8ZW58MHwwfHx8MTc3OTc0NzEwNXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@obionyeador?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Obi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Most people walk into a dealer, haggle the monthly payment, and think they won. They didn&apos;t. Lease hacking is the practice of breaking a lease down into its real parts and getting each one right. Do it well and you can drive a $50,000 car for the price of a Civic.</p>
@@ -178,7 +179,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Money factor is just the interest rate on a lease, written in a weird format. To convert it to an APR equivalent, multiply by 2400. So a money factor of 0.00150 equals about 3.6% APR.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Here&apos;s the part dealers don&apos;t volunteer: they can mark up the money factor and pocket the difference, exactly like they mark up loan rates in finance. Always ask for the &apos;buy rate,&apos; which is the unmarked rate from the manufacturer&apos;s finance arm.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1630165356811-645a4914aaca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBMZWFzZSUyMEhhY2tpbmclM0YlMjBjYXJ8ZW58MHwwfHx8MTc3OTc0NzEwNXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="white and black bmw m 3 on road during daytime" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1630165356811-645a4914aaca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBMZWFzZSUyMEhhY2tpbmclM0YlMjBjYXJ8ZW58MHwwfHx8MTc3OTc0NzEwNXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="white and black bmw m 3 on road during daytime" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@stereophototyp?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Sara Kurfeß</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Residual Value: The Lever You Can&apos;t Negotiate</h2>
@@ -206,7 +207,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=75" alt="person reviewing car finance documents" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=75" alt="person reviewing car finance documents" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">The dealer will happily sell you a car you cannot afford. That is not cynicism, it is their job. Knowing how much car you can actually afford before you walk in is the single most protective thing you can do for your finances.</p>
@@ -221,7 +222,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>10% of gross income keeps your car from crowding out retirement savings, an emergency fund, and everything else that matters.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=75" alt="budgeting and financial planning" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=900&q=75" alt="budgeting and financial planning" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Why Dealers Push 72 and 84 Month Loans</h2>
@@ -248,7 +249,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=75" alt="two people negotiating across a desk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=75" alt="two people negotiating across a desk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Most car buyers lose the negotiation before they say a word, because they do not have a script. Dealers run the same plays on every customer. Here is how to counter each one, word for word, so you stop improvising and start winning.</p>
@@ -269,7 +270,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Silence is your friend. After you name your number, stop talking and let them respond.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=75" alt="signing a contract" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&q=75" alt="signing a contract" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When They Pull the &quot;Let Me Talk to My Manager&quot; Move</h2>
@@ -299,7 +300,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=900&q=75" alt="car keys and contract documents" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=900&q=75" alt="car keys and contract documents" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Leasing and financing are not the same choice with different names. They are completely different financial products that make sense in completely different situations. Here is the honest math on each, without the dealer spin.</p>
@@ -314,7 +315,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If you use the car for business, you can often deduct lease payments in a way that purchase depreciation does not allow.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=75" alt="car on open road" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=900&q=75" alt="car on open road" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When Financing Wins</h2>
@@ -341,7 +342,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1471444928343-74173b9900b0?w=900&q=75" alt="car lot at dusk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1471444928343-74173b9900b0?w=900&q=75" alt="car lot at dusk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referrer" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Timing a car purchase is not a myth. Dealers have real monthly sales quotas. Manufacturers issue real bonus money when stores hit targets. When you show up matters, and knowing when the math shifts in your favor can save you $1,000 to $3,000 with no extra negotiating required.</p>
@@ -356,7 +357,7 @@ export const blogPosts: BlogPost[] = [
         <h2 className="text-2xl font-bold text-gray-900 pt-4">End of Quarter Is Even Better</h2>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Quarter-end bonuses from manufacturers are often larger than monthly bonuses. March, June, September, and December all tend to be stronger buying windows than other month-ends. The combination of monthly and quarterly pressure gives you more leverage than any other time of year.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=900&q=75" alt="dealership row of cars" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=900&q=75" alt="dealership row of cars" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">End of Year: Model Clearance Is Real</h2>
@@ -383,7 +384,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1498887960847-2a5e46312788?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMHJlYWQlMjBhJTIwY2FyfGVufDB8MHx8fDE3ODIwOTgwMTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="closeup photo of black analog speedometer" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1498887960847-2a5e46312788?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMHJlYWQlMjBhJTIwY2FyfGVufDB8MHx8fDE3ODIwOTgwMTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="closeup photo of black analog speedometer" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@chuttersnap?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">CHUTTERSNAP</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">That big white sticker on the window of every new car has a name. It&apos;s called the Monroney label, and it&apos;s the most honest piece of paper at the dealership. If you know how to read a car window sticker, you&apos;ll catch markups, fake add-ons, and missing features before you ever talk numbers. Here&apos;s exactly what to look for.</p>
@@ -401,7 +402,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Crash test ratings and warranty info: NHTSA star ratings and the bumper-to-bumper and powertrain coverage.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1547076286-60c93f1a3652?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMHJlYWQlMjBhJTIwY2FyfGVufDB8MHx8fDE3ODIwOTgwMTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="macrshot photography gauge cluster" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1547076286-60c93f1a3652?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMHJlYWQlMjBhJTIwY2FyfGVufDB8MHx8fDE3ODIwOTgwMTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="macrshot photography gauge cluster" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@viktortheo?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Viktor Theo</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Where dealers try to trick you</h2>
@@ -432,7 +433,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBpbnZvaWNlJTIwcHJpY2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODA1MXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBpbnZvaWNlJTIwcHJpY2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODA1MXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@obionyeador?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Obi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You&apos;ve probably seen the phrase invoice price tossed around in car ads and forum threads. It sounds like a magic number that beats MSRP. But what is invoice price, really, and can you actually buy a car below invoice? Short answer: yes, sometimes. Here&apos;s how it works and how to use it to your advantage.</p>
@@ -449,7 +450,7 @@ export const blogPosts: BlogPost[] = [
         </ul>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Add it up and a dealer can sell at invoice, or even a few hundred below, and still make money. That&apos;s why below-invoice deals exist, especially at month end or on outgoing model years.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1707999494560-f534cc79298c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBpbnZvaWNlJTIwcHJpY2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODA1MXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a yellow car with stacks of money on top of it" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1707999494560-f534cc79298c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBpbnZvaWNlJTIwcHJpY2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODA1MXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a yellow car with stacks of money on top of it" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@mirzaie?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Mehdi Mirzaie</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When Below Invoice Is Realistic</h2>
@@ -534,7 +535,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1567789884554-0b844b597180?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxFeHRlbmRlZCUyMHdhcnJhbnR5JTIwdnMlMjBmYWN0b3J5JTIwY2FyfGVufDB8MHx8fDE3ODIwOTgxNDN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="gray vehicle being fixed inside factory using robot machines" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1567789884554-0b844b597180?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxFeHRlbmRlZCUyMHdhcnJhbnR5JTIwdnMlMjBmYWN0b3J5JTIwY2FyfGVufDB8MHx8fDE3ODIwOTgxNDN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="gray vehicle being fixed inside factory using robot machines" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@lennykuhne?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Lenny Kuhne</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">When it comes to extended warranty vs factory warranty, what car dealers won&apos;t tell you could cost you thousands. The finance office is where dealerships make most of their profit, and warranties are the star of the show. Before you sign anything, you need to know what you&apos;re actually buying and what you already have.</p>
@@ -553,7 +554,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Walk away and shop third party providers like Endurance or your credit union for comparison quotes.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxFeHRlbmRlZCUyMHdhcnJhbnR5JTIwdnMlMjBmYWN0b3J5JTIwY2FyfGVufDB8MHx8fDE3ODIwOTgxNDN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxFeHRlbmRlZCUyMHdhcnJhbnR5JTIwdnMlMjBmYWN0b3J5JTIwY2FyfGVufDB8MHx8fDE3ODIwOTgxNDN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">The Coverage Gaps Dealers Skip Over</h2>
@@ -583,7 +584,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODI1Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODI1Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Thinking about crossing state lines for a better deal? You&apos;re not alone. Learning how to buy a car out of state can save you thousands, but only if you know the steps. This guide walks you through it without the headaches.</p>
@@ -602,7 +603,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Here&apos;s the part most buyers mess up. You pay sales tax in the state where you register the car, not where you buy it. So if you live in Ohio and buy in Florida, you&apos;ll pay Ohio&apos;s rate when you register.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Some dealers collect your home state tax for you. Private sellers won&apos;t. Budget for it now so you&apos;re not shocked at the DMV later.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODI1Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODI1Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Step 3: Get a Temporary Permit to Drive It Home</h2>
@@ -640,7 +641,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1743888743369-00ba6c192acf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxDUE8lMjBjZXJ0aWZpZWQlMjBwcmUtb3duZWQlMjB2cyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4MzM0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="A lamborghini and porsche sit together." className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1743888743369-00ba6c192acf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxDUE8lMjBjZXJ0aWZpZWQlMjBwcmUtb3duZWQlMjB2cyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4MzM0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="A lamborghini and porsche sit together." width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@cotan_vlad?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Vlad Cotan</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You&apos;re staring at two near identical cars on the same lot. One says CPO certified pre-owned. The other is just used and costs $2,000 less. So in the CPO certified pre-owned vs used car debate, which is the better deal? The honest answer depends on the car, the warranty, and how long you plan to keep it. Let&apos;s break it down.</p>
@@ -656,7 +657,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Financing the car, since CPO often qualifies for lower interest rates than standard used</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1764555278464-ca7bc8325f6e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxDUE8lMjBjZXJ0aWZpZWQlMjBwcmUtb3duZWQlMjB2cyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4MzM0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="Classic silver mercedes and white tesla on street." className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1764555278464-ca7bc8325f6e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxDUE8lMjBjZXJ0aWZpZWQlMjBwcmUtb3duZWQlMjB2cyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4MzM0fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="Classic silver mercedes and white tesla on street." width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@thehncreative?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Hieu</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When a Regular Used Car Wins</h2>
@@ -691,7 +692,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1498887960847-2a5e46312788?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwY3JlZGl0JTIwc2NvcmUlMjBkbyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4MzY1fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="closeup photo of black analog speedometer" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1498887960847-2a5e46312788?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwY3JlZGl0JTIwc2NvcmUlMjBkbyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4MzY1fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="closeup photo of black analog speedometer" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@chuttersnap?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">CHUTTERSNAP</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Walk into any dealership and the first thing they want to know is your credit score. That three digit number decides if you get a low rate or one that quietly drains your wallet for years. So what credit score do you need to get the best car loan rate? Let&apos;s break it down in plain English.</p>
@@ -708,7 +709,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">For the absolute lowest advertised rate, you typically need a FICO score of 720 or higher. Push past 780 and lenders treat you like royalty. But here&apos;s the good news: the gap between a 720 and an 800 is usually small. You don&apos;t need a perfect score to get a great deal.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">If your score sits in the high 600s, you can still get a fair rate, especially with a credit union. Don&apos;t assume you&apos;re stuck with whatever the dealer offers.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1547076286-60c93f1a3652?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwY3JlZGl0JTIwc2NvcmUlMjBkbyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4MzY1fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="macrshot photography gauge cluster" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1547076286-60c93f1a3652?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwY3JlZGl0JTIwc2NvcmUlMjBkbyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4MzY1fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="macrshot photography gauge cluster" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@viktortheo?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Viktor Theo</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">How much does your score really cost you?</h2>
@@ -739,7 +740,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1498887960847-2a5e46312788?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMHRyYWRlJTIwaW4lMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODM5N3ww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="closeup photo of black analog speedometer" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1498887960847-2a5e46312788?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMHRyYWRlJTIwaW4lMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODM5N3ww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="closeup photo of black analog speedometer" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@chuttersnap?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">CHUTTERSNAP</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Dealers make serious money on trade-ins. Most buyers accept the first number thrown at them and lose thousands without realizing it. If you want to trade in your car and not get ripped off, you need a plan before you ever set foot on the lot. The good news? It&apos;s simpler than you think.</p>
@@ -760,7 +761,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Print every offer and bring them with you so the dealer sees you&apos;ve done the work.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMHRyYWRlJTIwaW4lMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODM5N3ww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man in white shirt standing beside black car" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMHRyYWRlJTIwaW4lMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODM5N3ww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man in white shirt standing beside black car" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@kateibragimova?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Kate Ibragimova</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Clean it up and fix the cheap stuff</h2>
@@ -799,7 +800,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxEZWFsZXIlMjBhZGQtb25zJTIweW91JTIwc2hvdWxkJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg0MzR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxEZWFsZXIlMjBhZGQtb25zJTIweW91JTIwc2hvdWxkJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg0MzR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You negotiated a fair price on the car. Now you&apos;re sitting in the finance office, and a friendly manager is sliding a menu of extras across the desk. This is where deals go sideways. The dealer add-ons you should always decline live right here, on that glossy little screen, and saying no can save you thousands.</p>
@@ -816,7 +817,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Extended warranties bought on the spot: You can buy these later, often cheaper, from third parties or even the same manufacturer. Never sign one under pressure.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1574023278969-abb7ab49945c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxEZWFsZXIlMjBhZGQtb25zJTIweW91JTIwc2hvdWxkJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg0MzR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black cars in a parking lot" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1574023278969-abb7ab49945c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxEZWFsZXIlMjBhZGQtb25zJTIweW91JTIwc2hvdWxkJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg0MzR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black cars in a parking lot" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Add-ons that need a closer look</h2>
@@ -845,7 +846,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1498887960847-2a5e46312788?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGNhbGN1bGF0ZSUyMHlvdXIlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODQ3NXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="closeup photo of black analog speedometer" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1498887960847-2a5e46312788?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGNhbGN1bGF0ZSUyMHlvdXIlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODQ3NXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="closeup photo of black analog speedometer" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@chuttersnap?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">CHUTTERSNAP</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Walking into a dealership without knowing your numbers is how people end up with a payment that wrecks their budget. The good news? You can calculate your monthly car payment before going to the dealer in about ten minutes. Here&apos;s exactly how to do it, what to watch out for, and how to use that number as your shield once the sales pitch starts.</p>
@@ -861,7 +862,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">The real formula uses compound interest and looks scary. Skip it. Use a free auto loan calculator instead. Bankrate, NerdWallet, and even Google have solid ones built in.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Plug in your loan amount (price minus down payment), your APR, and your term in months. Hit calculate. That&apos;s your payment. Run it three or four times with different terms and down payments to see how the number moves.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGNhbGN1bGF0ZSUyMHlvdXIlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODQ3NXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGNhbGN1bGF0ZSUyMHlvdXIlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODQ3NXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Don&apos;t forget taxes and fees</h2>
@@ -975,7 +976,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1735541855744-2c683e4690c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHwzNiUyMHZzJTIwNDglMjB2cyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4NTcyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="Two white cars parked on the side of a road" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1735541855744-2c683e4690c8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHwzNiUyMHZzJTIwNDglMjB2cyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4NTcyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="Two white cars parked on the side of a road" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@ceorana?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Rana Singh</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Choosing between a 36, 48, 60, or 72 month car loan can cost or save you thousands. The shorter the term, the less interest you pay. But shorter terms also mean higher monthly payments. So which one actually saves you the most money, and which one fits real life? Let&apos;s break it down.</p>
@@ -993,7 +994,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Dealers love long terms because they let you afford a pricier car. The monthly payment looks friendly. The total cost does not.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Long loans also raise your risk of going underwater. That means you owe more than the car is worth. If you total it or want to trade it in early, you&apos;re stuck paying the gap.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1615440215093-86d18b953524?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHwzNiUyMHZzJTIwNDglMjB2cyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4NTcyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="yellow and black sports car on road during daytime" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1615440215093-86d18b953524?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHwzNiUyMHZzJTIwNDglMjB2cyUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4NTcyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="yellow and black sports car on road during daytime" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@lgnwvr?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">LOGAN WEAVER | @LGNWVR</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When a Longer Term Actually Makes Sense</h2>
@@ -1030,7 +1031,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMHNwb3QlMjBhJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg2MDZ8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMHNwb3QlMjBhJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg2MDZ8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">After every big hurricane or flood, thousands of soaked cars quietly slide back onto the used market. They get cleaned up, shipped across state lines, and sold to buyers who never see it coming. Knowing how to spot a flood damaged car can save you from a money pit that breaks down a month after you drive it home.</p>
@@ -1048,7 +1049,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Inspect screw heads on the door sills and seat bolts for rust, since these are rarely replaced after a flood.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1485575397155-c9b47f81f645?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMHNwb3QlMjBhJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg2MDZ8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="person driving black car" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1485575397155-c9b47f81f645?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMHNwb3QlMjBhJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg2MDZ8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="person driving black car" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@courtneycorlew?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Courtney Corlew</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Hidden spots most buyers miss</h2>
@@ -1126,7 +1127,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1742414348816-fe5f76446808?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxEZWFsZXIlMjBmaW5hbmNpbmclMjB2cyUyMGJhbmslMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODY4NHww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="An old bank of montreal building with vintage cars." className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1742414348816-fe5f76446808?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxEZWFsZXIlMjBmaW5hbmNpbmclMjB2cyUyMGJhbmslMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODY4NHww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="An old bank of montreal building with vintage cars." width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@communityarchives?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Community Archives of Belleville and Hastings County</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You found the car. Now comes the part most buyers fumble: the loan. The dealer financing vs bank financing question can cost or save you thousands over the life of a car loan, and most people pick the easy option without doing the math. Let&apos;s fix that.</p>
@@ -1139,7 +1140,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Credit unions are often the quiet winner here. Their auto loan rates tend to run lower than big banks because they&apos;re member-owned and not chasing profit the same way.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">The downside is you have to do a little legwork. But that legwork can be worth hundreds of dollars a year.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1776802740772-dcfefd9e8e26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxEZWFsZXIlMjBmaW5hbmNpbmclMjB2cyUyMGJhbmslMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODY4NHww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="Cars parked in a line outside a bank." className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1776802740772-dcfefd9e8e26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxEZWFsZXIlMjBmaW5hbmNpbmclMjB2cyUyMGJhbmslMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODY4NHww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="Cars parked in a line outside a bank." width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@geepee_lens?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Godspower Abdulahi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Which one actually saves you money?</h2>
@@ -1171,7 +1172,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1441148345475-03a2e82f9719?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4NzE2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black BMW car surrounded by grass field" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1441148345475-03a2e82f9719?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4NzE2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black BMW car surrounded by grass field" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@bchild311?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Benjamin Child</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Life changes fast. The car you signed up for two years ago might not fit your budget, your job, or your family anymore. The good news? You can get out of a car lease early without paying a fortune, but only if you know your options. Most people just call the dealer and accept whatever number they hear. That&apos;s how you end up writing a check for five grand.</p>
@@ -1188,7 +1189,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Here&apos;s the move most people miss. If your car is worth more than the buyout price, you have equity. You can buy the car from the leasing company and sell it the same day for a profit.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Check your car&apos;s value on Kelley Blue Book, Edmunds, and CarGurus. Then get instant cash offers from Carvana, CarMax, and a local dealer. If any offer beats your buyout, you win.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1529369623266-f5264b696110?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4NzE2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man standing beside white SUV near concrete road under blue sky at daytime" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1529369623266-f5264b696110?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4NzE2fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man standing beside white SUV near concrete road under blue sky at daytime" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@jamie452?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Jamie Street</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Try a lease transfer</h2>
@@ -1220,7 +1221,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1526583038916-f138f908476b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg3NjN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="two men fixing up blue car" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526583038916-f138f908476b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg3NjN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="two men fixing up blue car" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@marcst84?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Marc St</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Being upside down on your car loan means you owe more than the car is worth. It&apos;s a stressful spot, but it&apos;s also more common than most people think. The good news? You have real options, and a few smart moves can save you thousands.</p>
@@ -1242,7 +1243,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Skip any add-ons the new lender pitches, like GAP or extended warranties rolled into the loan.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1777013371332-c325bf12d613?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg3NjN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="White sedan parked outside a building with sign" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1777013371332-c325bf12d613?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIwOTg3NjN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="White sedan parked outside a building with sign" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@chiuchuuu?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Heng Chiu</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Avoid the Trade-In Trap</h2>
@@ -1272,7 +1273,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODgxOXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODgxOXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Buying a used car from a private seller can save you thousands compared to a dealership. But it also comes with real risks, like hidden damage, title fraud, or a stranger meeting you in a parking lot with cash. This guide walks you through how to buy a used car from a private seller safely, step by step, so you drive away confident instead of worried.</p>
@@ -1299,7 +1300,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Confirm the VIN on the dash matches the VIN on the door jamb and the title.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODgxOXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjA5ODgxOXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Get a Pre-Purchase Inspection</h2>
@@ -1331,7 +1332,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwZ29vZCUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4ODYzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="shallow focus photography of orange Volkswagen Beetle" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwZ29vZCUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4ODYzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="shallow focus photography of orange Volkswagen Beetle" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@danielcgold?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Dan Gold</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">So you&apos;re shopping for a car and the dealer asks the big question: how much are you putting down? A good down payment for a car can save you thousands in interest and keep you from owing more than the car is worth. But the right number isn&apos;t the same for everyone. Here&apos;s how to figure out what works for your wallet.</p>
@@ -1348,7 +1349,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Reduce the total interest you pay over the life of the loan</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1506610654-064fbba4780c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwZ29vZCUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4ODYzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black coupe on concrete road" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1506610654-064fbba4780c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwZ29vZCUyMGNhcnxlbnwwfDB8fHwxNzgyMDk4ODYzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black coupe on concrete road" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@flotography?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Florian Schneider</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When You Should Put Down Less</h2>
@@ -1414,7 +1415,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXIlMjB3aXRoJTIwYmFkJTIwY3JlZGl0JTIwY2FyfGVufDB8MHx8fDE3ODIwOTk5MTd8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXIlMjB3aXRoJTIwYmFkJTIwY3JlZGl0JTIwY2FyfGVufDB8MHx8fDE3ODIwOTk5MTd8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Trying to buy a car with bad credit feels like the deck is stacked against you. Higher rates, pushy salespeople, and sketchy lot offers are everywhere. The good news? You can still get a fair deal if you know what to do before you walk into a dealership. Here&apos;s the playbook.</p>
@@ -1430,7 +1431,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Bring the preapproval letter with you. Don&apos;t tell the dealer your rate until they show you theirs.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXIlMjB3aXRoJTIwYmFkJTIwY3JlZGl0JTIwY2FyfGVufDB8MHx8fDE3ODIwOTk5MTd8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXIlMjB3aXRoJTIwYmFkJTIwY3JlZGl0JTIwY2FyfGVufDB8MHx8fDE3ODIwOTk5MTd8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@obionyeador?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Obi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Save a down payment, even a small one</h2>
@@ -1465,7 +1466,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxOZXclMjBjYXIlMjB2cyUyMHVzZWQlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5OTk1MHww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxOZXclMjBjYXIlMjB2cyUyMHVzZWQlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5OTk1MHww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">The new car vs used car debate looks different in 2026. Used prices have cooled from their pandemic highs, but new car incentives are finally back. So which one is the smarter buy right now? Let&apos;s break it down so you can walk into a dealer knowing exactly what makes sense for your wallet.</p>
@@ -1482,7 +1483,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Plan to keep the car at least 7 years so the depreciation hit spreads out.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxOZXclMjBjYXIlMjB2cyUyMHVzZWQlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5OTk1MHww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxOZXclMjBjYXIlMjB2cyUyMHVzZWQlMjBjYXJ8ZW58MHwwfHx8MTc4MjA5OTk1MHww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@obionyeador?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Obi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When used is still the smart play</h2>
@@ -1516,7 +1517,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1662253273038-1054ad7b88a7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBvdXQtdGhlLWRvb3IlMjBwcmljZSUyMGNhcnxlbnwwfDB8fHwxNzgyMDk5OTk5fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a car with its door open" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1662253273038-1054ad7b88a7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBvdXQtdGhlLWRvb3IlMjBwcmljZSUyMGNhcnxlbnwwfDB8fHwxNzgyMDk5OTk5fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a car with its door open" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@finik21?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Liubomyr Vovchak</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">The out-the-door price on a car is the total amount you&apos;ll pay to drive off the lot. That means the car, the taxes, the fees, and every line item the dealer slips onto the contract. If you only negotiate the sticker price, you&apos;re playing half the game. Here&apos;s how to figure out your real out-the-door price before you ever sit down with a finance manager.</p>
@@ -1543,7 +1544,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Total it up. That&apos;s your out-the-door price.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1526145596637-638f120faac5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBvdXQtdGhlLWRvb3IlMjBwcmljZSUyMGNhcnxlbnwwfDB8fHwxNzgyMDk5OTk5fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black beetle car near house" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526145596637-638f120faac5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBvdXQtdGhlLWRvb3IlMjBwcmljZSUyMGNhcnxlbnwwfDB8fHwxNzgyMDk5OTk5fDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black beetle car near house" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@haythemgataa?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Haythem Gataa</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Why dealers hate giving you the OTD price upfront</h2>
@@ -1580,7 +1581,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMG5lZ290aWF0ZSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjEwMDAzMXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="silver sports coupe on asphalt road" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMG5lZ290aWF0ZSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjEwMDAzMXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="silver sports coupe on asphalt road" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Most people think a lease price is fixed. It isn&apos;t. If you know how to negotiate a car lease deal, you can shave real money off your monthly payment and skip the junk fees dealers love to sneak in. This guide walks you through the exact steps, in order, so you can show up prepared and leave with a number you feel good about.</p>
@@ -1598,7 +1599,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Email the internet sales manager at three or more dealers. Ask for a full lease breakdown: selling price, money factor, residual, fees, and drive-off cost.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Don&apos;t ask for a monthly payment. Ask for the numbers behind it. If a dealer refuses, cross them off the list and move on.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMG5lZ290aWF0ZSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjEwMDAzMXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMG5lZ290aWF0ZSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjEwMDAzMXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Step 3: Negotiate the Selling Price First</h2>
@@ -1627,7 +1628,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwY2FyJTIwY2FyfGVufDB8MHx8fDE3ODIxNTU0NTB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="running black Porsche sedan" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwY2FyJTIwY2FyfGVufDB8MHx8fDE3ODIxNTU0NTB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="running black Porsche sedan" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@campful?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Campbell</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You&apos;re staring at a new car window sticker and spot a line called the destination charge. It can run anywhere from around $1,000 to over $2,000. So what is a car dealer destination charge, and can you negotiate it? Here&apos;s the straight answer most salespeople won&apos;t give you.</p>
@@ -1644,7 +1645,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>If the dealer adds a second &apos;delivery&apos; or &apos;dealer prep&apos; fee on top, refuse it. That&apos;s a duplicate charge.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwY2FyJTIwY2FyfGVufDB8MHx8fDE3ODIxNTU0NTB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="shallow focus photography of orange Volkswagen Beetle" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwY2FyJTIwY2FyfGVufDB8MHx8fDE3ODIxNTU0NTB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="shallow focus photography of orange Volkswagen Beetle" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@danielcgold?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Dan Gold</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Red flags to watch for</h2>
@@ -1713,7 +1714,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1680395855021-79d18eec7da0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwc2FsdmFnZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NjYwfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="an old blue car is parked in a field" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1680395855021-79d18eec7da0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwc2FsdmFnZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NjYwfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="an old blue car is parked in a field" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@ka1ju_?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">andry star</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You spotted a 2020 SUV for half the price of every other one on the lot. The catch? It has a salvage title. So what is a salvage title car, and is the deal too good to be true? Short answer: usually yes, but not always. Let&apos;s break down what you&apos;re actually buying.</p>
@@ -1730,7 +1731,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the seller for repair receipts, photos of the damage, and the name of the shop that did the work. No paperwork means walk away.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1642276075121-3ac7d959a9f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwc2FsdmFnZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NjYwfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="an old vw bug is parked in front of a building" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1642276075121-3ac7d959a9f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwc2FsdmFnZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NjYwfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="an old vw bug is parked in front of a building" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@roonz_nl?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">RoonZ nl</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When a Salvage Car Can Be a Smart Buy</h2>
@@ -1759,7 +1760,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGNoZWNrJTIwYSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NzkzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man in white shirt standing beside black car" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGNoZWNrJTIwYSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NzkzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man in white shirt standing beside black car" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@kateibragimova?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Kate Ibragimova</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Buying a used car without checking the VIN is like marrying someone after one date. You need the backstory. Learning how to check a car history report by VIN before buying takes about 10 minutes and can save you thousands. Here&apos;s exactly how to do it right.</p>
@@ -1776,7 +1777,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Check your state DMV&apos;s title check tool if available, since some states offer free brand history.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1613214150132-9606e332d68e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGNoZWNrJTIwYSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NzkzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black car in grayscale photography" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1613214150132-9606e332d68e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGNoZWNrJTIwYSUyMGNhcnxlbnwwfDB8fHwxNzgyMTU3NzkzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black car in grayscale photography" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@ben_brunner?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Benjamin Brunner</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Red Flags to Look For</h2>
@@ -1806,7 +1807,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjB0aGUlMjBkaWZmZXJlbmNlJTIwY2FyfGVufDB8MHx8fDE3ODIxNTc4NjV8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjB0aGUlMjBkaWZmZXJlbmNlJTIwY2FyfGVufDB8MHx8fDE3ODIxNTc4NjV8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">If you&apos;ve shopped for a car loan, you&apos;ve seen both terms thrown around like they mean the same thing. They don&apos;t. Knowing the difference between pre-qualified and pre-approved for a car loan can save you thousands and stop a dealer from playing games with your rate.</p>
@@ -1822,7 +1823,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Pre-approval is the real deal. The lender pulls your credit, verifies your income, and gives you a specific loan amount, rate, and term. You usually get a letter or check you can take to the dealership.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">This puts you in the driver&apos;s seat. You walk in knowing exactly what you can spend and what you&apos;ll pay. The dealer either beats your rate or you use the one you&apos;ve got.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1502158895-0d817974dfaf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjB0aGUlMjBkaWZmZXJlbmNlJTIwY2FyfGVufDB8MHx8fDE3ODIxNTc4NjV8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="white Nissan GT-R and white Mitsubishi Lancer Evolution 10" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1502158895-0d817974dfaf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjB0aGUlMjBkaWZmZXJlbmNlJTIwY2FyfGVufDB8MHx8fDE3ODIxNTc4NjV8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="white Nissan GT-R and white Mitsubishi Lancer Evolution 10" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@connorlunsford?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Connor Lunsford</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Why the Difference Matters at the Dealership</h2>
@@ -1853,7 +1854,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1515086828834-023d61380316?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGF2b2lkJTIweW8teW8lMjBjYXJ8ZW58MHwwfHx8MTc4MjE1Nzg5OXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="person driving Toyota car" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1515086828834-023d61380316?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGF2b2lkJTIweW8teW8lMjBjYXJ8ZW58MHwwfHx8MTc4MjE1Nzg5OXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="person driving Toyota car" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@jessicamaephotographyga?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Jessica Furtney</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">You sign the papers, drive home in your new car, and feel great. Then a week later the dealer calls and says your financing fell through. That&apos;s the yo-yo financing scam, and learning how to avoid it at car dealerships can save you thousands and a massive headache.</p>
@@ -1870,7 +1871,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Your down payment check hasn&apos;t been cashed yet, which often means funding isn&apos;t locked in.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1518803331006-b3d0aca60d2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGF2b2lkJTIweW8teW8lMjBjYXJ8ZW58MHwwfHx8MTc4MjE1Nzg5OXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="woman holding steering wheel sitting inside car" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1518803331006-b3d0aca60d2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGF2b2lkJTIweW8teW8lMjBjYXJ8ZW58MHwwfHx8MTc4MjE1Nzg5OXww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="woman holding steering wheel sitting inside car" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@williamk?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">William Krause</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">How to Protect Yourself Before You Drive Off</h2>
@@ -1948,7 +1949,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Want to buy a car at end of model year and actually save real money? You&apos;re in the right spot. Dealers are sitting on last year&apos;s inventory while the new models roll in, and they need that old stock gone. That pressure is your leverage, and this guide shows you exactly how to use it.</p>
@@ -1968,7 +1969,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get pre-approved at your bank or credit union before you walk in so the finance office can&apos;t pad the rate.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Watch out for these traps</h2>
@@ -1991,7 +1992,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwbGVhc2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjE2MDA5Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhJTIwbGVhc2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjE2MDA5Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@obionyeador?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Obi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Got a letter from your dealer offering to end your lease early? That&apos;s a lease pull-ahead program, and it sounds like free money. Sometimes it is. Sometimes it&apos;s a clever way to get you into a more expensive car. Here&apos;s how to tell the difference before you sign anything.</p>
@@ -2009,7 +2010,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>The dealer is offering extra incentives on top, like loyalty cash or a lower money factor.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwbGVhc2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjE2MDA5Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhJTIwbGVhc2UlMjBjYXJ8ZW58MHwwfHx8MTc4MjE2MDA5Mnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When to walk away from the offer</h2>
@@ -2047,7 +2048,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1441148345475-03a2e82f9719?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMTQzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black BMW car surrounded by grass field" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1441148345475-03a2e82f9719?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMTQzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="black BMW car surrounded by grass field" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@bchild311?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Benjamin Child</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">If your car payment is eating your paycheck, you&apos;re not alone. Millions of Americans are upside down on their loans or just stretched too thin. The good news? You have real options to get out of a car loan you can no longer afford, and most of them are better than waiting for the repo truck.</p>
@@ -2069,7 +2070,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Aim for a used car under $15,000 with a loan term of 48 months or less.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1529369623266-f5264b696110?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMTQzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man standing beside white SUV near concrete road under blue sky at daytime" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1529369623266-f5264b696110?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGdldCUyMG91dCUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMTQzfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="man standing beside white SUV near concrete road under blue sky at daytime" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@jamie452?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Jamie Street</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 3: Refinance for a lower payment</h2>
@@ -2099,7 +2100,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhY3F1aXNpdGlvbiUyMGZlZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMjYyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1565043666747-69f6646db940?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwaXMlMjBhY3F1aXNpdGlvbiUyMGZlZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMjYyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="parked vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@obionyeador?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Obi</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">If you&apos;ve ever read a lease contract and spotted a charge you didn&apos;t expect, you&apos;re not alone. The acquisition fee on a car lease is one of those sneaky line items that can add hundreds to your deal. Here&apos;s what it actually is, why dealers charge it, and how to push back.</p>
@@ -2115,7 +2116,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Ask the finance manager to point to the exact line item, in writing, before you sign.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhY3F1aXNpdGlvbiUyMGZlZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMjYyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1574023240744-64c47c8c0676?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwaXMlMjBhY3F1aXNpdGlvbiUyMGZlZSUyMGNhcnxlbnwwfDB8fHwxNzgyMTYwMjYyfDA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a row of cars parked in a parking lot" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Can you negotiate the acquisition fee?</h2>
@@ -2147,7 +2148,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1589819292643-a78fba5aa0b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjBtdWNoJTIwZG9lcyUyMGl0JTIwY2FyfGVufDB8MHx8fDE3ODIxNjAyOTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="text" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1589819292643-a78fba5aa0b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjBtdWNoJTIwZG9lcyUyMGl0JTIwY2FyfGVufDB8MHx8fDE3ODIxNjAyOTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="text" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@joegunawan_?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Jonathan Gunawan</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Most people think the monthly cost to own a car is just the loan payment. It isn&apos;t. By the time you add fuel, insurance, repairs, and a few things you probably forgot, the real number can be double what&apos;s on the contract. Here&apos;s how to figure out what your car actually costs you every month, before you sign anything.</p>
@@ -2165,7 +2166,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Say you finance a used SUV with a $400 monthly payment. Looks affordable, right? Add $180 for insurance, $200 for gas if you drive 1,200 miles a month, $80 for maintenance, and $40 for registration spread out.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">That&apos;s $900 a month. The payment was less than half the real cost. This is why so many buyers feel broke two months after the dealership hands them the keys.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1713825034563-146dd9f503a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjBtdWNoJTIwZG9lcyUyMGl0JTIwY2FyfGVufDB8MHx8fDE3ODIxNjAyOTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a person wearing a hoodie with the words it&apos;s not always in the" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1713825034563-146dd9f503a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjBtdWNoJTIwZG9lcyUyMGl0JTIwY2FyfGVufDB8MHx8fDE3ODIxNjAyOTN8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a person wearing a hoodie with the words it&apos;s not always in the" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@introspectivedsgn?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Mclean</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">How to Calculate Your Own Number Before You Buy</h2>
@@ -2202,7 +2203,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1707779491283-4989f727825f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxTaG91bGQlMjB5b3UlMjBsZWFzZSUyMG9yJTIwY2FyfGVufDB8MHx8fDE3ODIxNjAzMzB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a yellow car parked in front of a blue wall" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1707779491283-4989f727825f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxTaG91bGQlMjB5b3UlMjBsZWFzZSUyMG9yJTIwY2FyfGVufDB8MHx8fDE3ODIxNjAzMzB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="a yellow car parked in front of a blue wall" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@mirzaie?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Mehdi Mirzaie</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Trying to decide whether to lease or buy an electric vehicle in 2026? You&apos;re not alone. EV prices, tax credits, and battery tech are all moving fast right now, and the wrong choice can cost you thousands. Here&apos;s a straight answer based on how you actually drive and what makes financial sense today.</p>
@@ -2218,7 +2219,7 @@ export const blogPosts: BlogPost[] = [
           <li className="flex items-start gap-3 text-base sm:text-lg text-gray-700 leading-relaxed"><span className="text-blue-500 font-bold mt-1 flex-shrink-0">→</span><span>Get gap coverage included since EVs depreciate fast in the first two years.</span></li>
         </ul>
         <figure>
-          <img src="https://images.unsplash.com/photo-1673187139181-795761a40ca1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxTaG91bGQlMjB5b3UlMjBsZWFzZSUyMG9yJTIwY2FyfGVufDB8MHx8fDE3ODIxNjAzMzB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="two cars parked next to each other in a parking lot" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1673187139181-795761a40ca1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxTaG91bGQlMjB5b3UlMjBsZWFzZSUyMG9yJTIwY2FyfGVufDB8MHx8fDE3ODIxNjAzMzB8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="two cars parked next to each other in a parking lot" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@usmanbim94?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Usman Malik</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">When Buying an EV Makes Sense</h2>
@@ -2254,7 +2255,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1526583038916-f138f908476b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIxNjA0NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="two men fixing up blue car" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526583038916-f138f908476b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIxNjA0NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="two men fixing up blue car" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@marcst84?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Marc St</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">So you want to trade in your car, but you owe the bank more than the car is worth. That&apos;s called negative equity, and it&apos;s more common than you think. If you owe more than your car is worth when trading in, you have real options, and most of them are better than what the dealer will suggest first.</p>
@@ -2273,7 +2274,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Nobody wants to hear this, but it&apos;s often the smartest play. Keep the car. Make extra principal payments. Wait until you have equity or at least break even.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">If your car still runs fine, six to twelve more months of payments can flip the math completely. Patience is free. Rolling $5,000 into a new 72-month loan is not.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1777013371332-c325bf12d613?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIxNjA0NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="White sedan parked outside a building with sign" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1777013371332-c325bf12d613?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxXaGF0JTIwdG8lMjBkbyUyMGlmJTIwY2FyfGVufDB8MHx8fDE3ODIxNjA0NDR8MA&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="White sedan parked outside a building with sign" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@chiuchuuu?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Heng Chiu</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Option 3: Sell It Yourself</h2>
@@ -2303,7 +2304,7 @@ export const blogPosts: BlogPost[] = [
     Content: () => (
       <div className="space-y-6">
         <figure>
-          <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwxfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="selective focus photography of assorted-color vehicles" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@sooprun?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Alex Suprun</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <p className="text-lg sm:text-xl text-gray-800 leading-relaxed font-medium">Trying to buy a car with no credit history and no cosigner feels like showing up to a party where everyone knows the rules but you. Lenders want proof you&apos;ll pay them back. You don&apos;t have any. The good news? You have more options than dealers will tell you, and a few smart moves can get you approved without a sky-high interest rate.</p>
@@ -2321,7 +2322,7 @@ export const blogPosts: BlogPost[] = [
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Credit unions are the single best move for no-credit buyers. Many have first-time buyer programs designed for people with thin files. Rates are usually lower than dealer financing, and approval is based partly on your relationship with the bank.</p>
         <p className="text-base sm:text-lg text-gray-700 leading-loose">Open an account, set up direct deposit, and let it sit for 60 to 90 days before you apply. Then ask specifically about their first-time auto buyer program.</p>
         <figure>
-          <img src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" className="w-full rounded-xl object-cover max-h-64" />
+          <Image src="https://images.unsplash.com/photo-1511125357779-27038c647d9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NjA4Nzl8MHwxfHNlYXJjaHwyfHxIb3clMjB0byUyMGJ1eSUyMGElMjBjYXJ8ZW58MHwwfHx8MTc4MjE1OTQwNnww&ixlib=rb-4.1.0&q=80&w=1080&w=900&q=75" alt="teal Volkswagen Beetle car parked beside sidewalk" width={900} height={256} className="w-full rounded-xl object-cover max-h-64" />
           <figcaption className="text-xs text-gray-400 mt-1.5 text-center">Photo by <a href="https://unsplash.com/@odiin?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Erik Odiin</a> on <a href="https://unsplash.com?utm_source=sign_or_walk&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Unsplash</a></figcaption>
         </figure>
         <h2 className="text-2xl font-bold text-gray-900 pt-4">Get preapproved before you shop</h2>

@@ -4,6 +4,15 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Sign or Walk — Know Before You Sign',
   description: 'Free AI car deal grader. Paste in your numbers and get an honest grade, every red flag, and a word-for-word negotiation script.',
+  alternates: { canonical: 'https://signorwalk.com' },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Sign or Walk',
+  url: 'https://signorwalk.com',
+  description: 'Free AI-powered car deal grader. Get an honest grade on your lease or finance deal — every red flag, every number, word-for-word negotiation script.',
 };
 
 function CheckIcon() {
@@ -17,6 +26,7 @@ function CheckIcon() {
 export default function LandingPage() {
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 {/* Hero */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-12 text-center">
         <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
@@ -135,7 +145,11 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 border border-gray-200 rounded-2xl bg-white">
           <div className="flex-1">
             <p className="text-sm font-bold text-gray-900 mb-1">Deal come back a C, D, or F?</p>
-            <p className="text-sm text-gray-500 leading-snug">A former dealership insider who's seen thousands of deals reviews your numbers and emails you exactly what to say — within 24 hours. $19.</p>
+            <p className="text-sm text-gray-500 leading-snug">A former dealership insider who's seen thousands of deals reviews your numbers and emails you exactly what to say — within 4 hours (8 AM–6 PM ET), or next business day. $19.</p>
+            <div className="mt-2.5 inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-2.5 py-1.5">
+              <span className="text-sm font-black text-green-700">$4,000 saved</span>
+              <span className="text-xs text-green-800">on a recent BMW X5 deal</span>
+            </div>
           </div>
           <a
             href={process.env.NEXT_PUBLIC_STRIPE_DEAL_SUPPORT_LINK}

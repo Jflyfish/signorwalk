@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Contact — Sign or Walk',
   description: 'Get in touch with the Sign or Walk team.',
+  alternates: { canonical: 'https://signorwalk.com/contact' },
 };
 
 export default function ContactPage() {

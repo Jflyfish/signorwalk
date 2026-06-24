@@ -13,6 +13,14 @@ export const metadata: Metadata = {
     description: 'Free AI-powered car deal grader. Grade your lease or finance deal in seconds.',
     type: 'website',
     url: 'https://signorwalk.com',
+    siteName: 'Sign or Walk',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Sign or Walk — Know Before You Sign' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sign or Walk — Know Before You Sign',
+    description: 'Free AI-powered car deal grader. Grade your lease or finance deal in seconds.',
+    images: ['/opengraph-image'],
   },
 };
 
@@ -102,7 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p className="text-gray-600 text-xs leading-relaxed">
                 <strong className="text-gray-500">Disclaimer:</strong> Sign or Walk provides AI-generated analysis for informational and educational purposes only. It is not financial, legal, or professional advice. Deal grades, payment calculations, and trade-in assessments are estimates based on the information you provide. Always verify numbers with your dealer, lender, and a qualified financial advisor before signing any contract. Sign or Walk assumes no liability for decisions made based on this analysis.
               </p>
-              <p className="text-gray-700 text-xs">© 2025 Sign or Walk. Free. Always.</p>
+              <p className="text-gray-700 text-xs">© 2026 Sign or Walk. Free. Always.</p>
             </div>
           </div>
         </footer>

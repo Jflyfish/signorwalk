@@ -5,6 +5,7 @@ import { blogPosts } from '@/lib/blogPosts';
 export const metadata: Metadata = {
   title: 'Blog — Sign or Walk',
   description: 'Car buying tips, deal breakdowns, and negotiation tactics from the Sign or Walk team.',
+  alternates: { canonical: 'https://signorwalk.com/blog' },
 };
 
 export default function BlogPage() {
