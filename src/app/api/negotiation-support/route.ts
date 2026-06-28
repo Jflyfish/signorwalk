@@ -177,8 +177,8 @@ export async function POST(req: NextRequest) {
       from: 'Sign or Walk <noreply@signorwalk.com>',
       to: process.env.SUPPORT_EMAIL || 'team@signorwalk.com',
       replyTo: email || undefined,
-      subject: `Deal Review — ${name} — ${vehicle} — ${state || 'Unknown state'}`,
-      text: emailText,
+      subject: `⚡ Action Required — Deal Review: ${name} · ${vehicle}`,
+      text: `ACTION REQUIRED — Paid deal review submission. Respond within 4 hours.\n\n${emailText}`,
       ...(attachments.length > 0 && { attachments }),
     });
 

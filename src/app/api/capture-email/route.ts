@@ -154,13 +154,10 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           from: 'Sign or Walk <noreply@signorwalk.com>',
           to: ['team@signorwalk.com'],
-          subject: `⚡ Action Required — New deal review: ${grade ?? '?'} grade${vehicle ? ` · ${vehicle}` : ''}`,
+          subject: `New lead: ${email} — ${grade ?? '?'} grade${vehicle ? ` · ${vehicle}` : ''}`,
           html: `
             <div style="font-family:sans-serif;max-width:480px;">
-              <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:14px 18px;margin-bottom:20px;">
-                <span style="font-size:13px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.05em;">⚡ Action Required</span>
-                <p style="margin:6px 0 0;font-size:14px;color:#78350f;">A new lead came in. Follow up within 4 hours for best conversion.</p>
-              </div>
+              <p style="font-size:15px;color:#111827;margin-bottom:12px;">New email capture:</p>
               <table style="font-size:14px;border-collapse:collapse;width:100%;">
                 <tr><td style="padding:6px 16px 6px 0;color:#6b7280;white-space:nowrap;">Email</td><td style="font-weight:600;color:#111827;">${email}</td></tr>
                 <tr><td style="padding:6px 16px 6px 0;color:#6b7280;white-space:nowrap;">Grade</td><td style="font-weight:600;color:#111827;">${grade ?? 'pending'}</td></tr>
