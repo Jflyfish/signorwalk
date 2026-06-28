@@ -110,6 +110,9 @@ export default function AnalyzePage() {
 
   // Results
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [analysisReady, setAnalysisReady] = useState(false);
+  const [capturedEmail, setCapturedEmail] = useState<string | null>(null);
+  const [pendingRequest, setPendingRequest] = useState<AnalysisRequest | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -201,11 +204,12 @@ export default function AnalyzePage() {
         }));
       } catch { /* ignore */ }
 
-      setPhase('results');
-      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      setPendingRequest(payload);
+      setAnalysisReady(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
       setPhase('upload');
+      setAnalysisReady(false);
       setShowManualForm(true);
     }
   }
@@ -379,14 +383,30 @@ export default function AnalyzePage() {
   // ── handleDealTypeToggle ─────────────────────────────────────────────────────
 
   function handleDealTypeToggle(newType: DealType) {
-    // Preserve shared values when switching
     setDealType(newType);
+  }
+
+  // ── email gate ───────────────────────────────────────────────────────────────
+
+  function proceedToResults(email?: string) {
+    if (email) {
+      setCapturedEmail(email);
+      const v = pendingRequest?.lease ?? pendingRequest?.finance;
+      const vehicle = v ? `${v.vehicleYear} ${v.vehicleMake} ${v.vehicleModel}`.trim() : '';
+      fetch('/api/capture-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, grade: analysis?.grade, vehicle, analysis }),
+      }).catch(() => { /* ignore */ });
+    }
+    setPhase('results');
+    setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   }
 
   // ── Phase: analyzing ─────────────────────────────────────────────────────────
 
   if (phase === 'analyzing') {
-    return <AnalyzingOverlay />;
+    return <AnalyzingOverlay isReady={analysisReady} onContinue={proceedToResults} />;
   }
 
   // ── Phase: results ───────────────────────────────────────────────────────────
@@ -398,6 +418,15 @@ export default function AnalyzePage() {
 
     return (
       <div ref={resultsRef} className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-3 print-page overflow-x-hidden">
+        {capturedEmail && (
+          <div className="no-print flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            We&apos;ll email this report to <span className="font-semibold ml-1">{capturedEmail}</span>
+          </div>
+        )}
+
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-7 print-card overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <GradeCircle grade={analysis.grade} size="lg" />
