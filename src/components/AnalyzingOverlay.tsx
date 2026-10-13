@@ -157,8 +157,8 @@ export function AnalyzingOverlay({ isReady = false, onContinue }: AnalyzingOverl
           Your free report is ready
         </div>
 
-        <h2 className="text-2xl font-black text-gray-900 mb-2">Enter your email to view it</h2>
-        <p className="text-sm text-gray-500 mb-8">We&apos;ll also send you a copy so you have it at the dealership.</p>
+        <h2 className="text-2xl font-black text-gray-900 mb-2">Your report is ready</h2>
+        <p className="text-sm text-gray-500 mb-8">Optional: enter your email and we'll send a copy so you have it at the dealership.</p>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
@@ -166,7 +166,6 @@ export function AnalyzingOverlay({ isReady = false, onContinue }: AnalyzingOverl
             value={gateEmail}
             onChange={e => setGateEmail(e.target.value)}
             placeholder="you@example.com"
-            required
             autoFocus={showGate}
             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           />
@@ -174,16 +173,16 @@ export function AnalyzingOverlay({ isReady = false, onContinue }: AnalyzingOverl
             type="submit"
             className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl text-sm transition-all shadow-sm"
           >
-            View my report →
+            {gateEmail.trim() ? 'Email me the report →' : 'View my report →'}
           </button>
         </form>
 
         <button
           type="button"
           onClick={() => onContinue?.()}
-          className="mt-4 text-sm text-gray-400 hover:text-gray-600 transition underline underline-offset-2"
+          className="mt-5 text-sm text-gray-500 hover:text-gray-800 transition font-medium"
         >
-          Continue without email
+          Skip — view report now
         </button>
       </div>
 
