@@ -160,6 +160,9 @@ test('analyze route is rules-only, drops free text, and rate limits without logg
 
     const missing = await POST(req, { params: Promise.resolve({ tenant: 'not-a-cu' }) });
     assert.equal(missing.status, 404);
+    const missingHtml = await missing.text();
+    assert.match(missingHtml, /Page not found/);
+    assert.equal(missingHtml.includes('Grade My Deal'), false);
 
     resetAnalyzeRateLimit();
     for (let i = 0; i < ANALYZE_LIMIT; i++) takeAnalyzeSlot('198.51.100.21');

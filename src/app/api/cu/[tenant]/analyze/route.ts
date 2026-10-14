@@ -4,6 +4,7 @@ import { InputError } from '@/cu/engine/normalize';
 import { gradePayload } from '@/cu/engine/report';
 import { applySecurityHeaders } from '@/cu/headers';
 import { clientAddress, takeAnalyzeSlot } from '@/cu/rate-limit';
+import { missingTenantResponse } from '@/cu/missing-page';
 import { getCuTenant } from '@/cu/tenants';
 
 const MAX_BODY = 20_000;
@@ -17,7 +18,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
   const { tenant: slug } = await ctx.params;
   const pathname = `/api/cu/${slug}/analyze`;
   const tenant = getCuTenant(slug);
-  if (!tenant) return json(pathname, { error: 'Not found' }, 404);
+  if (!tenant) return missingTenantResponse(pathname);
+  if (req.method !== 'POST') {
+    return applySecurityHeaders(new NextResponse(null, { status: 405, headers: { Allow: 'POST' } }), pathname);
+  }
 
   const limit = takeAnalyzeSlot(clientAddress(req.headers));
   if (!limit.allowed) {
@@ -73,3 +77,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
     return json(pathname, { success: false, error: 'Check the numbers and try again.' }, 500);
   }
 }
+
+export const GET = POST;
+export const PUT = POST;
+export const PATCH = POST;
+export const DELETE = POST;

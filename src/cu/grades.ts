@@ -1,4 +1,4 @@
-/** White text on these fills is at least 4.5:1. Words accompany the color. */
+/** Grade letters are this color on white. Each pair is above 4.5:1. */
 export const GRADE_FILL: Record<string, string> = {
   A: '#14532d',
   B: '#3f6212',
