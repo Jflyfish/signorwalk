@@ -117,7 +117,7 @@ Answer: [Draft design] No.
 Answer: [Draft design] There is no member file to sell or share. No advertising profile is built.
 
 3.6 Payments data
-Answer: [Draft design] Online checkout is not built. This website does not collect a card number. "Talk to us" is a mailto link and is not stored by the site.
+Answer: [Draft design] Online checkout is not built. This website does not collect a card number. "Over $5B? Email us." is a mailto link and is not stored by the site.
 
 ## 4. Integration
 
@@ -258,14 +258,14 @@ Out of scope for this draft, and not claimed here:
 ## What this marketing page aims for
 
 - Headings in order, with one page heading on each page
-- A pricing table with column headers, and the same figures as cards on a narrow screen
+- Three annual price cards, with the same figures at every width
 - Visible labels; the get-started page has no form, because checkout is not open
-- Keyboard access for links, the table, and the member number form at /cu/{slug}
+- Keyboard access for links and the numbers form at /cu/{slug}
 - Contrast intended to meet 4.5:1 for body text and link text on the new pages
 - Link text that says where the link goes
 - Grades and flags that include words, not color alone
 - The due-diligence packet is one zip download, with no email gate
-- A mailto link for institutions that do not have a list price
+- A mailto link, "Over $5B? Email us.", for institutions that do not have a list price
 
 A statement of aim is not a finding that every criterion passes.
 
@@ -326,34 +326,29 @@ The Customer is responsible for the accuracy of those URLs and for the rates and
 
 ## 4. Fees
 
-List prices, in United States dollars. Every priced tier is the same product. The tier follows total assets. There is no per-member fee.
+List prices, in United States dollars, billed annually. Every priced tier is the same product. The tier follows total assets. There is no per-member fee, no monthly price, and no setup fee.
 
-| Tier | Total assets | Monthly | Annual | Setup, one time |
-| --- | --- | --- | --- | --- |
-| Starter | Under $250 million | $600 | $6,000 | $0 |
-| Growth | $250 million–$1 billion | $1,200 | $12,000 | $1,500 |
-| Pro | $1 billion–$5 billion | $2,400 | $24,000 | $3,000 |
-| Custom | Over $5 billion, credit union leagues, and CUSOs | None published | None published | None published |
+| Tier | Total assets | Annual |
+| --- | --- | --- |
+| Starter | Under $250 million | $6,000 |
+| Growth | $250 million–$1 billion | $12,000 |
+| Pro | $1 billion–$5 billion | $24,000 |
 
-Annual billing is the annual amount in the table and includes two months free versus paying monthly. Monthly is the annual amount divided by 10. Twelve monthly invoices cost more than one annual invoice by exactly two monthly invoices.
-
-Setup is charged once, not each year. Starter has no setup fee.
-
-Institutions over $5 billion, leagues, and credit union service organizations (CUSOs) have no list price. They are "Talk to us" only. This sample does not create a price for them.
+Institutions over $5 billion have no published price. The public page says "Over $5B? Email us." That link is a mailto to ${TALK_TO_US_EMAIL}. This sample does not create a price for them.
 
 The public website's consumer footer says the consumer grader is free. That sentence is about the consumer site. It is not the price of this agreement. Members are not charged to use the branded page.
 
 ## 5. Billing
 
-The Customer may choose monthly or annual billing. Online checkout is not built. This sample does not authorize Provider to charge a card. An invoice process is [To be completed].
+Prices in section 4 are annual. There is no monthly price and no setup fee. Online checkout is not built. This sample does not authorize Provider to charge a card. An invoice process for a term after the pilot is [To be completed].
 
-## 6. 90-day pilot
+## 6. 90-day free pilot
 
-The Customer may start with a pilot of 90 days, measured from go-live, not from signature. [Counsel to confirm.]
+The Customer may start a 90-day free pilot. There is no charge for 90 days. The Customer can cancel anytime.
 
-Pilot fees: [To be completed]. The list prices in section 4 are the subscription prices. This draft does not, by itself, waive or discount them.
+The annual prices in section 4 are the prices after the pilot, if the Customer continues. Cancelling during the 90 days means those prices are not charged for the pilot. [Counsel to confirm how a later term is written.]
 
-The pilot is not a promise of funded loans, member savings, or a later term. Conversion from pilot to a longer term is [To be completed] and is not automatic in this draft.
+The pilot is not a promise of funded loans, member savings, or a later term. Conversion from the pilot to a paid term is not automatic in this draft.
 
 ## 7. Member data and core systems
 
