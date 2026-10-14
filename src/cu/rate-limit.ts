@@ -51,3 +51,24 @@ export function takeAnalyzeSlot(ip: string, now = Date.now()): { allowed: boolea
 export function resetAnalyzeRateLimit(): void {
   buckets.clear();
 }
+
+/** Separate window for worksheet reads. Same stateless, per-isolate limit. */
+export const EXTRACT_LIMIT = 6;
+const extractBuckets = new Map<string, number[]>();
+
+export function takeExtractSlot(ip: string, now = Date.now()): { allowed: boolean; retryAfterSec: number } {
+  const key = bucketKey(ip);
+  const recent = (extractBuckets.get(key) ?? []).filter(ts => now - ts < ANALYZE_WINDOW_MS);
+  if (recent.length >= EXTRACT_LIMIT) {
+    const retryAfterSec = Math.max(1, Math.ceil((ANALYZE_WINDOW_MS - (now - recent[0])) / 1000));
+    extractBuckets.set(key, recent);
+    return { allowed: false, retryAfterSec };
+  }
+  recent.push(now);
+  extractBuckets.set(key, recent);
+  return { allowed: true, retryAfterSec: 0 };
+}
+
+export function resetExtractRateLimit(): void {
+  extractBuckets.clear();
+}

@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState } from 'react';
 import { track } from '@vercel/analytics';
+import type { DerivedBrand } from '@/cu/contrast';
 import { GRADE_FILL } from '@/cu/grades';
 import type { TenantReport } from '@/cu/engine/types';
 import type { CuPublic } from '@/cu/tenants';
@@ -38,7 +39,7 @@ const inputClass =
   'w-full h-12 px-4 rounded-lg border border-[#E5E5E5] bg-white text-[18px] leading-[28px] text-[#111]';
 
 const textLink =
-  'text-[15px] font-semibold text-[#111] hover:underline underline-offset-4';
+  'cu-link text-[15px] font-semibold hover:underline underline-offset-4';
 
 function Field({
   id, label, hint, value, onChange,
@@ -91,24 +92,22 @@ function trackSafe(name: 'analysis_completed' | 'cta_clicked', props: Record<str
 }
 
 function Primary({
-  accent, children, type = 'button', disabled, onClick, href,
+  children, type = 'button', disabled, onClick, href,
 }: {
-  accent: string;
   children: React.ReactNode;
   type?: 'button' | 'submit';
   disabled?: boolean;
   onClick?: () => void;
   href?: string;
 }) {
-  const className = 'inline-flex items-center justify-center text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] text-white disabled:opacity-60';
-  const style = { backgroundColor: accent, color: '#fff' };
+  const className = 'cu-primary inline-flex items-center justify-center text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60';
   if (href) {
-    return <a href={href} className={className} style={style} onClick={onClick}>{children}</a>;
+    return <a href={href} className={className} onClick={onClick}>{children}</a>;
   }
-  return <button type={type} disabled={disabled} className={className} style={style} onClick={onClick}>{children}</button>;
+  return <button type={type} disabled={disabled} className={className} onClick={onClick}>{children}</button>;
 }
 
-export function CheckForm({ tenant }: { tenant: CuPublic }) {
+export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedBrand }) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [dealType, setDealType] = useState<DealType>('finance');
@@ -122,7 +121,35 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<TenantReport | null>(null);
 
-  const accent = `rgb(${tenant.colors.accent})`;
+  const accent = brand.brandText;
+  const [uploadNote, setUploadNote] = useState('');
+
+  async function onUpload(file: File | null) {
+    if (!file) return;
+    setUploadNote('Reading the worksheet.');
+    const body = new FormData();
+    body.set('file', file);
+    try {
+      const res = await fetch(`/api/cu/${tenant.id}/extract`, { method: 'POST', body });
+      const data = await res.json();
+      if (!res.ok || !data.success || !data.fields || typeof data.fields !== 'object') {
+        setUploadNote(typeof data.error === 'string' ? data.error : 'Enter the numbers instead.');
+        return;
+      }
+      if (data.dealType === 'lease' || data.dealType === 'finance') switchType(data.dealType);
+      const next: Partial<typeof EMPTY> = {};
+      for (const key of Object.keys(EMPTY) as FieldKey[]) {
+        const value = data.fields[key];
+        if (typeof value === 'string' && /^\d+(\.\d+)?$/.test(value)) next[key] = value;
+      }
+      setFields(prev => ({ ...prev, ...next }));
+      if (next.tradeDealerOffer || next.tradePayoff) setShowTrade(true);
+      if (next.extendedWarranty || next.gapInsurance || next.tireWheel || next.paintInterior) setShowAddons(true);
+      setUploadNote('Numbers filled from the worksheet. The file was not stored.');
+    } catch {
+      setUploadNote('Enter the numbers instead.');
+    }
+  }
 
   function setField(key: FieldKey, value: string) {
     setFields(prev => ({ ...prev, [key]: value }));
@@ -234,7 +261,6 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
 
         <div className="fixed inset-x-0 bottom-0 border-t border-[#E5E5E5] bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0">
           <Primary
-            accent={accent}
             href={tenant.preApprovalUrl}
             onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
           >
@@ -343,6 +369,24 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
         <div role="status" aria-live="polite" className="sr-only">{busy ? 'Checking the numbers.' : ''}</div>
         {error ? <p id={`${formId}-error`} role="alert" className="mb-6 text-[14px] font-semibold leading-[20px]">{error}</p> : null}
 
+        <div className="mb-6">
+          <label htmlFor="worksheet" className={`${textLink} underline decoration-[#555] decoration-1 underline-offset-4`}>
+            Upload a dealer worksheet
+          </label>
+          <input
+            id="worksheet"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            className="mt-2 block w-full text-[14px]"
+            onChange={event => {
+              const file = event.target.files?.[0] ?? null;
+              event.target.value = '';
+              void onUpload(file);
+            }}
+          />
+          <p className="mt-2 text-[14px] leading-[20px] text-[#555]" role="status">{uploadNote || 'The file is read for numbers and then discarded. It is not stored.'}</p>
+        </div>
+
         <fieldset>
           <legend className="mb-4 text-[14px] font-semibold leading-[20px]">Offer type</legend>
           <div className="grid grid-cols-2 gap-4">
@@ -356,7 +400,7 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
                     borderStyle: 'solid',
                     borderWidth: selected ? 2 : 1,
                     borderColor: selected ? accent : '#E5E5E5',
-                    backgroundColor: selected ? `rgb(${tenant.colors.accent} / 0.06)` : '#fff',
+                    backgroundColor: selected ? brand.tint : '#fff',
                   }}
                 >
                   <input
@@ -437,7 +481,7 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
         </div>
 
         <div className="mt-10">
-          <Primary accent={accent} type="submit" disabled={busy}>
+          <Primary type="submit" disabled={busy}>
             {busy ? 'Checking…' : 'Check this offer'}
           </Primary>
         </div>

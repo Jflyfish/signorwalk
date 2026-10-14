@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
-import { inter } from '@/cu/inter';
-import { CU_TENANTS, getCuTenant, toCuPublic } from '@/cu/tenants';
-import { DealStorageReset } from './DealStorageReset';
+import { CU_TENANTS, getCuTenant } from '@/cu/tenants';
+import { resolveBrand } from '@/cu/brand';
+
+export const dynamic = 'force-dynamic';
 
 export function generateStaticParams() {
   return CU_TENANTS.map(tenant => ({ tenant: tenant.id }));
@@ -28,22 +29,6 @@ export async function generateMetadata({
   };
 }
 
-function Mark({ logo, color }: { logo: 'harborlight' | 'summit'; color: string }) {
-  if (logo === 'harborlight') {
-    return (
-      <svg viewBox="0 0 32 32" className="h-8 w-8" aria-hidden="true">
-        <path d="M16 6v14M10 20h12" stroke={color} strokeWidth="2" strokeLinecap="round" />
-        <path d="M16 10l8 4" stroke={color} strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 32 32" className="h-8 w-8" aria-hidden="true">
-      <path d="M6 24l10-14 10 14" fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default async function CuLayout({
   children,
   params,
@@ -54,36 +39,39 @@ export default async function CuLayout({
   const tenant = getCuTenant((await params).tenant);
   if (!tenant) {
     return (
-      <div className={`${inter.className} cu-missing min-h-screen bg-white text-[#111]`}>
+      <div className="cu-missing min-h-screen bg-white text-[#111]">
         <style>{`
-          body > nav, body > footer { display: none !important; }
-          body { background: #fff; }
           .cu-missing :focus-visible { outline: 2px solid #111; outline-offset: 2px; }
         `}</style>
         {children}
       </div>
     );
   }
-  const pub = toCuPublic(tenant);
-  const accent = `rgb(${pub.colors.accent})`;
-
+  const brand = await resolveBrand(tenant);
   return (
-    <div className={`${inter.className} cu-shell min-h-screen bg-white text-[#111]`} style={{ ['--cu-accent' as string]: accent }}>
+    <div
+      className={`cu-shell min-h-screen bg-white text-[#111] ${brand.font === 'serif' ? 'cu-serif' : ''}`}
+      style={{
+        ['--cu-fill' as string]: brand.brandFill,
+        ['--cu-on' as string]: brand.onBrand,
+        ['--cu-hover' as string]: brand.hover,
+        ['--cu-text' as string]: brand.brandText,
+        ['--cu-focus' as string]: brand.focus,
+        ['--cu-tint' as string]: brand.tint,
+      }}
+    >
       <style>{`
-        body > nav, body > footer { display: none !important; }
-        body { background: #fff; }
-        .cu-shell :focus-visible { outline: 2px solid var(--cu-accent); outline-offset: 2px; }
+        .cu-shell :focus-visible { outline: 2px solid var(--cu-focus); outline-offset: 2px; }
+        .cu-serif { font-family: Georgia, "Iowan Old Style", Palatino, "Palatino Linotype", serif; }
+        .cu-link { color: var(--cu-text); }
+        .cu-primary { background: var(--cu-fill); color: var(--cu-on); }
+        .cu-primary:hover { background: var(--cu-hover); }
+        .cu-primary:disabled { opacity: 0.6; }
+        .cu-nav-active { color: var(--cu-text); border-bottom: 2px solid var(--cu-text); }
       `}</style>
-      <DealStorageReset />
       <a href="#cu-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-[14px] focus:font-semibold">
         Skip to content
       </a>
-      <header className="mx-auto flex min-h-16 w-full max-w-[560px] items-center gap-2 px-4 py-4">
-        <Mark logo={pub.logo} color={accent} />
-        <p className="min-w-0 text-[14px] leading-[20px] text-[#555]">
-          <span className="font-semibold text-[#111]">{pub.name}</span> with Sign or Walk
-        </p>
-      </header>
       <div id="cu-content" tabIndex={-1}>
         {children}
       </div>
