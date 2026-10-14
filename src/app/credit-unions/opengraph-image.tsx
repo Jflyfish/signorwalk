@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const alt = 'Win back the auto loans dealers take from your members.';
+export const alt = 'Help your members spot a bad car deal before they sign.';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -23,7 +23,7 @@ export default function OpenGraphImage() {
           Sign or Walk
         </div>
         <div style={{ display: 'flex', fontSize: 64, fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.03em', maxWidth: 920 }}>
-          Win back the auto loans dealers take from your members.
+          Help your members spot a bad car deal before they sign.
         </div>
       </div>
     ),
