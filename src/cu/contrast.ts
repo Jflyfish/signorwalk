@@ -176,9 +176,12 @@ function safeSecondary(hex: string | undefined): string | undefined {
   return rgb ? rgbToHex(rgb) : undefined;
 }
 
+const LOGO_DATA = /^data:image\/(?:png|jpeg|webp|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/;
+
 export function safeLogo(url: string | undefined): string | undefined {
   if (!url) return undefined;
   const trimmed = url.trim();
+  if (LOGO_DATA.test(trimmed) && trimmed.length <= 500_000) return trimmed;
   if (trimmed.length > 300) return undefined;
   if (trimmed.startsWith('/cu-brand/') && !trimmed.includes('..')) return trimmed;
   try {

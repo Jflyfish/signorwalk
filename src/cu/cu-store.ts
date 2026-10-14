@@ -49,9 +49,23 @@ const memory = new Map<string, string>();
 
 const BANNED = /sellingprice|msrp|vin|ssn|socialsecurity|dateofbirth|membername|worksheet|base64|password|monthlypayment|documenttext|imagebytes/i;
 const SSN = /\b\d{3}-\d{2}-\d{4}\b/;
+const LOGO_DATA = /^data:image\/(?:png|jpeg|webp|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/;
 
 function assertCuRecord(value: unknown): void {
-  const json = JSON.stringify(value);
+  const copy: Record<string, unknown> = value && typeof value === 'object'
+    ? { ...(value as Record<string, unknown>) }
+    : {};
+  if (value && typeof value === 'object') {
+    for (const key of ['logoLight', 'logoDark'] as const) {
+      const logo = copy[key];
+      if (typeof logo !== 'string' || !logo.startsWith('data:')) continue;
+      if (!LOGO_DATA.test(logo) || logo.length > 500_000) {
+        throw new Error('Credit-union storage cannot hold member data');
+      }
+      delete copy[key];
+    }
+  }
+  const json = JSON.stringify(value && typeof value === 'object' ? copy : value);
   if (BANNED.test(json) || SSN.test(json)) {
     throw new Error('Credit-union storage cannot hold member data');
   }

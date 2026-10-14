@@ -13,7 +13,7 @@ function merge(base: CuTenant, stored: StoredBranding | null): CuTenant['brand']
     logoLight: safeLogo(stored.logoLight) || base.brand.logoLight,
     logoDark: safeLogo(stored.logoDark) || base.brand.logoDark,
     logoAspect: stored.logoAspect || base.brand.logoAspect,
-    font: stored.font === 'serif' || stored.font === 'inter' ? stored.font : base.brand.font,
+    font: 'inter',
   };
 }
 

@@ -4,7 +4,8 @@ import test from 'node:test';
 import { NextRequest } from 'next/server';
 import { ephemeralSecret, checkCredentials, signSession, verifySession } from '../src/cu/auth';
 import { capChroma, contrastRatio, deriveBrand, parseHex, rgbToOklch } from '../src/cu/contrast';
-import { getAggregates, recordCheck, resetCuStore, saveSettings } from '../src/cu/cu-store';
+import { getAggregates, getBranding, recordCheck, resetCuStore, saveBranding, saveSettings } from '../src/cu/cu-store';
+import { readLogoFile } from '../src/cu/logo-file';
 import { formatOcrLog, pickOcrFields } from '../src/cu/ocr';
 import { sendAggregateSummary, summaryText } from '../src/cu/notify';
 import { CHECKOUT_STATUS } from '../src/app/credit-unions/get-started/checkout-stubs';
@@ -68,6 +69,16 @@ test('credit-union storage keeps counts and rejects member data', async () => {
   await assert.rejects(() => saveSettings('harborlight-cu', { emailEnabled: true, notifyEmail: '123-45-6789' }));
   const settings = await import('../src/cu/cu-store');
   await assert.rejects(() => settings.saveBranding('harborlight-cu', { primary: '#111111', shortName: 'vin secret' }));
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=', 'base64');
+  const logo = readLogoFile(png, 'image/png');
+  assert.ok(logo);
+  assert.equal(logo.width, 1);
+  assert.equal(logo.height, 1);
+  assert.equal(logo.aspect, 1);
+  await saveBranding('harborlight-cu', { primary: '#075985', shortName: 'Harborlight CU', logoLight: logo.dataUrl, logoAspect: logo.aspect });
+  const stored = await getBranding('harborlight-cu');
+  assert.equal(stored?.logoLight, logo.dataUrl);
+  assert.equal(stored?.logoAspect, 1);
   resetCuStore();
 });
 

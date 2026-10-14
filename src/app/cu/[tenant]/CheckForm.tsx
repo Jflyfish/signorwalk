@@ -234,17 +234,18 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
     const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
     return (
       <div className="mx-auto w-full max-w-[560px] px-4 pb-24 pt-16 md:pb-16 md:pt-24">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-4">
+          <p className="text-[14px] leading-[20px] text-[#555] md:hidden">Grade</p>
           <p
             aria-hidden="true"
-            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[16px] text-[64px] font-extrabold leading-none"
+            className="mt-4 flex h-24 w-24 shrink-0 items-center justify-center rounded-[16px] text-[64px] font-extrabold leading-none md:mt-0"
             style={{ color: gradeColor, backgroundColor: gradeTint(gradeColor) }}
           >
             {report.grade}
           </p>
-          <div>
-            <p className="text-[14px] leading-[20px] text-[#555]">Grade</p>
-            <h1 ref={headingRef} tabIndex={-1} className="text-[18px] leading-[28px]">
+          <div className="mt-4 md:mt-0">
+            <p className="hidden text-[14px] leading-[20px] text-[#555] md:block">Grade</p>
+            <h1 ref={headingRef} tabIndex={-1} className="text-[18px] leading-[28px] md:mt-4">
               <span className="sr-only">{report.grade}. </span>{report.headline}
             </h1>
           </div>

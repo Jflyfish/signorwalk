@@ -3,10 +3,11 @@ import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
-import { getAggregates, getSettings, staffDirectory } from '@/cu/cu-store';
+import { getAggregates, getBranding, getSettings, staffDirectory } from '@/cu/cu-store';
 import { getCuTenant } from '@/cu/tenants';
-import { saveBrandingAction, saveSettingsAction, sendSummaryAction, signOut } from '../../actions';
+import { saveSettingsAction, sendSummaryAction, signOut } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
+import { BrandingForm } from './BrandingForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +15,15 @@ export const metadata: Metadata = {
   title: 'Dashboard',
   robots: { index: false, follow: false },
 };
+
+type Section = 'usage' | 'branding' | 'settings';
+
+function sectionFrom(query: { section?: string; saved?: string; error?: string; notice?: string }): Section {
+  if (query.section === 'branding' || query.section === 'settings' || query.section === 'usage') return query.section;
+  if (query.saved === 'branding' || query.error === 'branding') return 'branding';
+  if (query.saved === 'settings' || query.saved === 'email' || query.error === 'email' || query.notice) return 'settings';
+  return 'usage';
+}
 
 const NOTICES: Record<string, string> = {
   settings: 'Settings saved.',
@@ -29,7 +39,7 @@ export default async function DashboardPage({
   searchParams,
 }: {
   params: Promise<{ tenant: string }>;
-  searchParams: Promise<{ saved?: string; error?: string; notice?: string }>;
+  searchParams: Promise<{ section?: string; saved?: string; error?: string; notice?: string }>;
 }) {
   const tenant = getCuTenant((await params).tenant);
   if (!tenant) notFound();
@@ -39,19 +49,27 @@ export default async function DashboardPage({
   const brand = await resolveBrand(tenant);
   const aggregates = await getAggregates(tenant.id);
   const settings = await getSettings(tenant.id);
+  const stored = await getBranding(tenant.id);
   const query = await searchParams;
+  const section = sectionFrom(query);
   const notice = NOTICES[query.saved ?? ''] || NOTICES[query.notice ?? ''];
   const error = query.error === 'branding'
-    ? 'Check the short name, colors, and logo aspect.'
+    ? 'Check the short name and colors.'
     : query.error === 'email'
       ? 'Check the credit-union email address.'
       : '';
   const staff = staffDirectory().filter(row => row.tenantId === tenant.id);
+  const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
+  const tabs: { id: Section; label: string }[] = [
+    { id: 'usage', label: 'Usage' },
+    { id: 'branding', label: 'Branding' },
+    { id: 'settings', label: 'Settings' },
+  ];
 
   return (
     <>
       <header className="border-b border-[#E5E5E5]">
-        <div className="mx-auto flex h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-4">
+        <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-4">
           <BrandLockup
             name={tenant.name}
             shortName={brand.shortName}
@@ -59,6 +77,7 @@ export default async function DashboardPage({
             mark={tenant.logo}
             logoLight={brand.logoLight}
             logoAspect={brand.logoAspect}
+            fullNameOnPhone
           />
           <details className="relative shrink-0">
             <summary className="cursor-pointer text-[15px] font-semibold">Account</summary>
@@ -74,16 +93,23 @@ export default async function DashboardPage({
       </header>
       <nav className="border-b border-[#E5E5E5]">
         <div className="mx-auto flex w-full max-w-[1120px] gap-6 px-4">
-          <a href="#usage" className="cu-nav-active py-3 text-[15px] font-semibold">Usage</a>
-          <a href="#branding" className="py-3 text-[15px] font-semibold text-[#555]">Branding</a>
-          <a href="#settings" className="py-3 text-[15px] font-semibold text-[#555]">Settings</a>
+          {tabs.map(tab => (
+            <a
+              key={tab.id}
+              href={`/cu/${tenant.id}/dashboard?section=${tab.id}`}
+              className={`py-3 text-[15px] font-semibold ${section === tab.id ? 'cu-nav-active' : 'text-[#555]'}`}
+              aria-current={section === tab.id ? 'page' : undefined}
+            >
+              {tab.label}
+            </a>
+          ))}
         </div>
       </nav>
       <main className="mx-auto w-full max-w-[1120px] px-4 py-10">
         {notice ? <p className="mb-6 text-[14px] font-semibold leading-[20px]" role="status">{notice}</p> : null}
         {error ? <p className="mb-6 text-[14px] font-semibold leading-[20px]" role="alert">{error}</p> : null}
 
-        <section id="usage" aria-labelledby="usage-heading">
+        {section === 'usage' ? <section aria-labelledby="usage-heading">
           <h1 id="usage-heading" className="text-[32px] font-bold leading-[38px]">Usage</h1>
           <div className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-3">
             <p>
@@ -99,19 +125,19 @@ export default async function DashboardPage({
               <span className="mt-2 block text-[14px] leading-[20px] text-[#555]">Accounts</span>
             </p>
           </div>
-          <div className="mt-10 overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+          <div className="mt-10">
+            <table className="w-full max-w-[560px] border-collapse text-left">
               <thead>
                 <tr className="border-b border-[#E5E5E5] text-[14px] leading-[20px] text-[#555]">
                   <th className="py-3 pr-4 font-semibold">Grade</th>
-                  <th className="py-3 font-semibold">Count</th>
+                  <th className="py-3 text-right font-semibold">Count</th>
                 </tr>
               </thead>
               <tbody>
                 {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
                   <tr key={grade} className="border-b border-[#E5E5E5] text-[15px]">
                     <td className="py-3 pr-4">{grade}</td>
-                    <td className="py-3 tabular-nums">{aggregates.grades[grade]}</td>
+                    <td className="py-3 text-right tabular-nums">{aggregates.grades[grade]}</td>
                   </tr>
                 ))}
               </tbody>
@@ -133,43 +159,22 @@ export default async function DashboardPage({
               ))}
             </tbody>
           </table>
-        </section>
+        </section> : null}
 
-        <section id="branding" className="mt-16" aria-labelledby="branding-heading">
-          <h2 id="branding-heading" className="text-[24px] font-bold leading-[30px]">Branding</h2>
-          <p className="mt-4 text-[14px] leading-[20px] text-[#555]">Derived text {brand.brandText}. Fill {brand.brandFill}. Focus {brand.focus}.</p>
-          <form action={saveBrandingAction} className="mt-6 grid max-w-[560px] gap-4">
-            <input type="hidden" name="tenant" value={tenant.id} />
-            <label className="text-[14px] font-semibold leading-[20px]">Short name
-              <input name="shortName" defaultValue={brand.shortName} maxLength={24} required className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal" />
-            </label>
-            <label className="text-[14px] font-semibold leading-[20px]">Primary
-              <input name="primary" defaultValue={tenant.brand.primary} required className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal" />
-            </label>
-            <label className="text-[14px] font-semibold leading-[20px]">Secondary
-              <input name="secondary" defaultValue={brand.secondary ?? ''} className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal" />
-            </label>
-            <label className="text-[14px] font-semibold leading-[20px]">Logo, light background
-              <input name="logoLight" defaultValue={brand.logoLight ?? ''} className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal" />
-            </label>
-            <label className="text-[14px] font-semibold leading-[20px]">Logo, dark background
-              <input name="logoDark" defaultValue={brand.logoDark ?? ''} className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal" />
-            </label>
-            <label className="text-[14px] font-semibold leading-[20px]">Logo aspect
-              <input name="logoAspect" defaultValue={String(brand.logoAspect)} inputMode="decimal" required className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal" />
-            </label>
-            <label className="text-[14px] font-semibold leading-[20px]">Font
-              <select name="font" defaultValue={brand.font} className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] bg-white px-4 text-[16px] font-normal">
-                <option value="inter">Inter</option>
-                <option value="serif">Serif</option>
-              </select>
-            </label>
-            <button type="submit" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save branding</button>
-          </form>
-        </section>
+        {section === 'branding' ? <section aria-labelledby="branding-heading">
+          <h1 id="branding-heading" className="text-[32px] font-bold leading-[38px]">Branding</h1>
+          <BrandingForm
+            tenantId={tenant.id}
+            shortName={brand.shortName}
+            primary={sourcePrimary}
+            secondary={brand.secondary ?? ''}
+            logoLight={brand.logoLight ?? ''}
+            logoDark={brand.logoDark ?? ''}
+          />
+        </section> : null}
 
-        <section id="settings" className="mt-16" aria-labelledby="settings-heading">
-          <h2 id="settings-heading" className="text-[24px] font-bold leading-[30px]">Settings</h2>
+        {section === 'settings' ? <section aria-labelledby="settings-heading">
+          <h1 id="settings-heading" className="text-[32px] font-bold leading-[38px]">Settings</h1>
           <form action={saveSettingsAction} className="mt-6 grid max-w-[560px] gap-4">
             <input type="hidden" name="tenant" value={tenant.id} />
             <label className="flex items-center gap-2 text-[15px] font-semibold">
@@ -182,13 +187,14 @@ export default async function DashboardPage({
             </label>
             <button type="submit" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save settings</button>
           </form>
-          <form action={sendSummaryAction} className="mt-6">
-            <input type="hidden" name="tenant" value={tenant.id} />
-            <button type="submit" className="inline-flex h-12 items-center justify-center rounded-lg border border-[#E5E5E5] bg-white px-4 text-[15px] font-semibold text-[#111] md:h-11" disabled={!settings.emailEnabled}>
-              Send summary
-            </button>
-          </form>
-        </section>
+          <div className="mt-6">
+            <p className="text-[14px] leading-[20px] text-[#555]">Emails the counts to the credit-union inbox.</p>
+            <form action={sendSummaryAction} className="mt-2">
+              <input type="hidden" name="tenant" value={tenant.id} />
+              <button type="submit" className="cu-link text-[15px] font-semibold underline decoration-[#555] decoration-1 underline-offset-4">Send summary</button>
+            </form>
+          </div>
+        </section> : null}
       </main>
     </>
   );

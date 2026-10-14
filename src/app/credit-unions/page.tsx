@@ -55,7 +55,7 @@ export default function CreditUnionsPage() {
         <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] text-[#555]">{VALUE}</p>
       </div>
 
-      <div className="bg-[#FAFAFA] py-16">
+      <div className="mt-16 bg-[#FAFAFA] py-16 md:mt-24">
         <div className="mx-auto w-full max-w-[960px] px-4">
           <ul className="grid gap-4 md:grid-cols-3">
             {pricedTiers.map(tier => {

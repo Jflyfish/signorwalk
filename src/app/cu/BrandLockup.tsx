@@ -6,6 +6,7 @@ export function BrandLockup({
   logoLight,
   logoAspect = 1,
   beside = true,
+  fullNameOnPhone = false,
 }: {
   name: string;
   shortName: string;
@@ -14,10 +15,17 @@ export function BrandLockup({
   logoLight?: string;
   logoAspect?: number;
   beside?: boolean;
+  /** Dashboard header: the full credit-union name, without the product line, on a phone. */
+  fullNameOnPhone?: boolean;
 }) {
   const custom = Boolean(logoLight && !logoLight.startsWith('/cu-brand/'));
+  const productLine = beside ? (
+    <p className={`min-w-0 text-[14px] leading-[20px] text-[#555] ${fullNameOnPhone ? 'hidden md:block' : ''}`}>
+      {custom || mark ? null : <span className="sr-only">{name} </span>}with Sign or Walk
+    </p>
+  ) : null;
   return (
-    <div className="flex min-w-0 items-center gap-2">
+    <div className={`flex min-w-0 items-center gap-2 ${fullNameOnPhone ? 'flex-1' : ''}`}>
       {custom ? (
         <img src={logoLight} alt={name} className="h-7 w-auto max-w-[160px] object-contain md:h-8" style={{ aspectRatio: String(logoAspect) }} />
       ) : mark ? (
@@ -34,12 +42,11 @@ export function BrandLockup({
           )}
         </span>
       ) : null}
-      <span className="truncate text-[15px] font-semibold leading-[20px] text-[#111]">{shortName}</span>
-      {beside ? (
-        <p className="min-w-0 text-[14px] leading-[20px] text-[#555]">
-          {custom || mark ? null : <span className="sr-only">{name} </span>}with Sign or Walk
-        </p>
+      {fullNameOnPhone ? (
+        <span className="min-w-0 text-[15px] font-semibold leading-[20px] text-[#111] md:hidden">{name}</span>
       ) : null}
+      <span className={`min-w-0 truncate text-[15px] font-semibold leading-[20px] text-[#111] ${fullNameOnPhone ? 'hidden md:inline' : ''}`}>{shortName}</span>
+      {productLine}
     </div>
   );
 }

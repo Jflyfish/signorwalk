@@ -10,7 +10,8 @@ import {
   signSession,
   verifySession,
 } from '@/cu/auth';
-import { saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
+import { getBranding, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
+import { readLogoFile } from '@/cu/logo-file';
 import { sendAggregateSummary } from '@/cu/notify';
 import { getCuTenant } from '@/cu/tenants';
 
@@ -75,10 +76,10 @@ export async function saveSettingsAction(formData: FormData) {
   await guard(tenant);
   const notifyEmail = String(formData.get('notifyEmail') ?? '').trim();
   if (notifyEmail.length > 120 || (notifyEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail))) {
-    redirect(`/cu/${tenant}/dashboard?error=email#settings`);
+    redirect(`/cu/${tenant}/dashboard?section=settings&error=email`);
   }
   await saveSettings(tenant, { emailEnabled: formData.get('emailEnabled') === 'on', notifyEmail: notifyEmail || undefined });
-  redirect(`/cu/${tenant}/dashboard?saved=settings#settings`);
+  redirect(`/cu/${tenant}/dashboard?section=settings&saved=settings`);
 }
 
 export async function saveBrandingAction(formData: FormData) {
@@ -87,31 +88,35 @@ export async function saveBrandingAction(formData: FormData) {
   const shortName = String(formData.get('shortName') ?? '').trim().replace(/\s+/g, ' ');
   const primary = String(formData.get('primary') ?? '').trim();
   const secondary = String(formData.get('secondary') ?? '').trim();
-  const logoLight = String(formData.get('logoLight') ?? '').trim();
-  const logoDark = String(formData.get('logoDark') ?? '').trim();
-  const font = String(formData.get('font') ?? '');
-  const aspect = Number(formData.get('logoAspect'));
   const hex = /^#[0-9a-fA-F]{6}$/;
-  if ([...shortName].length < 1 || [...shortName].length > 24 || !hex.test(primary)) {
-    redirect(`/cu/${tenant}/dashboard?error=branding#branding`);
-  }
-  if (secondary && !hex.test(secondary)) redirect(`/cu/${tenant}/dashboard?error=branding#branding`);
-  if (!Number.isFinite(aspect) || aspect < 0.2 || aspect > 8) redirect(`/cu/${tenant}/dashboard?error=branding#branding`);
+  const brandingError = `/cu/${tenant}/dashboard?section=branding&error=branding`;
+  if ([...shortName].length < 1 || [...shortName].length > 24 || !hex.test(primary)) redirect(brandingError);
+  if (secondary && !hex.test(secondary)) redirect(brandingError);
+  const light = await logoFromForm(formData.get('logoLightFile'));
+  const dark = await logoFromForm(formData.get('logoDarkFile'));
+  if (light === 'invalid' || dark === 'invalid') redirect(brandingError);
+  const current = await getBranding(tenant);
   const branding: StoredBranding = {
     shortName,
     primary,
     secondary: secondary || undefined,
-    logoLight: logoLight || undefined,
-    logoDark: logoDark || undefined,
-    logoAspect: aspect,
-    font: font === 'serif' ? 'serif' : 'inter',
+    logoLight: light?.dataUrl ?? current?.logoLight,
+    logoDark: dark?.dataUrl ?? current?.logoDark,
+    logoAspect: light?.aspect ?? dark?.aspect ?? current?.logoAspect,
+    font: 'inter',
   };
   try {
     await saveBranding(tenant, branding);
   } catch {
-    redirect(`/cu/${tenant}/dashboard?error=branding#branding`);
+    redirect(brandingError);
   }
-  redirect(`/cu/${tenant}/dashboard?saved=branding#branding`);
+  redirect(`/cu/${tenant}/dashboard?section=branding&saved=branding`);
+}
+
+async function logoFromForm(entry: FormDataEntryValue | null) {
+  if (!(entry instanceof File) || entry.size === 0) return null;
+  const logo = readLogoFile(Buffer.from(await entry.arrayBuffer()), entry.type || 'application/octet-stream');
+  return logo ?? 'invalid';
 }
 
 export async function sendSummaryAction(formData: FormData) {
@@ -119,9 +124,9 @@ export async function sendSummaryAction(formData: FormData) {
   await guard(tenant);
   try {
     const result = await sendAggregateSummary(tenant);
-    if (!result.sent) redirect(`/cu/${tenant}/dashboard?notice=${result.reason}#settings`);
+    if (!result.sent) redirect(`/cu/${tenant}/dashboard?section=settings&notice=${result.reason}`);
   } catch {
-    redirect(`/cu/${tenant}/dashboard?error=email#settings`);
+    redirect(`/cu/${tenant}/dashboard?section=settings&error=email`);
   }
-  redirect(`/cu/${tenant}/dashboard?saved=email#settings`);
+  redirect(`/cu/${tenant}/dashboard?section=settings&saved=email`);
 }
