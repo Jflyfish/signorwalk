@@ -12,7 +12,6 @@ const links = [
   { href: '/glossary', label: 'Glossary' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
-  { href: '/credit-unions', label: 'Credit unions' },
 ];
 
 export default function MobileNav() {

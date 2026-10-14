@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { tenantFromHeader } from '@/tenants/request';
 
 export async function POST(req: NextRequest) {
-  if (!tenantFromHeader(req.headers.get('x-tenant')).features.negotiationSupport) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  }
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error('RESEND_API_KEY is not set');

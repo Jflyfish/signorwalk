@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { evaluateDeal } from '../src/lib/engine/evaluate';
-import { buildTenantReport, gradePayload } from '../src/lib/engine/report';
+import { evaluateDeal } from '../src/cu/engine/evaluate';
+import { buildTenantReport, gradePayload } from '../src/cu/engine/report';
 import { cases } from './cases';
 
 interface Expected {

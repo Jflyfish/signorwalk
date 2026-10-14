@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { tenantFromHeader } from '@/tenants/request';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -60,9 +59,6 @@ Be aggressive about extracting numbers — if a number appears next to a relevan
 Return ONLY the JSON object. No explanation.`;
 
 export async function POST(req: NextRequest) {
-  if (!tenantFromHeader(req.headers.get('x-tenant')).features.documentUpload) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  }
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;

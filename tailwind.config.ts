@@ -11,13 +11,6 @@ const config: Config = {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
-      colors: {
-        brand: {
-          primary: 'rgb(var(--brand-primary) / <alpha-value>)',
-          fg: 'rgb(var(--brand-primary-fg) / <alpha-value>)',
-          accent: 'rgb(var(--brand-accent) / <alpha-value>)',
-        },
-      },
     },
   },
   plugins: [],

@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import test from 'node:test';
-import { FLAG_IDS } from '../src/lib/engine/types';
-import { ALL_TEMPLATES, FLAG_COPY, SLOTS, TEMPLATE_PACK_VERSION } from '../src/templates/tp-1.0.0/en';
-import { renderTemplate, templatePlaceholders } from '../src/templates/tp-1.0.0/render';
+import { FLAG_IDS } from '../src/cu/engine/types';
+import { ALL_TEMPLATES, FLAG_COPY, SLOTS, TEMPLATE_PACK_VERSION } from '../src/cu/templates/tp-1.0.0/en';
+import { renderTemplate, templatePlaceholders } from '../src/cu/templates/tp-1.0.0/render';
 
 const BANNED = [
   /credit tier/i,
@@ -80,11 +81,18 @@ test('templates render only engine-formatted slot values', () => {
   assert.throws(() => renderTemplate(FLAG_COPY.FLAG_DOC_FEE_HIGH.issue, { docFee: 'jane@example.com' }));
 });
 
+function walk(dir: string): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, name.name);
+    if (name.isDirectory()) out.push(...walk(path));
+    else if (name.name.endsWith('.tsx')) out.push(path);
+  }
+  return out;
+}
+
 test('credit-union UI does not say Sign or Walk except the powered-by line', () => {
-  const files = [
-    ...readdirSync('src/components/tenant').map(name => `src/components/tenant/${name}`),
-    'src/components/tenant/TenantHome.tsx',
-  ];
+  const files = walk('src/app/cu');
   const seen = new Set<string>();
   for (const file of files) {
     if (seen.has(file) || !file.endsWith('.tsx')) continue;

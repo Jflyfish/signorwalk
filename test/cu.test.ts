@@ -1,0 +1,178 @@
+import assert from 'node:assert/strict';
+import { inflateRawSync } from 'node:zlib';
+import test from 'node:test';
+import { NextRequest } from 'next/server';
+import { ANALYZE_LOG_KEYS, formatAnalyzeLog } from '../src/cu/log';
+import { GRADE_FILL } from '../src/cu/grades';
+import { securityHeaderList } from '../src/cu/headers';
+import { dueDiligenceDocs } from '../src/cu/packet/documents';
+import { buildZip } from '../src/cu/packet/zip';
+import { ANALYZE_LIMIT, resetAnalyzeRateLimit, takeAnalyzeSlot } from '../src/cu/rate-limit';
+import { clearDealStorage, DEAL_STORAGE_KEYS } from '../src/cu/storage';
+import { contrastRatio, parseRgbChannels } from '../src/cu/contrast';
+import { getCuTenant, toCuPublic } from '../src/cu/tenants';
+import { config } from '../src/middleware';
+import { POST } from '../src/app/api/cu/[tenant]/analyze/route';
+
+test('middleware matches only credit-union paths', () => {
+  assert.deepEqual(config.matcher, ['/cu/:path*', '/credit-unions', '/credit-unions/:path*']);
+  const joined = config.matcher.join(' ');
+  assert.equal(joined.includes('/analyze'), false);
+  assert.equal(joined.includes('/api/analyze'), false);
+  assert.equal(joined.includes('tenant='), false);
+});
+
+test('slug resolves the two demo tenants and nothing else', () => {
+  assert.equal(getCuTenant('harborlight-cu')?.name, 'Harborlight Credit Union');
+  assert.equal(getCuTenant('SUMMIT-RIDGE-FCU')?.id, 'summit-ridge-fcu');
+  assert.equal(getCuTenant('sow'), undefined);
+  assert.equal(getCuTenant('harborlight.signorwalk.app'), undefined);
+  assert.equal(getCuTenant('../harborlight-cu'), undefined);
+});
+
+test('public links carry aggregate UTM parameters', () => {
+  const pub = toCuPublic(getCuTenant('harborlight-cu')!);
+  const pre = new URL(pub.preApprovalUrl);
+  assert.equal(pre.searchParams.get('utm_source'), 'signorwalk');
+  assert.equal(pre.searchParams.get('utm_medium'), 'referral');
+  assert.equal(pre.searchParams.get('utm_campaign'), 'harborlight-cu');
+  assert.equal(pre.searchParams.get('utm_content'), 'preapproval');
+  const rates = new URL(pub.ratesUrl);
+  assert.equal(rates.searchParams.get('utm_content'), 'rates');
+  assert.equal(rates.searchParams.get('utm_campaign'), 'harborlight-cu');
+});
+
+test('brand and grade colors meet WCAG AA for text', () => {
+  const white: [number, number, number] = [255, 255, 255];
+  for (const id of ['harborlight-cu', 'summit-ridge-fcu'] as const) {
+    const tenant = getCuTenant(id)!;
+    assert.ok(contrastRatio(parseRgbChannels(tenant.colors.primary), parseRgbChannels(tenant.colors.primaryFg)) >= 4.5);
+    assert.ok(contrastRatio(parseRgbChannels(tenant.colors.accent), white) >= 4.5);
+  }
+  for (const hex of Object.values(GRADE_FILL)) {
+    const n = parseInt(hex.slice(1), 16);
+    const rgb: [number, number, number] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    assert.ok(contrastRatio(rgb, white) >= 4.5, hex);
+  }
+});
+
+test('analyze logs cannot carry fields outside the allowlist', () => {
+  const line = formatAnalyzeLog({
+    ts: '2026-01-01T00:00:00.000Z',
+    tenant: 'harborlight-cu',
+    route: '/api/cu/analyze',
+    schemaVersion: '1',
+    templatePack: 'tp-1.0.0',
+    grade: 'B',
+    flagIds: ['FLAG_DOC_FEE_HIGH'],
+    archetype: 'FIN_HIGH_FEES',
+    fallbackUsed: false,
+    latencyMs: 4,
+    outcome: 'ok',
+    email: 'person@example.com',
+    vehicle: '2024 Honda',
+    notes: 'secret',
+  } as never);
+  const parsed = JSON.parse(line) as Record<string, unknown>;
+  for (const key of Object.keys(parsed)) assert.ok(ANALYZE_LOG_KEYS.includes(key as never), key);
+  assert.equal(JSON.stringify(parsed).includes('person@example.com'), false);
+  assert.equal(JSON.stringify(parsed).includes('Honda'), false);
+});
+
+test('deal storage clear removes only the consumer deal keys', () => {
+  const removed: string[] = [];
+  clearDealStorage({ removeItem: key => removed.push(key) });
+  assert.deepEqual(removed, [...DEAL_STORAGE_KEYS]);
+  assert.equal(DEAL_STORAGE_KEYS.includes('sow_session' as never), true);
+});
+
+test('in-memory analyze limit does not store the address and resets', () => {
+  resetAnalyzeRateLimit();
+  for (let i = 0; i < ANALYZE_LIMIT; i++) {
+    assert.equal(takeAnalyzeSlot('203.0.113.10', 1_000_000).allowed, true);
+  }
+  const blocked = takeAnalyzeSlot('203.0.113.10', 1_000_000);
+  assert.equal(blocked.allowed, false);
+  assert.ok(blocked.retryAfterSec >= 1);
+  assert.equal(takeAnalyzeSlot('203.0.113.11', 1_000_000).allowed, true);
+  assert.equal(takeAnalyzeSlot('203.0.113.10', 1_000_000 + 60_000).allowed, true);
+  resetAnalyzeRateLimit();
+});
+
+test('due diligence packet is one zip containing every draft', () => {
+  const zip = buildZip(dueDiligenceDocs.map(doc => ({ name: doc.filename, data: Buffer.from(doc.body) })));
+  assert.equal(zip.subarray(0, 2).toString(), 'PK');
+  const names = dueDiligenceDocs.map(doc => doc.filename);
+  for (const name of names) assert.ok(zip.includes(Buffer.from(name)), name);
+  const first = dueDiligenceDocs[0];
+  const name = Buffer.from(first.filename);
+  const local = zip.indexOf(Buffer.from([0x50, 0x4b, 0x03, 0x04]));
+  const compressedSize = zip.readUInt32LE(local + 18);
+  const nameLen = zip.readUInt16LE(local + 26);
+  assert.equal(zip.subarray(local + 30, local + 30 + nameLen).equals(name), true);
+  const inflated = inflateRawSync(zip.subarray(local + 30 + nameLen, local + 30 + nameLen + compressedSize));
+  assert.equal(inflated.equals(Buffer.from(first.body)), true);
+});
+
+test('credit-union headers deny framing and payment, and member pages skip third-party fonts', () => {
+  const cu = securityHeaderList('/cu/harborlight-cu');
+  const csp = cu.find(h => h.key === 'Content-Security-Policy')!.value;
+  assert.match(csp, /frame-ancestors 'none'/);
+  assert.match(csp, /object-src 'none'/);
+  assert.equal(csp.includes('impactcdn'), false);
+  assert.equal(csp.includes('fonts.googleapis'), false);
+  assert.match(cu.find(h => h.key === 'Permissions-Policy')!.value, /payment=\(\)/);
+  assert.equal(cu.find(h => h.key === 'X-Frame-Options')!.value, 'DENY');
+  assert.match(securityHeaderList('/credit-unions').find(h => h.key === 'Content-Security-Policy')!.value, /fonts.googleapis.com/);
+});
+
+test('analyze route is rules-only, drops free text, and rate limits without logging it', async () => {
+  resetAnalyzeRateLimit();
+  const logs: string[] = [];
+  const original = console.log;
+  console.log = (...args: unknown[]) => { logs.push(args.map(String).join(' ')); };
+  try {
+    const req = new NextRequest('https://signorwalk.com/api/cu/harborlight-cu/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-real-ip': '198.51.100.20' },
+      body: JSON.stringify({
+        dealType: 'finance',
+        sellingPrice: '30000',
+        msrp: '32000',
+        apr: '6.5',
+        termMonths: '60',
+        docFee: '300',
+        notes: 'SSN 123-45-6789 jane@example.com',
+        vehicle: 'secret-vin',
+      }),
+    });
+    const res = await POST(req, { params: Promise.resolve({ tenant: 'harborlight-cu' }) });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.mode, 'rules');
+    assert.equal(data.templatePack, 'tp-1.0.0');
+    const blob = JSON.stringify(data);
+    assert.equal(blob.includes('123-45-6789'), false);
+    assert.equal(blob.includes('jane@example.com'), false);
+    assert.equal(blob.includes('secret-vin'), false);
+    assert.equal(logs.some(line => line.includes('198.51.100.20') || line.includes('jane@example.com')), false);
+    assert.match(res.headers.get('x-content-type-options') ?? '', /nosniff/);
+
+    const missing = await POST(req, { params: Promise.resolve({ tenant: 'not-a-cu' }) });
+    assert.equal(missing.status, 404);
+
+    resetAnalyzeRateLimit();
+    for (let i = 0; i < ANALYZE_LIMIT; i++) takeAnalyzeSlot('198.51.100.21');
+    const limited = new NextRequest('https://signorwalk.com/api/cu/harborlight-cu/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-real-ip': '198.51.100.21' },
+      body: JSON.stringify({ dealType: 'finance', sellingPrice: '1' }),
+    });
+    const blocked = await POST(limited, { params: Promise.resolve({ tenant: 'harborlight-cu' }) });
+    assert.equal(blocked.status, 429);
+    assert.ok(Number(blocked.headers.get('retry-after')) >= 1);
+  } finally {
+    console.log = original;
+    resetAnalyzeRateLimit();
+  }
+});

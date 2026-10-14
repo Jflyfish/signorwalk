@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { tenantFromHeader } from '@/tenants/request';
 
 const GRADE_COLOR: Record<string, string> = {
   A: '#16a34a', B: '#65a30d', C: '#d97706', D: '#dc2626', F: '#b91c1c',
@@ -136,9 +135,6 @@ function buildReportHtml(email: string, grade: string, vehicle: string, analysis
 }
 
 export async function POST(req: NextRequest) {
-  if (!tenantFromHeader(req.headers.get('x-tenant')).features.emailCapture) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  }
   const { email, grade, vehicle, analysis } = await req.json();
   if (!email) return NextResponse.json({ success: false }, { status: 400 });
 

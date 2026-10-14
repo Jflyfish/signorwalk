@@ -1,4 +1,4 @@
-import type { EngineInput } from '../src/lib/engine/types';
+import type { EngineInput } from '../src/cu/engine/types';
 
 export const cases: { name: string; input: EngineInput }[] = [
   { name: 'fin-clean-strong', input: { dealType: 'finance', msrp: 40000, sellingPrice: 36000, apr: 5.9, termMonths: 60, docFee: 299, downPayment: 4000 } },

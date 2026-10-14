@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { formatAnalyzeLog } from '@/lib/analyze-log';
-import { gradePayload } from '@/lib/engine/report';
-import { InputError } from '@/lib/engine/normalize';
 import { AnalysisRequest, BundledCosts } from '@/lib/types';
-import { tenantFromHeader } from '@/tenants/request';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -358,54 +354,7 @@ Respond with ONLY a valid JSON object — no markdown, no code blocks:
 }`;
 }
 
-async function rulesOnlyPost(req: NextRequest, tenantId: string, templatePack: string) {
-  const started = Date.now();
-  const log = (outcome: 'ok' | 'invalid' | 'error', extra?: { grade?: string; flagIds?: string[]; archetype?: string }) => {
-    console.log(formatAnalyzeLog({
-      ts: new Date().toISOString(),
-      tenant: tenantId,
-      route: '/api/analyze',
-      schemaVersion: '1',
-      templatePack,
-      fallbackUsed: false,
-      latencyMs: Date.now() - started,
-      outcome,
-      ...extra,
-    }));
-  };
-
-  try {
-    const raw = await req.text();
-    if (raw.length > 20_000) {
-      log('invalid');
-      return NextResponse.json({ success: false, error: 'Check the numbers and try again.' }, { status: 413 });
-    }
-    let body: unknown;
-    try {
-      body = JSON.parse(raw);
-    } catch {
-      log('invalid');
-      return NextResponse.json({ success: false, error: 'Check the numbers and try again.' }, { status: 400 });
-    }
-    const analysis = gradePayload(body, tenantFromHeader(tenantId).brand.name);
-    log('ok', { grade: analysis.grade, flagIds: analysis.itemsToReview.map(item => item.id), archetype: analysis.archetype });
-    return NextResponse.json({ success: true, mode: 'rules', templatePack, analysis });
-  } catch (error) {
-    if (error instanceof InputError) {
-      log('invalid');
-      return NextResponse.json({ success: false, error: error.message }, { status: 400 });
-    }
-    log('error');
-    return NextResponse.json({ success: false, error: 'Check the numbers and try again.' }, { status: 500 });
-  }
-}
-
 export async function POST(req: NextRequest) {
-  const tenant = tenantFromHeader(req.headers.get('x-tenant'));
-  if (!tenant.features.aiReport) {
-    return rulesOnlyPost(req, tenant.id, tenant.disclosures.templatePackVersion);
-  }
-
   try {
     const data: AnalysisRequest = await req.json();
 

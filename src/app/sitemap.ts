@@ -1,8 +1,5 @@
 import type { MetadataRoute } from 'next';
 import { blogPosts } from '@/lib/blogPosts';
-import { getRequestTenant } from '@/tenants/request';
-
-export const dynamic = 'force-dynamic';
 
 const BASE = 'https://signorwalk.com';
 
@@ -19,10 +16,7 @@ const LAST_MODIFIED = {
   contact: '2026-06-23',
 };
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const tenant = await getRequestTenant();
-  if (!tenant.indexable) return [];
-
+export default function sitemap(): MetadataRoute.Sitemap {
   const blogIndexDate = new Date(
     Math.max(new Date(LAST_MODIFIED.blog).getTime(), ...blogPosts.map(p => new Date(p.date).getTime()).filter(t => !isNaN(t))),
   );
