@@ -74,6 +74,14 @@ function statusText(status: 'good' | 'warn' | 'bad'): string {
   return 'Outside typical range';
 }
 
+function gradeTint(hex: string): string {
+  const raw = hex.replace('#', '');
+  const r = Number.parseInt(raw.slice(0, 2), 16);
+  const g = Number.parseInt(raw.slice(2, 4), 16);
+  const b = Number.parseInt(raw.slice(4, 6), 16);
+  return `rgb(${r} ${g} ${b} / 0.1)`;
+}
+
 function trackSafe(name: 'analysis_completed' | 'cta_clicked', props: Record<string, string>) {
   try {
     track(name, props);
@@ -199,10 +207,21 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
     const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
     return (
       <div className="mx-auto w-full max-w-[560px] px-4 pb-24 pt-16 md:pb-16 md:pt-24">
-        <h1 ref={headingRef} tabIndex={-1} className="text-[72px] font-bold leading-[72px] outline-none" style={{ color: gradeColor }}>
-          <span className="sr-only">Grade </span>{report.grade}
-        </h1>
-        <p className="mt-4 text-[18px] leading-[28px]">{report.headline}</p>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+          <p
+            aria-hidden="true"
+            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[16px] text-[64px] font-extrabold leading-none"
+            style={{ color: gradeColor, backgroundColor: gradeTint(gradeColor) }}
+          >
+            {report.grade}
+          </p>
+          <div>
+            <p className="text-[14px] leading-[20px] text-[#555]">Grade</p>
+            <h1 ref={headingRef} tabIndex={-1} className="text-[18px] leading-[28px]">
+              <span className="sr-only">{report.grade}. </span>{report.headline}
+            </h1>
+          </div>
+        </div>
 
         {shown.length > 0 && (
           <section className="mt-10" aria-labelledby="review-heading">
@@ -219,17 +238,19 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
             href={tenant.preApprovalUrl}
             onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
           >
-            Get pre-approved with {tenant.name}
+            <span className="md:hidden">Get pre-approved</span>
+            <span className="hidden md:inline">Get pre-approved with {tenant.name}</span>
           </Primary>
         </div>
 
         <div className="mt-10 border-t border-[#E5E5E5] pt-6">
           <button
             type="button"
-            className={textLink}
+            className={`${textLink} inline-flex items-center gap-1`}
             aria-expanded={showDetails}
             onClick={() => setShowDetails(open => !open)}
           >
+            <span aria-hidden="true">{showDetails ? '▾' : '▸'}</span>
             See details
           </button>
           {showDetails && (
@@ -330,8 +351,13 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
               return (
                 <label
                   key={option}
-                  className="flex h-12 cursor-pointer items-center gap-2 border px-4 text-[15px] font-semibold"
-                  style={{ borderColor: selected ? accent : '#E5E5E5' }}
+                  className="flex h-12 cursor-pointer items-center gap-2 rounded-lg px-4 text-[15px] font-semibold"
+                  style={{
+                    borderStyle: 'solid',
+                    borderWidth: selected ? 2 : 1,
+                    borderColor: selected ? accent : '#E5E5E5',
+                    backgroundColor: selected ? `rgb(${tenant.colors.accent} / 0.06)` : '#fff',
+                  }}
                 >
                   <input
                     type="radio"

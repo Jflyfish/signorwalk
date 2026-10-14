@@ -54,8 +54,12 @@ export default async function CuLayout({
   const tenant = getCuTenant((await params).tenant);
   if (!tenant) {
     return (
-      <div className={`${inter.className} min-h-screen bg-white text-[#111]`}>
-        <style>{'body > nav, body > footer { display: none !important; } body { background: #fff; }'}</style>
+      <div className={`${inter.className} cu-missing min-h-screen bg-white text-[#111]`}>
+        <style>{`
+          body > nav, body > footer { display: none !important; }
+          body { background: #fff; }
+          .cu-missing :focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+        `}</style>
         {children}
       </div>
     );
@@ -80,7 +84,7 @@ export default async function CuLayout({
           <span className="font-semibold text-[#111]">{pub.name}</span> with Sign or Walk
         </p>
       </header>
-      <div id="cu-content" tabIndex={-1} className="outline-none">
+      <div id="cu-content" tabIndex={-1}>
         {children}
       </div>
     </div>
