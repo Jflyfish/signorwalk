@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
+import { formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
 const HEADLINE = 'Help your members spot a bad car deal before they sign.';
@@ -26,47 +26,49 @@ export const metadata: Metadata = {
   },
 };
 
-const focus =
-  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900';
+const button =
+  'inline-flex items-center justify-center h-12 w-full md:h-11 px-4 rounded-lg bg-[#111] text-white text-[15px] font-semibold hover:bg-[#111] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#111]';
+
+const textLink = 'text-[15px] font-semibold text-[#111] hover:underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#111]';
 
 export default function CreditUnionsPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-14 sm:pt-20 pb-4">
-      <h1 className="max-w-3xl text-4xl sm:text-5xl font-black tracking-tight text-gray-900 leading-[1.05]">
-        {HEADLINE}
-      </h1>
-      <p className="mt-5 max-w-2xl text-lg text-gray-700 leading-relaxed">{VALUE}</p>
+    <div className="flex min-h-screen flex-col">
+      <header className="mx-auto flex h-16 w-full max-w-[960px] items-center px-4">
+        <p className="text-[15px] font-semibold leading-[20px]">Sign or Walk</p>
+      </header>
 
-      <ul className="mt-12 grid gap-4 md:grid-cols-3">
-        {pricedTiers.map(tier => (
-          <li key={tier.id} className="flex flex-col rounded-2xl border border-gray-200 bg-white p-6">
-            <h2 className="text-lg font-bold text-gray-900">{tier.name}</h2>
-            <p className="mt-3 text-3xl font-black tracking-tight text-gray-900 tabular-nums">
-              ${tier.annualUsd / 1000}K/yr
-            </p>
-            <p className="mt-1 text-sm text-gray-700">{ASSETS[tier.id]}</p>
-            <Link
-              href="/credit-unions/get-started"
-              className={`mt-6 inline-flex items-center justify-center min-h-11 px-4 rounded-lg bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 ${focus}`}
-            >
-              Start 90-day free pilot
-            </Link>
-            <p className="mt-2 text-sm text-gray-700">No charge for 90 days. Cancel anytime.</p>
-          </li>
-        ))}
-      </ul>
+      <div className="mx-auto w-full max-w-[960px] flex-1 px-4 pt-16 md:pt-24">
+        <h1 className="max-w-[640px] text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px]">
+          {HEADLINE}
+        </h1>
+        <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] text-[#555]">{VALUE}</p>
 
-      <p className="mt-10 text-sm text-gray-800">
-        Over $5B, leagues, and CUSOs:{' '}
-        <a href={`mailto:${TALK_TO_US_EMAIL}`} className={`underline underline-offset-2 font-semibold text-gray-900 ${focus}`}>
-          {TALK_TO_US_EMAIL}
-        </a>
-      </p>
-      <p className="mt-3 text-sm">
-        <a href="/credit-unions/packet" className={`underline underline-offset-2 font-semibold text-gray-900 ${focus}`}>
-          Draft due diligence packet
-        </a>
-      </p>
+        <ul className="mt-16 grid gap-4 md:mt-24 md:grid-cols-3">
+          {pricedTiers.map(tier => (
+            <li key={tier.id} className="flex flex-col border border-[#E5E5E5] bg-[#FAFAFA] p-6">
+              <h2 className="text-[24px] font-bold leading-[30px]">{tier.name}</h2>
+              <p className="mt-4 text-[14px] leading-[20px] text-[#555]">{ASSETS[tier.id]}</p>
+              <p className="mt-4 text-[32px] font-bold leading-[32px] tabular-nums">{formatUsd(tier.annualUsd)}/yr</p>
+              <Link href={`/credit-unions/get-started?tier=${tier.id}`} className={`${button} mt-4`}>
+                Start 90-day free pilot
+              </Link>
+              <p className="mt-4 text-[14px] leading-[20px] text-[#555]">No charge for 90 days. Cancel anytime.</p>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-16 md:mt-24">
+          <a href={`mailto:${TALK_TO_US_EMAIL}`} className={textLink}>Over $5B? Email us.</a>
+        </p>
+        <p className="mt-4">
+          <a href="/credit-unions/packet" className={textLink}>Download due-diligence packet (draft)</a>
+        </p>
+      </div>
+
+      <footer className="mx-auto mt-16 w-full max-w-[960px] px-4 pb-16 md:mt-24 md:pb-24">
+        <p className="text-[14px] leading-[20px] text-[#555]">© Sign or Walk</p>
+      </footer>
     </div>
   );
 }

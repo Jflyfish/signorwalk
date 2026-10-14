@@ -35,7 +35,10 @@ type FieldKey = keyof typeof EMPTY;
 type DealType = 'lease' | 'finance';
 
 const inputClass =
-  'w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base bg-white text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900';
+  'w-full h-12 px-4 rounded-lg border border-[#E5E5E5] bg-white text-[18px] leading-[28px] text-[#111]';
+
+const textLink =
+  'text-[15px] font-semibold text-[#111] hover:underline underline-offset-4';
 
 function Field({
   id, label, hint, value, onChange,
@@ -49,8 +52,8 @@ function Field({
   const hintId = hint ? `${id}-hint` : undefined;
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-semibold text-gray-900 mb-1">{label}</label>
-      {hint ? <p id={hintId} className="text-xs text-gray-700 mb-1">{hint}</p> : null}
+      <label htmlFor={id} className="mb-2 block text-[14px] font-semibold leading-[20px]">{label}</label>
+      {hint ? <p id={hintId} className="mb-2 text-[14px] leading-[20px] text-[#555]">{hint}</p> : null}
       <input
         id={id}
         name={id}
@@ -79,6 +82,24 @@ function trackSafe(name: 'analysis_completed' | 'cta_clicked', props: Record<str
   }
 }
 
+function Primary({
+  accent, children, type = 'button', disabled, onClick, href,
+}: {
+  accent: string;
+  children: React.ReactNode;
+  type?: 'button' | 'submit';
+  disabled?: boolean;
+  onClick?: () => void;
+  href?: string;
+}) {
+  const className = 'inline-flex items-center justify-center text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] text-white disabled:opacity-60';
+  const style = { backgroundColor: accent, color: '#fff' };
+  if (href) {
+    return <a href={href} className={className} style={style} onClick={onClick}>{children}</a>;
+  }
+  return <button type={type} disabled={disabled} className={className} style={style} onClick={onClick}>{children}</button>;
+}
+
 export function CheckForm({ tenant }: { tenant: CuPublic }) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -88,12 +109,11 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
   const [fields, setFields] = useState(EMPTY);
   const [showTrade, setShowTrade] = useState(false);
   const [showAddons, setShowAddons] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<TenantReport | null>(null);
 
-  const primary = `rgb(${tenant.colors.primary})`;
-  const fg = `rgb(${tenant.colors.primaryFg})`;
   const accent = `rgb(${tenant.colors.accent})`;
 
   function setField(key: FieldKey, value: string) {
@@ -158,6 +178,7 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
         setError(typeof data.error === 'string' ? data.error : 'Check the numbers and try again.');
         return;
       }
+      setShowDetails(false);
       setReport(data.analysis as TenantReport);
       const grade = String(data.analysis.grade);
       const archetype = String(data.analysis.archetype);
@@ -173,122 +194,119 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
   }
 
   if (report) {
+    const shown = report.itemsToReview.slice(0, 3);
+    const rest = report.itemsToReview.slice(3);
+    const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
     return (
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10 space-y-4">
-        <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-black tracking-tight text-gray-900 outline-none">
-          Offer comparison
+      <div className="mx-auto w-full max-w-[560px] px-4 pb-24 pt-16 md:pb-16 md:pt-24">
+        <h1 ref={headingRef} tabIndex={-1} className="text-[72px] font-bold leading-[72px] outline-none" style={{ color: gradeColor }}>
+          <span className="sr-only">Grade </span>{report.grade}
         </h1>
-        <section className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6" aria-labelledby="grade-heading">
-          <div className="flex items-start gap-4">
-            <div
-              className="w-16 h-16 rounded-full text-white flex items-center justify-center text-3xl font-black shrink-0"
-              style={{ backgroundColor: GRADE_FILL[report.grade] ?? '#111827' }}
-              aria-hidden="true"
-            >
-              {report.grade}
-            </div>
-            <div>
-              <p id="grade-heading" className="text-sm font-semibold text-gray-700">Grade {report.grade}</p>
-              <p className="text-xl font-bold text-gray-900 mt-1">{report.headline}</p>
-              <p className="text-sm text-gray-800 mt-2 leading-relaxed">{report.gradeExplanation}</p>
-              <p className="mt-3 inline-block text-sm font-semibold text-gray-900 bg-gray-100 border border-gray-200 rounded-full px-3 py-1">
-                {report.recommendationLabel}
+        <p className="mt-4 text-[18px] leading-[28px]">{report.headline}</p>
+
+        {shown.length > 0 && (
+          <section className="mt-10" aria-labelledby="review-heading">
+            <h2 id="review-heading" className="text-[24px] font-bold leading-[30px]">Items to review</h2>
+            <ul className="mt-4 list-disc space-y-4 pl-4 text-[18px] leading-[28px]">
+              {shown.map(item => <li key={item.id}>{item.issue}</li>)}
+            </ul>
+          </section>
+        )}
+
+        <div className="fixed inset-x-0 bottom-0 border-t border-[#E5E5E5] bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0">
+          <Primary
+            accent={accent}
+            href={tenant.preApprovalUrl}
+            onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
+          >
+            Get pre-approved with {tenant.name}
+          </Primary>
+        </div>
+
+        <div className="mt-10 border-t border-[#E5E5E5] pt-6">
+          <button
+            type="button"
+            className={textLink}
+            aria-expanded={showDetails}
+            onClick={() => setShowDetails(open => !open)}
+          >
+            See details
+          </button>
+          {showDetails && (
+            <div className="mt-6">
+              {report.breakdown.length > 0 && (
+                <section aria-labelledby="breakdown-heading">
+                  <h2 id="breakdown-heading" className="text-[24px] font-bold leading-[30px]">Figures you entered</h2>
+                  <ul className="mt-4">
+                    {report.breakdown.map(row => (
+                      <li key={row.label} className="border-t border-[#E5E5E5] py-4">
+                        <div className="flex items-baseline justify-between gap-4">
+                          <p className="text-[18px] leading-[28px]">{row.label}</p>
+                          <p className="text-[18px] font-semibold leading-[28px] tabular-nums">{row.value}</p>
+                        </div>
+                        <p className="text-[14px] leading-[20px] text-[#555]">{statusText(row.status)}</p>
+                        <p className="mt-2 text-[14px] leading-[20px] text-[#555]">{row.explanation}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {rest.length > 0 && (
+                <section className="mt-10" aria-labelledby="more-review-heading">
+                  <h2 id="more-review-heading" className="text-[24px] font-bold leading-[30px]">More items</h2>
+                  <ul className="mt-4 list-disc space-y-4 pl-4 text-[18px] leading-[28px]">
+                    {rest.map(item => (
+                      <li key={item.id}>
+                        {item.issue}
+                        <span className="mt-2 block text-[14px] leading-[20px] text-[#555]">{item.action}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              <section className="mt-10 border-t border-[#E5E5E5] pt-6" aria-labelledby="questions-heading">
+                <h2 id="questions-heading" className="text-[24px] font-bold leading-[30px]">Questions you can ask</h2>
+                <p className="mt-4 text-[18px] leading-[28px]">{report.questionsToAsk}</p>
+                <p className="mt-4 text-[14px] leading-[20px] text-[#555]">{report.structureNote}</p>
+              </section>
+
+              {report.tradeIn && (
+                <section className="mt-10 border-t border-[#E5E5E5] pt-6" aria-labelledby="trade-heading">
+                  <h2 id="trade-heading" className="text-[24px] font-bold leading-[30px]">{report.tradeIn.headline}</h2>
+                  <p className="mt-4 text-[18px] leading-[28px]">{report.tradeIn.details}</p>
+                </section>
+              )}
+
+              {report.stateTaxNote && (
+                <section className="mt-10 border-t border-[#E5E5E5] pt-6" aria-labelledby="tax-heading">
+                  <h2 id="tax-heading" className="text-[24px] font-bold leading-[30px]">Trade-in and tax</h2>
+                  <p className="mt-4 text-[18px] leading-[28px]">{report.stateTaxNote}</p>
+                </section>
+              )}
+
+              <ul className="mt-10 space-y-4 border-t border-[#E5E5E5] pt-6 text-[14px] leading-[20px] text-[#555]">
+                {report.disclaimers.map(line => <li key={line}>{line}</li>)}
+              </ul>
+
+              <p className="mt-6">
+                <a
+                  href={tenant.ratesUrl}
+                  className={textLink}
+                  onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'rates' })}
+                >
+                  {tenant.ratesLabel}
+                </a>
               </p>
             </div>
-          </div>
-          <p className="text-gray-800 mt-4 leading-relaxed">{report.summary}</p>
-          {report.limitedData ? (
-            <p className="text-sm text-gray-700 mt-2">Some worksheet lines were left blank. Blank lines were not treated as problems.</p>
-          ) : null}
-        </section>
-
-        {report.breakdown.length > 0 && (
-          <section className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6" aria-labelledby="breakdown-heading">
-            <h2 id="breakdown-heading" className="text-lg font-bold text-gray-900 mb-1">Figures you entered</h2>
-            <ul className="divide-y divide-gray-100">
-              {report.breakdown.map(row => (
-                <li key={row.label} className="py-3">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <p className="font-semibold text-gray-900">{row.label}</p>
-                    <p className="text-sm text-gray-900 tabular-nums">{row.value}</p>
-                  </div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-700 mt-1">{statusText(row.status)}</p>
-                  <p className="text-sm text-gray-700 mt-1 leading-relaxed">{row.explanation}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {report.itemsToReview.length > 0 && (
-          <section className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6" aria-labelledby="review-heading">
-            <h2 id="review-heading" className="text-lg font-bold text-gray-900 mb-3">Items to review</h2>
-            <ul className="space-y-4">
-              {report.itemsToReview.map(item => (
-                <li key={item.id}>
-                  <p className="text-gray-900">{item.issue}</p>
-                  <p className="text-sm text-gray-700 mt-1">{item.action}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <section className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6" aria-labelledby="questions-heading">
-          <h2 id="questions-heading" className="text-lg font-bold text-gray-900 mb-2">Questions you can ask</h2>
-          <p className="text-gray-800 leading-relaxed">{report.questionsToAsk}</p>
-          <p className="text-sm text-gray-700 mt-3">{report.structureNote}</p>
-        </section>
-
-        {report.tradeIn && (
-          <section className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6" aria-labelledby="trade-heading">
-            <h2 id="trade-heading" className="text-lg font-bold text-gray-900">{report.tradeIn.headline}</h2>
-            <p className="text-gray-800 mt-2 leading-relaxed">{report.tradeIn.details}</p>
-          </section>
-        )}
-
-        {report.stateTaxNote && (
-          <section className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6" aria-labelledby="tax-heading">
-            <h2 id="tax-heading" className="text-lg font-bold text-gray-900 mb-2">Trade-in and tax</h2>
-            <p className="text-gray-800 leading-relaxed">{report.stateTaxNote}</p>
-          </section>
-        )}
-
-        <section className="rounded-2xl p-5 sm:p-6" style={{ backgroundColor: primary, color: fg }} aria-labelledby="next-heading">
-          <h2 id="next-heading" className="text-lg font-bold">Continue with {tenant.name}</h2>
-          <p className="text-sm mt-1 mb-4 opacity-90">These links leave this page and open the credit union’s own site. This tool does not take an application.</p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a
-              href={tenant.preApprovalUrl}
-              className="inline-flex justify-center px-5 py-3 rounded-xl bg-white text-sm font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ color: accent }}
-              onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
-            >
-              {tenant.preApprovalLabel}
-            </a>
-            <a
-              href={tenant.ratesUrl}
-              className="inline-flex justify-center px-5 py-3 rounded-xl border border-white/40 text-sm font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ color: fg }}
-              onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'rates' })}
-            >
-              {tenant.ratesLabel}
-            </a>
-          </div>
-        </section>
-
-        <ul className="text-xs text-gray-700 space-y-2 leading-relaxed">
-          {report.disclaimers.map(line => <li key={line}>{line}</li>)}
-        </ul>
-
-        <button
-          type="button"
-          className="text-sm font-semibold underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
-          style={{ color: accent }}
-          onClick={() => { setReport(null); setError(''); }}
-        >
-          Check another offer
-        </button>
+          )}
+          <p className="mt-6">
+            <button type="button" className={textLink} onClick={() => { setReport(null); setError(''); }}>
+              Check another offer
+            </button>
+          </p>
+        </div>
       </div>
     );
   }
@@ -296,60 +314,55 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
   const terms = dealType === 'lease' ? LEASE_TERMS : FINANCE_TERMS;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-      <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-gray-900">Check a vehicle offer</h1>
-      <p className="mt-3 text-lg text-gray-700 leading-relaxed">
-        Enter numbers from the worksheet. Leave a line blank if you do not have it. Do not enter your name, address, Social Security number, or account number.
-      </p>
+    <div className="mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pb-24 md:pt-24">
+      <h1 className="text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px]">Check a dealer offer</h1>
+      <p className="mt-6 text-[18px] leading-[28px] text-[#555]">Enter the numbers from the dealer worksheet.</p>
 
-      <form
-        onSubmit={onSubmit}
-        className="mt-8 bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-6"
-        aria-describedby={error ? `${formId}-error` : undefined}
-      >
+      <form onSubmit={onSubmit} className="mt-10" aria-describedby={error ? `${formId}-error` : undefined}>
         <div role="status" aria-live="polite" className="sr-only">{busy ? 'Checking the numbers.' : ''}</div>
-        {error ? (
-          <p id={`${formId}-error`} role="alert" className="text-sm font-medium text-red-900 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-            {error}
-          </p>
-        ) : null}
+        {error ? <p id={`${formId}-error`} role="alert" className="mb-6 text-[14px] font-semibold leading-[20px]">{error}</p> : null}
 
         <fieldset>
-          <legend className="text-sm font-semibold text-gray-900 mb-2">Offer type</legend>
-          <div className="grid grid-cols-2 gap-2">
-            {(['finance', 'lease'] as const).map(option => (
-              <label key={option} className={`border rounded-xl px-3 py-3 cursor-pointer ${dealType === option ? 'border-gray-900 bg-gray-50' : 'border-gray-300'}`}>
-                <input
-                  type="radio"
-                  name="dealType"
-                  value={option}
-                  checked={dealType === option}
-                  onChange={() => switchType(option)}
-                  className="mr-2"
-                />
-                <span className="font-medium text-gray-900">{option === 'finance' ? 'Finance' : 'Lease'}</span>
-              </label>
-            ))}
+          <legend className="mb-4 text-[14px] font-semibold leading-[20px]">Offer type</legend>
+          <div className="grid grid-cols-2 gap-4">
+            {(['finance', 'lease'] as const).map(option => {
+              const selected = dealType === option;
+              return (
+                <label
+                  key={option}
+                  className="flex h-12 cursor-pointer items-center gap-2 border px-4 text-[15px] font-semibold"
+                  style={{ borderColor: selected ? accent : '#E5E5E5' }}
+                >
+                  <input
+                    type="radio"
+                    name="dealType"
+                    value={option}
+                    checked={selected}
+                    onChange={() => switchType(option)}
+                  />
+                  {option === 'finance' ? 'Finance' : 'Lease'}
+                </label>
+              );
+            })}
           </div>
         </fieldset>
 
-        <div className="grid sm:grid-cols-2 gap-4">
-          <Field id="sellingPrice" label={dealType === 'lease' ? 'Selling price (cap cost)' : 'Selling price'} hint="Dollars, before tax." value={fields.sellingPrice} onChange={v => setField('sellingPrice', v)} />
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <Field id="sellingPrice" label={dealType === 'lease' ? 'Selling price (cap cost)' : 'Selling price'} value={fields.sellingPrice} onChange={v => setField('sellingPrice', v)} />
           <Field id="msrp" label="MSRP" value={fields.msrp} onChange={v => setField('msrp', v)} />
           <Field id="monthlyPayment" label="Quoted monthly payment" value={fields.monthlyPayment} onChange={v => setField('monthlyPayment', v)} />
           <Field id="downPayment" label={dealType === 'lease' ? 'Cap cost reduction' : 'Cash down payment'} value={fields.downPayment} onChange={v => setField('downPayment', v)} />
           <Field id="docFee" label="Documentation fee" value={fields.docFee} onChange={v => setField('docFee', v)} />
           <Field id="rebates" label="Rebates" value={fields.rebates} onChange={v => setField('rebates', v)} />
           <div>
-            <label htmlFor="termMonths" className="block text-sm font-semibold text-gray-900 mb-1">Term (months)</label>
+            <label htmlFor="termMonths" className="mb-2 block text-[14px] font-semibold leading-[20px]">Term (months)</label>
             <select id="termMonths" name="termMonths" value={term} onChange={e => setTerm(e.target.value)} className={inputClass}>
               {terms.map(option => <option key={option} value={option}>{option}</option>)}
             </select>
           </div>
           <div>
-            <label htmlFor="state" className="block text-sm font-semibold text-gray-900 mb-1">State</label>
-            <p id="state-hint" className="text-xs text-gray-700 mb-1">Optional. Used only for a general trade-in tax note.</p>
-            <select id="state" name="state" value={state} aria-describedby="state-hint" onChange={e => setState(e.target.value)} className={inputClass}>
+            <label htmlFor="state" className="mb-2 block text-[14px] font-semibold leading-[20px]">State</label>
+            <select id="state" name="state" value={state} onChange={e => setState(e.target.value)} className={inputClass}>
               <option value="">Not specified</option>
               {US_STATES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
@@ -357,56 +370,51 @@ export function CheckForm({ tenant }: { tenant: CuPublic }) {
           {dealType === 'finance' ? (
             <>
               <Field id="apr" label="APR" hint="Percent, such as 6.9" value={fields.apr} onChange={v => setField('apr', v)} />
-              <Field id="amountFinanced" label="Amount financed" hint="Optional. Leave blank to calculate from price, down payment, and trade." value={fields.amountFinanced} onChange={v => setField('amountFinanced', v)} />
+              <Field id="amountFinanced" label="Amount financed" value={fields.amountFinanced} onChange={v => setField('amountFinanced', v)} />
             </>
           ) : (
             <>
-              <Field id="moneyFactor" label="Money factor" hint="Such as 0.00180" value={fields.moneyFactor} onChange={v => setField('moneyFactor', v)} />
-              <Field id="buyRateMoneyFactor" label="Base money factor" hint="Only if the worksheet shows one." value={fields.buyRateMoneyFactor} onChange={v => setField('buyRateMoneyFactor', v)} />
+              <Field id="moneyFactor" label="Money factor" value={fields.moneyFactor} onChange={v => setField('moneyFactor', v)} />
+              <Field id="buyRateMoneyFactor" label="Base money factor" value={fields.buyRateMoneyFactor} onChange={v => setField('buyRateMoneyFactor', v)} />
               <Field id="residualPercent" label="Residual percent of MSRP" value={fields.residualPercent} onChange={v => setField('residualPercent', v)} />
               <Field id="acquisitionFee" label="Acquisition fee" value={fields.acquisitionFee} onChange={v => setField('acquisitionFee', v)} />
             </>
           )}
         </div>
 
-        <fieldset className="border border-gray-200 rounded-xl p-4">
-          <legend className="px-1 text-sm font-semibold text-gray-900">Trade-in</legend>
-          <label className="flex items-center gap-2 text-sm text-gray-900 mt-1">
+        <div className="mt-6 border-t border-[#E5E5E5] pt-6">
+          <label className="flex items-center gap-2 text-[15px] font-semibold">
             <input type="checkbox" checked={showTrade} onChange={e => setShowTrade(e.target.checked)} />
             Include a trade-in
           </label>
           {showTrade && (
-            <div className="grid sm:grid-cols-2 gap-4 mt-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field id="tradeDealerOffer" label="Dealer offer for the trade" value={fields.tradeDealerOffer} onChange={v => setField('tradeDealerOffer', v)} />
               <Field id="tradePayoff" label="Payoff still owed" value={fields.tradePayoff} onChange={v => setField('tradePayoff', v)} />
             </div>
           )}
-        </fieldset>
+        </div>
 
-        <fieldset className="border border-gray-200 rounded-xl p-4">
-          <legend className="px-1 text-sm font-semibold text-gray-900">Optional products</legend>
-          <label className="flex items-center gap-2 text-sm text-gray-900 mt-1">
+        <div className="mt-6 border-t border-[#E5E5E5] pt-6">
+          <label className="flex items-center gap-2 text-[15px] font-semibold">
             <input type="checkbox" checked={showAddons} onChange={e => setShowAddons(e.target.checked)} />
             Include optional products
           </label>
           {showAddons && (
-            <div className="grid sm:grid-cols-2 gap-4 mt-4">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field id="gapInsurance" label="GAP product" value={fields.gapInsurance} onChange={v => setField('gapInsurance', v)} />
               <Field id="extendedWarranty" label="Service contract" value={fields.extendedWarranty} onChange={v => setField('extendedWarranty', v)} />
               <Field id="tireWheel" label="Tire and wheel product" value={fields.tireWheel} onChange={v => setField('tireWheel', v)} />
               <Field id="paintInterior" label="Appearance product" value={fields.paintInterior} onChange={v => setField('paintInterior', v)} />
             </div>
           )}
-        </fieldset>
+        </div>
 
-        <button
-          type="submit"
-          disabled={busy}
-          className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-bold disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
-          style={{ backgroundColor: primary, color: fg }}
-        >
-          {busy ? 'Checking…' : 'Check this offer'}
-        </button>
+        <div className="mt-10">
+          <Primary accent={accent} type="submit" disabled={busy}>
+            {busy ? 'Checking…' : 'Check this offer'}
+          </Primary>
+        </div>
       </form>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { inter } from '@/cu/inter';
 import { CU_TENANTS, getCuTenant, toCuPublic } from '@/cu/tenants';
 import { DealStorageReset } from './DealStorageReset';
 
@@ -16,30 +17,26 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const tenant = getCuTenant((await params).tenant);
   if (!tenant) return { title: 'Not found', robots: { index: false, follow: false } };
-  const title = `${tenant.name} — Check a vehicle offer`;
-  const description = `Educational comparison of a vehicle lease or finance offer for ${tenant.name} members. Not an offer of credit.`;
   return {
-    title,
-    description,
+    title: `Check a dealer offer — ${tenant.name}`,
+    description: `Enter the numbers from a dealer worksheet. Educational comparison for ${tenant.name} members. Not an offer of credit.`,
     robots: { index: false, follow: false },
     alternates: { canonical: `https://signorwalk.com/cu/${tenant.id}` },
   };
 }
 
-function Mark({ logo }: { logo: 'harborlight' | 'summit' }) {
+function Mark({ logo, color }: { logo: 'harborlight' | 'summit'; color: string }) {
   if (logo === 'harborlight') {
     return (
-      <svg viewBox="0 0 32 32" className="w-9 h-9" aria-hidden="true">
-        <rect width="32" height="32" rx="8" fill="white" fillOpacity="0.16" />
-        <path d="M16 7v13M11 20h10" stroke="white" strokeWidth="2" strokeLinecap="round" />
-        <path d="M16 11l7 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <svg viewBox="0 0 32 32" className="h-8 w-8" aria-hidden="true">
+        <path d="M16 6v14M10 20h12" stroke={color} strokeWidth="2" strokeLinecap="round" />
+        <path d="M16 10l8 4" stroke={color} strokeWidth="2" strokeLinecap="round" />
       </svg>
     );
   }
   return (
-    <svg viewBox="0 0 32 32" className="w-9 h-9" aria-hidden="true">
-      <rect width="32" height="32" rx="8" fill="white" fillOpacity="0.16" />
-      <path d="M7 22l9-12 9 12" fill="none" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+    <svg viewBox="0 0 32 32" className="h-8 w-8" aria-hidden="true">
+      <path d="M6 24l10-14 10 14" fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -54,56 +51,29 @@ export default async function CuLayout({
   const tenant = getCuTenant((await params).tenant);
   if (!tenant) notFound();
   const pub = toCuPublic(tenant);
-  const primary = `rgb(${pub.colors.primary})`;
-  const fg = `rgb(${pub.colors.primaryFg})`;
   const accent = `rgb(${pub.colors.accent})`;
 
   return (
-    <>
-      <style>{'body > nav, body > footer { display: none !important; }'}</style>
+    <div className={`${inter.className} cu-shell min-h-screen bg-white text-[#111]`} style={{ ['--cu-accent' as string]: accent }}>
+      <style>{`
+        body > nav, body > footer { display: none !important; }
+        body { background: #fff; }
+        .cu-shell :focus-visible { outline: 2px solid var(--cu-accent); outline-offset: 2px; }
+      `}</style>
       <DealStorageReset />
-      <a
-        href="#cu-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-gray-900"
-      >
+      <a href="#cu-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-[14px] focus:font-semibold">
         Skip to content
       </a>
-      <div className="min-h-screen bg-slate-50 text-gray-900 flex flex-col">
-        <header className="sticky top-0 z-40" style={{ backgroundColor: primary, color: fg }}>
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 min-h-16 py-3 flex items-center justify-between gap-4">
-            <a href={`/cu/${pub.id}`} className="flex items-center gap-3 min-w-0 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-              <Mark logo={pub.logo} />
-              <span className="min-w-0">
-                <span className="block font-bold tracking-tight leading-tight">{pub.name}</span>
-                <span className="hidden sm:block text-xs opacity-80">{pub.tagline}</span>
-              </span>
-            </a>
-            <a
-              href={pub.privacyUrl}
-              className="text-sm font-semibold shrink-0 rounded-md px-2 py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              Privacy
-            </a>
-          </div>
-        </header>
-        <div id="cu-content" tabIndex={-1} className="flex-1 outline-none">
-          {children}
-        </div>
-        <footer className="border-t border-gray-200 bg-white">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-3">
-            <p className="text-sm font-semibold text-gray-900">{pub.legalName}</p>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              Educational estimate only. Not an offer of credit and not financial, legal, or tax advice. Confirm every figure with the dealer. {pub.name} does not endorse any dealer.
-            </p>
-            <p className="text-sm">
-              <a href={pub.privacyUrl} className="font-semibold underline underline-offset-2" style={{ color: accent }}>Privacy</a>
-              <span className="text-gray-400 px-2" aria-hidden="true">·</span>
-              <a href={pub.supportUrl} className="font-semibold underline underline-offset-2" style={{ color: accent }}>Support</a>
-            </p>
-            <p className="text-sm text-gray-700">Powered by Sign or Walk, an independent provider.</p>
-          </div>
-        </footer>
+      <header className="mx-auto flex h-16 w-full max-w-[560px] items-center gap-2 px-4">
+        <Mark logo={pub.logo} color={accent} />
+        <p className="text-[14px] leading-[20px] text-[#555]">
+          <span className="sr-only">{pub.name} </span>
+          with Sign or Walk
+        </p>
+      </header>
+      <div id="cu-content" tabIndex={-1} className="outline-none">
+        {children}
       </div>
-    </>
+    </div>
   );
 }

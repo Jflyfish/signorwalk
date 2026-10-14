@@ -91,7 +91,7 @@ function walk(dir: string): string[] {
   return out;
 }
 
-test('credit-union UI does not say Sign or Walk except the powered-by line', () => {
+test('credit-union UI says Sign or Walk only in the header line', () => {
   const files = walk('src/app/cu');
   const seen = new Set<string>();
   for (const file of files) {
@@ -99,7 +99,7 @@ test('credit-union UI does not say Sign or Walk except the powered-by line', () 
     seen.add(file);
     const text = readFileSync(file, 'utf8');
     const hits = text.match(/Sign or Walk/g) ?? [];
-    const allowed = text.match(/Powered by Sign or Walk/g) ?? [];
+    const allowed = text.match(/(?:with|Powered by) Sign or Walk/g) ?? [];
     assert.equal(hits.length, allowed.length, file);
   }
 });
