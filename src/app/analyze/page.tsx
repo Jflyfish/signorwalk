@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AnalyzingOverlay } from '@/components/AnalyzingOverlay';
+import { trackDealGraded } from '@/lib/analytics';
 import { AnalysisResult, AnalysisRequest, DealType, TradeInData } from '@/lib/types';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -177,6 +178,7 @@ export default function AnalyzePage() {
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Analysis failed');
       setAnalysis(data.analysis);
+      trackDealGraded({ grade: data.analysis.grade, dealType: payload.dealType, source: 'analyze' });
 
       // Save session for negotiation-support
       // Use overrideRequest fields when available (avoids stale state on auto-analysis from upload)
