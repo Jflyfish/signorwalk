@@ -5,6 +5,7 @@ import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { US_STATES } from '@/lib/states';
 import { STATE_TAX_DATA } from '@/lib/stateTaxData';
 import { AnalyzingOverlay } from '@/components/AnalyzingOverlay';
+import { trackDealGraded } from '@/lib/analytics';
 import {
   AnalysisResult, AnalysisRequest, LeaseFormData, FinanceFormData,
   TradeInData, BundledCosts,
@@ -594,6 +595,7 @@ export default function AdvancedAnalyzePage() {
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Analysis failed');
       setAnalysis(data.analysis);
+      trackDealGraded({ grade: data.analysis.grade, dealType: payload.dealType, source: 'advanced' });
       setShowForm(false);
       setIsAdjustMode(false);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
