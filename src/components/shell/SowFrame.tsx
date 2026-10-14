@@ -79,6 +79,9 @@ export function SowFrame({ children }: { children: React.ReactNode }) {
             <Link href="/contact" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden sm:block">
               Contact
             </Link>
+            <Link href="/credit-unions" className="text-gray-400 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition hidden min-[700px]:block">
+              Credit unions
+            </Link>
             <MobileNav />
           </div>
         </div>
@@ -102,7 +105,7 @@ export function SowFrame({ children }: { children: React.ReactNode }) {
               </div>
               <p className="text-gray-500 text-xs">Know before you sign.</p>
             </div>
-            <nav className="flex items-center gap-4">
+            <nav className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <Link href="/" className="text-gray-500 hover:text-gray-300 text-sm transition">Home</Link>
               <Link href="/analyze" className="text-gray-500 hover:text-gray-300 text-sm transition">Grade My Deal</Link>
               <Link href="/ask-a-pro" className="text-gray-500 hover:text-gray-300 text-sm transition">Ask a Pro</Link>
@@ -110,6 +113,7 @@ export function SowFrame({ children }: { children: React.ReactNode }) {
               <Link href="/glossary" className="text-gray-500 hover:text-gray-300 text-sm transition">Glossary</Link>
               <Link href="/about" className="text-gray-500 hover:text-gray-300 text-sm transition">About</Link>
               <Link href="/contact" className="text-gray-500 hover:text-gray-300 text-sm transition">Contact</Link>
+              <Link href="/credit-unions" className="text-gray-500 hover:text-gray-300 text-sm transition">Credit unions</Link>
             </nav>
           </div>
           <div className="border-t border-gray-800 pt-6 space-y-3">
