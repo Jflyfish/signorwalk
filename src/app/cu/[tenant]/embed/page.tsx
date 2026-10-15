@@ -68,7 +68,13 @@ export default async function EmbedPage({
           logoAspect={brand.logoAspect}
         />
       </header>
-      <EmbedFrame tenant={pub} brand={brand} targetOrigin={decision.targetOrigin} numbersOnly={numbersOnly} />
+      <EmbedFrame
+        tenant={pub}
+        brand={brand}
+        targetOrigin={decision.targetOrigin}
+        numbersOnly={numbersOnly}
+        demoSample={query.entry === 'numbers'}
+      />
     </div>
   );
 }

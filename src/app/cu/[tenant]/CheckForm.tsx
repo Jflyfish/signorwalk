@@ -1,10 +1,12 @@
 'use client';
 
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { track } from '@vercel/analytics';
 import { FILE_READ_ERROR, UPLOAD_DISCLOSURE } from '@/cu/copy';
 import type { DerivedBrand } from '@/cu/contrast';
+import { DEMO_FINANCE_SAMPLE } from '@/cu/demo-sample';
 import { GRADE_FILL } from '@/cu/grades';
+import { ADD_APR_RECOMMENDATION, financeGradeIsProvisional, memberRecommendationLine } from '@/cu/recommendation-display';
 import type { TenantReport } from '@/cu/engine/types';
 import type { CuPublic } from '@/cu/tenants';
 import { memberLink } from '@/cu/utm';
@@ -121,25 +123,41 @@ export function CheckForm({
   onGrade,
   embedded = false,
   numbersOnly = false,
+  demoSample = false,
 }: {
   tenant: CuPublic;
   brand: DerivedBrand;
   onGrade?: (grade: string) => void;
   embedded?: boolean;
   numbersOnly?: boolean;
+  /** Landing and embed demos only. Member checks stay empty. */
+  demoSample?: boolean;
 }) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const returnToApr = useRef(false);
   const [dealType, setDealType] = useState<DealType>('finance');
   const [term, setTerm] = useState('60');
   const [state, setState] = useState('');
-  const [fields, setFields] = useState(EMPTY);
+  const [fields, setFields] = useState(() => (demoSample ? { ...EMPTY, ...DEMO_FINANCE_SAMPLE } : EMPTY));
   const [showTrade, setShowTrade] = useState(false);
   const [showAddons, setShowAddons] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<TenantReport | null>(null);
+  const [needsApr, setNeedsApr] = useState(false);
+
+  useEffect(() => {
+    if (needsApr) {
+      headingRef.current?.focus();
+      return;
+    }
+    if (returnToApr.current) {
+      returnToApr.current = false;
+      document.getElementById('apr')?.focus();
+    }
+  }, [needsApr]);
 
   const accent = brand.brandText;
   const [uploadNote, setUploadNote] = useState('');
@@ -217,10 +235,21 @@ export function CheckForm({
       payload[key] = raw.replace(/[$,]/g, '');
       any = true;
     }
+    if (dealType === 'finance' && !payload.apr) {
+      if (!any) {
+        setError('Enter at least one number from the worksheet.');
+        return;
+      }
+      setReport(null);
+      setShowDetails(false);
+      setNeedsApr(true);
+      return;
+    }
     if (!any) {
       setError('Enter at least one number from the worksheet.');
       return;
     }
+    setNeedsApr(false);
     setBusy(true);
     try {
       const res = await fetch(`/api/cu/${tenant.id}/analyze`, {
@@ -249,11 +278,46 @@ export function CheckForm({
     }
   }
 
+  if (needsApr) {
+    return (
+      <div className={embedded
+        ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
+        : 'mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pt-24'}>
+        <p className="text-[14px] leading-[20px] cu-muted">Incomplete</p>
+        <h1 ref={headingRef} tabIndex={-1} className="mt-4 text-[24px] font-bold leading-[30px] outline-none">
+          Incomplete: add your APR for a full grade.
+        </h1>
+        <p className="mt-4 text-[18px] leading-[28px]">
+          This finance offer has no APR from the worksheet, so there is no grade yet. A grade from this tool is a comparison, not a credit decision.
+        </p>
+        <p className="mt-4 text-[15px] font-semibold leading-[24px]">{ADD_APR_RECOMMENDATION}</p>
+        <div className="mt-10">
+          <Primary
+            type="button"
+            onClick={() => {
+              returnToApr.current = true;
+              setNeedsApr(false);
+            }}
+          >
+            Add the APR
+          </Primary>
+        </div>
+      </div>
+    );
+  }
+
   if (report) {
     const usingFlags = report.itemsToReview.length > 0;
     const shown = (usingFlags ? report.itemsToReview : report.notes).slice(0, 2);
     const rest = usingFlags ? report.itemsToReview.slice(2) : [];
-    const caption = report.grade === 'A' || report.recommendation !== 'sign' ? report.recommendationLabel : '';
+    const aprBlank = dealType === 'finance' && !(Number(fields.apr.replace(/[$,]/g, '')) > 0);
+    const caption = memberRecommendationLine({
+      recommendation: report.recommendation,
+      recommendationLabel: report.recommendationLabel,
+      grade: report.grade,
+      aprBlank,
+      provisional: dealType === 'finance' && financeGradeIsProvisional(report, aprBlank),
+    });
     const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
     return (
       <div className={embedded
@@ -409,6 +473,11 @@ export function CheckForm({
     <div className="mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pb-24 md:pt-24">
       <h1 className="text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px]">Check a dealer offer</h1>
       <p className="mt-6 text-[18px] leading-[28px] cu-muted">Enter the numbers from the dealer worksheet.</p>
+      {demoSample ? (
+        <p className="mt-4 text-[15px] leading-[24px]">
+          Sample finance offer for this demo, with a {DEMO_FINANCE_SAMPLE.apr}% APR. Replace any number with the worksheet.
+        </p>
+      ) : null}
 
       <form onSubmit={onSubmit} className="mt-10" aria-describedby={error ? `${formId}-error` : undefined}>
         <div role="status" aria-live="polite" className="sr-only">{busy ? 'Checking the numbers.' : ''}</div>
@@ -493,7 +562,10 @@ export function CheckForm({
           </div>
           {dealType === 'finance' ? (
             <>
-              <Field id="apr" label="APR" hint="Percent, such as 6.9" value={fields.apr} onChange={v => setField('apr', v)} />
+              <p className="text-[15px] font-semibold leading-[24px] sm:col-span-2">
+                Add the APR for a full grade. A blank APR stays incomplete and does not show a letter.
+              </p>
+              <Field id="apr" label="APR" hint="Percent from the worksheet, such as 5.9" value={fields.apr} onChange={v => setField('apr', v)} />
               <Field id="amountFinanced" label="Amount financed" value={fields.amountFinanced} onChange={v => setField('amountFinanced', v)} />
             </>
           ) : (

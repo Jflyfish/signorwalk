@@ -23,7 +23,7 @@ export default function CreditUnionTermsPage() {
       </p>
       <ul className="mt-6 list-disc space-y-2 pl-5 text-[18px] leading-[28px]">
         <li>A credit union can start a 90-day trial. The form does not ask for a card. Online checkout is not built.</li>
-        <li>The trial stays unverified until the email link is opened. Until then the public check, embed, and worksheet read stay off. The dashboard opens. Saves stay off.</li>
+        <li>The trial stays unverified until Confirm is chosen on the email link. Opening the link does not confirm it. Until then the public check, embed, and worksheet read stay off. The dashboard opens. Saves stay off.</li>
         <li>The grade compares numbers with labeled ranges. It is not the credit union’s rate, not an offer of credit, and not a guarantee of savings.</li>
         <li>List prices are on the plans page. What happens after 90 days, and whether the pilot can end early, are open.</li>
       </ul>

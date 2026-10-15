@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { inflateRawSync } from 'node:zlib';
 import test from 'node:test';
 import { NextRequest } from 'next/server';
@@ -16,6 +17,9 @@ import { getCuTenant, toCuPublic } from '../src/cu/tenants';
 import { memberLink } from '../src/cu/utm';
 import { config } from '../src/middleware';
 import { POST } from '../src/app/api/cu/[tenant]/analyze/route';
+import { DEMO_FINANCE_SAMPLE } from '../src/cu/demo-sample';
+import { gradePayload } from '../src/cu/engine/report';
+import { ADD_APR_RECOMMENDATION, financeGradeIsProvisional, memberRecommendationLine } from '../src/cu/recommendation-display';
 
 test('middleware matches only credit-union paths', () => {
   assert.deepEqual(config.matcher, ['/cu/:path*', '/credit-unions', '/credit-unions/:path*']);
@@ -232,4 +236,43 @@ test('analyze route is rules-only, drops free text, and rate limits without logg
     console.log = original;
     resetAnalyzeRateLimit();
   }
+});
+
+test('demo sample includes an APR and grades; a blank APR is still a B from the engine', () => {
+  assert.equal(DEMO_FINANCE_SAMPLE.apr, '5.9');
+  const graded = gradePayload({
+    dealType: 'finance',
+    termMonths: '60',
+    ...DEMO_FINANCE_SAMPLE,
+  }, 'Harborlight Credit Union');
+  assert.equal(graded.grade, 'A');
+  assert.equal(graded.notes.some(note => note.id === 'rate-missing'), false);
+
+  const { apr: _apr, ...withoutApr } = DEMO_FINANCE_SAMPLE;
+  const blank = gradePayload({
+    dealType: 'finance',
+    termMonths: '60',
+    ...withoutApr,
+  }, 'Harborlight Credit Union');
+  assert.equal(blank.grade, 'B');
+  assert.equal(blank.notes.some(note => note.id === 'rate-missing'), true);
+  assert.equal(blank.recommendation, 'sign');
+  const line = memberRecommendationLine({
+    recommendation: blank.recommendation,
+    recommendationLabel: blank.recommendationLabel,
+    grade: blank.grade,
+    aprBlank: true,
+    provisional: financeGradeIsProvisional(blank, true),
+  });
+  assert.equal(line, ADD_APR_RECOMMENDATION);
+  assert.equal(line.includes('Compares favorably'), false);
+  const fullLine = memberRecommendationLine({
+    recommendation: graded.recommendation,
+    recommendationLabel: graded.recommendationLabel,
+    grade: graded.grade,
+    aprBlank: false,
+    provisional: financeGradeIsProvisional(graded, false),
+  });
+  assert.equal(fullLine, graded.recommendationLabel);
+  assert.equal(readFileSync('src/cu/engine/evaluate.ts', 'utf8').includes('function recommendationFor'), true);
 });

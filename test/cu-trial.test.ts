@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { ephemeralSecret } from '../src/cu/auth';
 import { NextRequest } from 'next/server';
@@ -9,8 +9,9 @@ import { FRAME_ANCESTORS_HEADER, frameAncestorsToken } from '../src/cu/embed';
 import { missingCreditUnionResponse } from '../src/middleware';
 import { resetSignupRateLimit, SIGNUP_LIMIT, takeSignupSlot } from '../src/cu/rate-limit';
 import { deleteStaffLogin, staffLoginMatches } from '../src/cu/staff-login';
-import { loadCuTenant, removeTenant, tenantUnavailable } from '../src/cu/tenant-directory';
+import { getTenantProfile, loadCuTenant, removeTenant, tenantUnavailable } from '../src/cu/tenant-directory';
 import { signupNotifyAddress } from '../src/cu/notify';
+import { confirmTrialToken } from '../src/cu/trial-confirm';
 import { createTrial, TRIAL_MS } from '../src/cu/trial';
 
 test('a trial creates a hashed staff login and a 90-day end', async () => {
@@ -133,7 +134,16 @@ test('signup is limited to five an hour and an ended trial is unavailable', asyn
   assert.match(actions, /notice=confirm/);
   assert.equal(actions.includes('verified = true'), false);
   assert.match(actions, /resendConfirmAction/);
-  assert.match(readFileSync('src/app/cu/[tenant]/confirm/route.ts', 'utf8'), /profile\.verified = true/);
+  const confirmPage = readFileSync('src/app/cu/[tenant]/confirm/page.tsx', 'utf8');
+  const confirmAction = readFileSync('src/app/cu/[tenant]/confirm/actions.ts', 'utf8');
+  assert.match(confirmPage, /<button type="submit"[\s\S]*Confirm\s*<\/button>/);
+  assert.match(confirmPage, /action=\{confirmTrial\}/);
+  assert.equal(confirmPage.includes('method="get"'), false);
+  assert.equal(confirmPage.includes('verified = true'), false);
+  assert.equal(confirmPage.includes('saveTenantProfile'), false);
+  assert.match(confirmAction, /confirmTrialToken/);
+  assert.match(readFileSync('src/cu/trial-confirm.ts', 'utf8'), /profile\.verified = true/);
+  assert.equal(existsSync('src/app/cu/[tenant]/confirm/route.ts'), false);
   assert.match(readFileSync('src/app/cu/[tenant]/dashboard/page.tsx', 'utf8'), /Check your email to confirm/);
   const rate = readFileSync('src/cu/rate-limit.ts', 'utf8');
   assert.match(rate, /incrementWindow/);
@@ -238,5 +248,28 @@ test('missing and removed credit unions answer 404', async () => {
   assert.equal(seeded.status, 204);
   const denied = await GET(new NextRequest('http://127.0.0.1/api/cu/present?id=harborlight-cu'));
   assert.equal(denied.status, 404);
+  resetCuStore();
+});
+
+test('a trial stays unverified until the confirm action runs', async () => {
+  resetCuStore();
+  const created = await createTrial({
+    name: 'Cedar Credit Union',
+    contactName: 'Avery Chen',
+    email: `cedar-${randomBytes(4).toString('hex')}@example.com`,
+    secret: ephemeralSecret(),
+    website: '',
+    honeypot: '',
+  });
+  assert.equal(created.ok, true);
+  if (!created.ok) return;
+  assert.equal((await loadCuTenant(created.id))?.verified, false);
+  assert.equal(await confirmTrialToken(created.id, 'not-the-token'), false);
+  assert.equal((await loadCuTenant(created.id))?.verified, false);
+  assert.equal(await confirmTrialToken(created.id, created.confirmToken), true);
+  assert.equal((await loadCuTenant(created.id))?.verified, true);
+  assert.equal((await getTenantProfile(created.id))?.confirmHash, undefined);
+  assert.equal(await confirmTrialToken(created.id, created.confirmToken), false);
+  await removeTenant(created.id);
   resetCuStore();
 });
