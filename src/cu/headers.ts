@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { frameAncestorsForPath } from './embed';
 
 /**
  * Response headers for /cu and /credit-unions only.
@@ -14,6 +15,7 @@ export function securityHeaderList(pathname: string): { key: string; value: stri
     style.push('https://fonts.googleapis.com');
     font.push('https://fonts.gstatic.com');
   }
+  const ancestors = frameAncestorsForPath(pathname);
   const csp = [
     "default-src 'self'",
     `script-src ${script.join(' ')}`,
@@ -21,19 +23,21 @@ export function securityHeaderList(pathname: string): { key: string; value: stri
     `font-src ${font.join(' ')}`,
     "img-src 'self' data: blob:",
     "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
-    "frame-ancestors 'none'",
+    `frame-ancestors ${ancestors}`,
     "base-uri 'self'",
     "form-action 'self'",
     "object-src 'none'",
   ].join('; ');
 
-  return [
+  const headers = [
     { key: 'X-Content-Type-Options', value: 'nosniff' },
     { key: 'X-Frame-Options', value: 'DENY' },
     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
     { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
     { key: 'Content-Security-Policy', value: csp },
   ];
+  if (ancestors === "'none'") return headers;
+  return headers.filter(header => header.key !== 'X-Frame-Options');
 }
 
 export function applySecurityHeaders(res: NextResponse, pathname = '/cu'): NextResponse {

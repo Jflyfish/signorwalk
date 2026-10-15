@@ -108,7 +108,7 @@ function Primary({
   return <button type={type} disabled={disabled} className={className} onClick={onClick}>{children}</button>;
 }
 
-export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedBrand }) {
+export function CheckForm({ tenant, brand, onGrade }: { tenant: CuPublic; brand: DerivedBrand; onGrade?: (grade: string) => void }) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [dealType, setDealType] = useState<DealType>('finance');
@@ -218,6 +218,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
       setReport(data.analysis as TenantReport);
       const grade = String(data.analysis.grade);
       const archetype = String(data.analysis.archetype);
+      if (/^[ABCDF]$/.test(grade)) onGrade?.(grade);
       if (['A', 'B', 'C', 'D', 'F'].includes(grade) && /^(LEASE|FIN)_[A-Z_]+$/.test(archetype)) {
         trackSafe('analysis_completed', { tenant: tenant.id, grade, dealType, archetype });
       }

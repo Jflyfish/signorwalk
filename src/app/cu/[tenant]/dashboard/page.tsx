@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
 import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
+import { deepLink, iframeSnippet } from '@/cu/embed';
 import { getCuTenant } from '@/cu/tenants';
 import { saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
@@ -18,10 +19,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Section = 'usage' | 'branding' | 'settings';
+type Section = 'usage' | 'branding' | 'settings' | 'embed';
 
 function sectionFrom(query: { section?: string; saved?: string; error?: string; notice?: string }): Section {
-  if (query.section === 'branding' || query.section === 'settings' || query.section === 'usage') return query.section;
+  if (query.section === 'branding' || query.section === 'settings' || query.section === 'usage' || query.section === 'embed') return query.section;
   if (query.saved === 'branding' || query.error === 'branding') return 'branding';
   if (query.saved === 'settings' || query.saved === 'email' || query.error === 'email' || query.notice) return 'settings';
   return 'usage';
@@ -87,10 +88,13 @@ export default async function DashboardPage({
   const caution = query.notice ? NOTICES[query.notice] : '';
   const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
   const shareUrl = `https://signorwalk.com/cu/${tenant.id}`;
+  const embedUrl = deepLink(tenant.id);
+  const snippet = iframeSnippet(tenant.id);
   const tabs: { id: Section; label: string }[] = [
     { id: 'usage', label: 'Usage' },
     { id: 'branding', label: 'Branding' },
     { id: 'settings', label: 'Settings' },
+    { id: 'embed', label: 'Embed' },
   ];
 
   return (
@@ -107,12 +111,12 @@ export default async function DashboardPage({
         />
       </StaffHeader>
       <nav className="border-b cu-line">
-        <div className="mx-auto flex w-full max-w-[1120px] gap-6 px-4">
+        <div className="mx-auto flex w-full max-w-[1120px] gap-6 overflow-x-auto px-4">
           {tabs.map(tab => (
             <a
               key={tab.id}
               href={`/cu/${tenant.id}/dashboard?section=${tab.id}`}
-              className={`py-3 text-[15px] font-semibold ${section === tab.id ? 'cu-nav-active' : 'cu-muted'}`}
+              className={`shrink-0 py-3 text-[15px] font-semibold ${section === tab.id ? 'cu-nav-active' : 'cu-muted'}`}
               aria-current={section === tab.id ? 'page' : undefined}
             >
               {tab.label}
@@ -203,6 +207,31 @@ export default async function DashboardPage({
               <button type="submit" className="cu-link text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline">Send summary</button>
             </form>
           </div>
+        </section> : null}
+
+        {section === 'embed' ? <section aria-labelledby="embed-heading">
+          <h1 id="embed-heading" className="text-[32px] font-bold leading-[38px]">Embed</h1>
+          <p className="mt-4 max-w-[560px] text-[15px] leading-[24px]">Place the check on your site or in your app. The page uses your brand and leaves out the marketing navigation.</p>
+
+          <h2 className="mt-10 text-[24px] font-bold leading-[30px]">Iframe</h2>
+          <p className="mt-2 max-w-[560px] text-[14px] leading-[20px] cu-muted">Paste this on a page whose origin is on your allowlist. The script sets the height from signorwalk.cu.resize.</p>
+          <pre className="mt-4 max-w-full overflow-x-auto whitespace-pre rounded-lg border cu-line bg-[#FAFAFA] p-4 text-[13px] leading-[20px]">{snippet}</pre>
+          <CopyLink text={snippet} label="Copy snippet" />
+
+          <h2 className="mt-10 text-[24px] font-bold leading-[30px]">App deep link</h2>
+          <p className="mt-2 max-w-[560px] text-[14px] leading-[20px] cu-muted">Open this URL in a WKWebView or Android WebView.</p>
+          <p className="mt-2 max-w-[560px] break-all text-[14px] leading-[20px]">
+            <a href={embedUrl} className="underline underline-offset-4 cu-linkline">{embedUrl}</a>
+          </p>
+          <CopyLink url={embedUrl} />
+
+          <h2 className="mt-10 text-[24px] font-bold leading-[30px]">Web, iOS, and Android</h2>
+          <ul className="mt-4 max-w-[560px] list-disc space-y-4 pl-4 text-[15px] leading-[24px]">
+            <li>Web: use the iframe on an allowlisted origin. Listen for signorwalk.cu.resize and signorwalk.cu.completed. The completed payload is the grade letter only.</li>
+            <li>iOS: load the deep link as the WKWebView document, or iframe it from a page you host and read the same messages there.</li>
+            <li>Android: load the deep link in a WebView with JavaScript on, or iframe it from a page you host. Do not expect member fields on the completed event.</li>
+          </ul>
+          <p className="mt-4 max-w-[560px] text-[14px] leading-[20px] cu-muted">Check that event.origin is https://signorwalk.com before reading a message. A framed local copy is at /credit-unions/embed-demo.</p>
         </section> : null}
       </main>
     </>

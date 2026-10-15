@@ -19,6 +19,8 @@ export interface CuTenant {
   ratesUrl: string;
   preApprovalLabel: string;
   ratesLabel: string;
+  /** HTTPS origins allowed to frame /cu/{id}/embed. Never '*'. */
+  embedOrigins: readonly string[];
 }
 
 /**
@@ -45,6 +47,7 @@ export const CU_TENANTS: readonly CuTenant[] = [
     ratesUrl: 'https://www.harborlightcu.example/rates/auto',
     preApprovalLabel: 'Get pre-approved at Harborlight',
     ratesLabel: 'See Harborlight auto rates',
+    embedOrigins: ['https://www.harborlightcu.example'],
   },
   {
     id: 'summit-ridge-fcu',
@@ -66,6 +69,7 @@ export const CU_TENANTS: readonly CuTenant[] = [
     ratesUrl: 'https://www.summitridgefcu.example/loans/auto-rates',
     preApprovalLabel: 'Get pre-approved at Summit Ridge',
     ratesLabel: 'See Summit Ridge auto rates',
+    embedOrigins: ['https://www.summitridgefcu.example'],
   },
   {
     id: 'larkspur-cu',
@@ -87,6 +91,7 @@ export const CU_TENANTS: readonly CuTenant[] = [
     ratesUrl: 'https://www.larkspurcu.example/rates/auto',
     preApprovalLabel: 'Get pre-approved at Larkspur',
     ratesLabel: 'See Larkspur auto rates',
+    embedOrigins: ['https://www.larkspurcu.example'],
   },
 ];
 
