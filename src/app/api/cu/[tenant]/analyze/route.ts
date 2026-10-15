@@ -6,7 +6,7 @@ import { gradePayload } from '@/cu/engine/report';
 import { applySecurityHeaders } from '@/cu/headers';
 import { clientAddress, takeAnalyzeSlot } from '@/cu/rate-limit';
 import { missingTenantResponse } from '@/cu/missing-page';
-import { getCuTenant } from '@/cu/tenants';
+import { loadCuTenant, TENANT_UNAVAILABLE } from '@/cu/tenant-directory';
 
 const MAX_BODY = 20_000;
 
@@ -18,8 +18,11 @@ function json(pathname: string, body: unknown, status: number, extra?: Record<st
 export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: string }> }) {
   const { tenant: slug } = await ctx.params;
   const pathname = `/api/cu/${slug}/analyze`;
-  const tenant = getCuTenant(slug);
+  const tenant = await loadCuTenant(slug);
   if (!tenant) return missingTenantResponse(pathname);
+  if (tenant.status === 'paused') {
+    return json(pathname, { success: false, error: TENANT_UNAVAILABLE }, 404);
+  }
   if (req.method !== 'POST') {
     return applySecurityHeaders(new NextResponse(null, { status: 405, headers: { Allow: 'POST' } }), pathname);
   }

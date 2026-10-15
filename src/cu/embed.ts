@@ -73,13 +73,16 @@ export function frameAncestorsForPath(pathname: string): string {
 
 export function allowEmbed(input: {
   tenantId: string | null | undefined;
+  /** Stored allowlist. When set, it replaces the config seed list. */
+  embedOrigins?: readonly string[];
   referer: string | null;
   secFetchDest: string | null;
   requestOrigin: string | null;
 }): EmbedDecision {
   const tenant = getCuTenant(input.tenantId);
-  if (!tenant) return { ok: false };
-  const allowed = new Set(tenant.embedOrigins.filter(isEmbedOrigin));
+  const origins = input.embedOrigins ?? tenant?.embedOrigins;
+  if (!origins) return { ok: false };
+  const allowed = new Set(origins.filter(isEmbedOrigin));
   if (input.requestOrigin && isEmbedOrigin(input.requestOrigin)) allowed.add(input.requestOrigin);
   const referer = originOf(input.referer);
   if (referer) {

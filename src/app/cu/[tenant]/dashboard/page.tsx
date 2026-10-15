@@ -5,7 +5,7 @@ import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
 import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
 import { deepLink, iframeSnippet } from '@/cu/embed';
-import { getCuTenant } from '@/cu/tenants';
+import { loadCuTenant } from '@/cu/tenant-directory';
 import { saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 import { StaffHeader } from '../../StaffHeader';
@@ -68,7 +68,7 @@ export default async function DashboardPage({
   params: Promise<{ tenant: string }>;
   searchParams: Promise<{ section?: string; saved?: string; error?: string; notice?: string }>;
 }) {
-  const tenant = getCuTenant((await params).tenant);
+  const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) notFound();
   const jar = await cookies();
   const session = verifySession(jar.get(CU_SESSION_COOKIE)?.value);

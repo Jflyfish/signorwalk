@@ -48,6 +48,7 @@ export function BrandingForm({
   secondary,
   logoLight,
   logoDark,
+  returnTo,
 }: {
   tenantId: string;
   shortName: string;
@@ -55,6 +56,7 @@ export function BrandingForm({
   secondary: string;
   logoLight: string;
   logoDark: string;
+  returnTo?: 'owner';
 }) {
   const [color, setColor] = useState(primary);
   const [name, setName] = useState(shortName);
@@ -70,6 +72,7 @@ export function BrandingForm({
   return (
     <form action={saveBrandingAction} className="mt-6 grid max-w-[560px] gap-4">
       <input type="hidden" name="tenant" value={tenantId} />
+      {returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}
       {derived ? (
         <div>
           <div className="flex gap-6">

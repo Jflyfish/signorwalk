@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { CU_TENANTS, getCuTenant } from '@/cu/tenants';
+import { CU_TENANTS } from '@/cu/tenants';
+import { loadCuTenant } from '@/cu/tenant-directory';
 import { resolveBrand } from '@/cu/brand';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +14,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ tenant: string }>;
 }): Promise<Metadata> {
-  const tenant = getCuTenant((await params).tenant);
+  const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) {
     return {
       title: 'Page not found',
@@ -36,7 +37,7 @@ export default async function CuLayout({
   children: React.ReactNode;
   params: Promise<{ tenant: string }>;
 }) {
-  const tenant = getCuTenant((await params).tenant);
+  const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) {
     return (
       <div className="cu-missing min-h-screen bg-white cu-ink">

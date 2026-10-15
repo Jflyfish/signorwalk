@@ -2,18 +2,22 @@
 
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import {
-  canOpenTenant,
-  checkCredentials,
-  CU_SESSION_COOKIE,
-  demoTenantId,
-  signSession,
-  verifySession,
-} from '@/cu/auth';
-import { getBranding, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
+import { canOpenTenant, checkCredentials, CU_SESSION_COOKIE, demoTenantId, signSession, verifySession, type CuSession } from '@/cu/auth';
+import { getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
 import { readLogoFile } from '@/cu/logo-file';
 import { sendAggregateSummary } from '@/cu/notify';
-import { getCuTenant } from '@/cu/tenants';
+import {
+  getTenantProfile,
+  loadCuTenant,
+  normalizeProfile,
+  parseEmbedOrigins,
+  removalConfirmed,
+  removeTenant,
+  replaceEmbedOrigins,
+  saveTenantProfile,
+  setTenantStatus,
+  tenantBrandOk,
+} from '@/cu/tenant-directory';
 
 async function secureCookie(): Promise<boolean> {
   const h = await headers();
@@ -30,7 +34,7 @@ async function currentSession() {
 
 export async function signIn(formData: FormData) {
   const tenant = String(formData.get('tenant') ?? '').trim().toLowerCase();
-  if (!getCuTenant(tenant)) redirect(`/cu/${demoTenantId()}/sign-in?error=denied`);
+  if (!(await loadCuTenant(tenant))) redirect(`/cu/${demoTenantId()}/sign-in?error=denied`);
   const email = String(formData.get('email') ?? '');
   const password = String(formData.get('password') ?? '');
   const result = checkCredentials(tenant, email, password);
@@ -54,7 +58,7 @@ export async function signIn(formData: FormData) {
 export async function signOut(formData: FormData) {
   const session = await currentSession();
   const tenant = String(formData.get('tenant') ?? '');
-  const dest = getCuTenant(tenant)?.id ?? demoTenantId();
+  const dest = (await loadCuTenant(tenant))?.id ?? demoTenantId();
   const jar = await cookies();
   jar.set(CU_SESSION_COOKIE, '', {
     httpOnly: true,
@@ -67,10 +71,21 @@ export async function signOut(formData: FormData) {
   redirect(`/cu/${dest}/sign-in`);
 }
 
-async function guard(tenant: string) {
+async function guard(tenant: string): Promise<CuSession> {
   const session = await currentSession();
-  if (!getCuTenant(tenant) || !canOpenTenant(session, tenant)) redirect(`/cu/${tenant}/sign-in`);
+  const record = await loadCuTenant(tenant);
+  if (!record || !session || !canOpenTenant(session, tenant)) redirect(`/cu/${tenant}/sign-in`);
   return session;
+}
+
+async function ownerOnly(): Promise<void> {
+  const session = await currentSession();
+  if (!session) redirect(`/cu/${demoTenantId()}/sign-in`);
+  if (session.role !== 'admin') redirect(`/cu/${session.tenantId}/dashboard`);
+}
+
+function emailOk(value: string): boolean {
+  return value.length <= 120 && (!value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
 }
 
 export async function saveSettingsAction(formData: FormData) {
@@ -86,12 +101,15 @@ export async function saveSettingsAction(formData: FormData) {
 
 export async function saveBrandingAction(formData: FormData) {
   const tenant = String(formData.get('tenant') ?? '');
-  await guard(tenant);
+  const session = await guard(tenant);
+  const owner = session.role === 'admin' && formData.get('returnTo') === 'owner';
   const shortName = String(formData.get('shortName') ?? '').trim().replace(/\s+/g, ' ');
   const primary = String(formData.get('primary') ?? '').trim();
   const secondary = String(formData.get('secondary') ?? '').trim();
   const hex = /^#[0-9a-fA-F]{6}$/;
-  const brandingError = `/cu/${tenant}/dashboard?section=branding&error=branding`;
+  const brandingError = owner
+    ? `/cu/admin?cu=${tenant}&error=branding`
+    : `/cu/${tenant}/dashboard?section=branding&error=branding`;
   if ([...shortName].length < 1 || [...shortName].length > 24 || !hex.test(primary)) redirect(brandingError);
   if (secondary && !hex.test(secondary)) redirect(brandingError);
   const light = await logoFromForm(formData.get('logoLightFile'));
@@ -112,7 +130,7 @@ export async function saveBrandingAction(formData: FormData) {
   } catch {
     redirect(brandingError);
   }
-  redirect(`/cu/${tenant}/dashboard?section=branding&saved=branding`);
+  redirect(owner ? `/cu/admin?cu=${tenant}&saved=branding` : `/cu/${tenant}/dashboard?section=branding&saved=branding`);
 }
 
 async function logoFromForm(entry: FormDataEntryValue | null) {
@@ -131,4 +149,102 @@ export async function sendSummaryAction(formData: FormData) {
     redirect(`/cu/${tenant}/dashboard?section=settings&error=email`);
   }
   redirect(`/cu/${tenant}/dashboard?section=settings&saved=email`);
+}
+
+export async function createOwnerTenantAction(formData: FormData) {
+  await ownerOnly();
+  const id = String(formData.get('id') ?? '');
+  const shortName = String(formData.get('shortName') ?? '');
+  const primary = String(formData.get('primary') ?? '').trim();
+  const profile = normalizeProfile({
+    id,
+    name: String(formData.get('name') ?? ''),
+    legalName: String(formData.get('legalName') ?? ''),
+    tagline: String(formData.get('tagline') ?? ''),
+    supportUrl: String(formData.get('supportUrl') ?? ''),
+    privacyUrl: String(formData.get('privacyUrl') ?? ''),
+    preApprovalUrl: String(formData.get('preApprovalUrl') ?? ''),
+    ratesUrl: String(formData.get('ratesUrl') ?? ''),
+    preApprovalLabel: String(formData.get('preApprovalLabel') ?? ''),
+    ratesLabel: String(formData.get('ratesLabel') ?? ''),
+    embedOrigins: [],
+    status: 'active',
+    shortName,
+  });
+  if (!profile || !tenantBrandOk(profile.id, shortName, primary) || await loadCuTenant(profile.id)) {
+    redirect('/cu/admin?cu=new&error=profile');
+  }
+  try {
+    await saveTenantProfile(profile, { shortName, primary });
+  } catch {
+    redirect('/cu/admin?cu=new&error=profile');
+  }
+  redirect(`/cu/admin?cu=${profile.id}&saved=profile`);
+}
+
+export async function saveOwnerProfileAction(formData: FormData) {
+  await ownerOnly();
+  const id = String(formData.get('tenant') ?? '');
+  const current = await getTenantProfile(id);
+  if (!current) redirect('/cu/admin?error=missing');
+  const profile = normalizeProfile({
+    ...current,
+    name: String(formData.get('name') ?? ''),
+    legalName: String(formData.get('legalName') ?? ''),
+    tagline: String(formData.get('tagline') ?? ''),
+    supportUrl: String(formData.get('supportUrl') ?? ''),
+    privacyUrl: String(formData.get('privacyUrl') ?? ''),
+    preApprovalUrl: String(formData.get('preApprovalUrl') ?? ''),
+    ratesUrl: String(formData.get('ratesUrl') ?? ''),
+    preApprovalLabel: String(formData.get('preApprovalLabel') ?? ''),
+    ratesLabel: String(formData.get('ratesLabel') ?? ''),
+    shortName: current.name,
+  });
+  if (!profile) redirect(`/cu/admin?cu=${id}&error=profile`);
+  try {
+    await saveTenantProfile(profile);
+  } catch {
+    redirect(`/cu/admin?cu=${id}&error=profile`);
+  }
+  redirect(`/cu/admin?cu=${id}&saved=profile`);
+}
+
+export async function saveOwnerSettingsAction(formData: FormData) {
+  await ownerOnly();
+  const id = String(formData.get('tenant') ?? '');
+  if (!(await loadCuTenant(id))) redirect('/cu/admin?error=missing');
+  const notifyEmail = String(formData.get('notifyEmail') ?? '').trim();
+  const origins = parseEmbedOrigins(String(formData.get('embedOrigins') ?? ''));
+  if (!emailOk(notifyEmail) || !origins) redirect(`/cu/admin?cu=${id}&error=settings`);
+  const previous = await getSettings(id);
+  try {
+    await saveSettings(id, { emailEnabled: formData.get('emailEnabled') === 'on', notifyEmail: notifyEmail || undefined });
+    await replaceEmbedOrigins(id, origins);
+  } catch {
+    await saveSettings(id, previous);
+    redirect(`/cu/admin?cu=${id}&error=settings`);
+  }
+  redirect(`/cu/admin?cu=${id}&saved=settings`);
+}
+
+export async function setOwnerStatusAction(formData: FormData) {
+  await ownerOnly();
+  const id = String(formData.get('tenant') ?? '');
+  const status = formData.get('status') === 'paused' ? 'paused' : formData.get('status') === 'active' ? 'active' : null;
+  if (!status || !(await loadCuTenant(id))) redirect('/cu/admin?error=missing');
+  try {
+    await setTenantStatus(id, status);
+  } catch {
+    redirect(`/cu/admin?cu=${id}&error=profile`);
+  }
+  redirect(`/cu/admin?cu=${id}&saved=${status === 'paused' ? 'paused' : 'resumed'}`);
+}
+
+export async function removeTenantAction(formData: FormData) {
+  await ownerOnly();
+  const id = String(formData.get('tenant') ?? '');
+  if (!removalConfirmed(String(formData.get('confirm') ?? ''))) redirect(`/cu/admin?cu=${id}&confirm=remove`);
+  if (!(await loadCuTenant(id))) redirect('/cu/admin?error=missing');
+  await removeTenant(id);
+  redirect('/cu/admin?removed=1');
 }

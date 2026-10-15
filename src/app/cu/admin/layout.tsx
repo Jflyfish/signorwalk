@@ -3,6 +3,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="cu-admin min-h-screen bg-white cu-ink">
       <style>{`
         .cu-admin :focus-visible { outline: 2px solid var(--cu-ink); outline-offset: 2px; }
+        .cu-admin .cu-primary { background: var(--cu-ink); color: #fff; }
+        .cu-admin .cu-primary:hover { background: #333; }
+        .cu-admin .cu-link { color: var(--cu-ink); }
+        .cu-admin .cu-nav-active { color: var(--cu-ink); border-bottom: 2px solid var(--cu-ink); }
       `}</style>
       {children}
     </div>

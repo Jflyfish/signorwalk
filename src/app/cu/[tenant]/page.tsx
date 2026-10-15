@@ -1,14 +1,24 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-
-export const dynamic = 'force-dynamic';
 import { resolveBrand } from '@/cu/brand';
-import { getCuTenant, toCuPublic } from '@/cu/tenants';
+import { loadCuTenant } from '@/cu/tenant-directory';
+import { toCuPublic } from '@/cu/tenants';
+import { Unavailable } from '../Unavailable';
 import { BrandLockup } from '../BrandLockup';
 import { CheckForm } from './CheckForm';
 
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }): Promise<Metadata> {
+  const tenant = await loadCuTenant((await params).tenant);
+  if (tenant?.status === 'paused') return { title: 'Unavailable', robots: { index: false, follow: false } };
+  return {};
+}
+
 export default async function CuPage({ params }: { params: Promise<{ tenant: string }> }) {
-  const tenant = getCuTenant((await params).tenant);
+  const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) notFound();
+  if (tenant.status === 'paused') return <Unavailable />;
   const brand = await resolveBrand(tenant);
   return (
     <>

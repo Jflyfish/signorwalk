@@ -5,11 +5,13 @@ import { withUtm } from './utm';
 export type CuTenantId = 'harborlight-cu' | 'summit-ridge-fcu' | 'larkspur-cu';
 
 export interface CuTenant {
-  id: CuTenantId;
+  id: string;
   name: string;
   legalName: string;
   tagline: string;
-  logo: 'harborlight' | 'summit' | 'larkspur';
+  logo?: 'harborlight' | 'summit' | 'larkspur';
+  /** Active when omitted. The store is the runtime source for pause. */
+  status?: 'active' | 'paused';
   /** Space-separated RGB channels, for example "11 58 91". */
   colors: { primary: string; primaryFg: string; accent: string };
   brand: BrandTokens;

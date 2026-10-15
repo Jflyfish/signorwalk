@@ -1,19 +1,30 @@
+import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { resolveBrand } from '@/cu/brand';
 import { allowEmbed, requestOriginFrom } from '@/cu/embed';
-import { getCuTenant, toCuPublic } from '@/cu/tenants';
+import { loadCuTenant } from '@/cu/tenant-directory';
+import { toCuPublic } from '@/cu/tenants';
+import { Unavailable } from '../../Unavailable';
 import { BrandLockup } from '../../BrandLockup';
 import { EmbedFrame } from './EmbedFrame';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }): Promise<Metadata> {
+  const tenant = await loadCuTenant((await params).tenant);
+  if (tenant?.status === 'paused') return { title: 'Unavailable', robots: { index: false, follow: false } };
+  return {};
+}
+
 export default async function EmbedPage({ params }: { params: Promise<{ tenant: string }> }) {
-  const tenant = getCuTenant((await params).tenant);
+  const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) notFound();
+  if (tenant.status === 'paused') return <Unavailable />;
   const h = await headers();
   const decision = allowEmbed({
     tenantId: tenant.id,
+    embedOrigins: tenant.embedOrigins,
     referer: h.get('referer'),
     secFetchDest: h.get('sec-fetch-dest'),
     requestOrigin: requestOriginFrom(name => h.get(name)),

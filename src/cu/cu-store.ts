@@ -190,6 +190,39 @@ export function staffDirectory(): StaffLabel[] {
   ];
 }
 
+export async function readStoreJson<T>(key: string): Promise<T | null> {
+  const raw = await readRaw(key);
+  if (!raw) return null;
+  const parsed = JSON.parse(raw) as T;
+  assertCuRecord(parsed);
+  return parsed;
+}
+
+export async function writeStoreJson(key: string, value: unknown): Promise<void> {
+  assertCuRecord(value);
+  await writeRaw(key, JSON.stringify(value));
+}
+
+export async function deleteStoreKey(key: string): Promise<void> {
+  memory.delete(key);
+  if (!restConfig()) return;
+  try {
+    await restCommand(['DEL', key]);
+  } catch {
+    /* The in-memory copy already dropped the key. */
+  }
+}
+
+export async function deleteTenantData(tenantId: string): Promise<void> {
+  for (const kind of ['profile', 'branding', 'settings', 'aggregates']) {
+    await deleteStoreKey(keyFor(tenantId, kind));
+  }
+}
+
+export function storeKey(tenantId: string, kind: string): string {
+  return keyFor(tenantId, kind);
+}
+
 export function resetCuStore(): void {
   memory.clear();
 }

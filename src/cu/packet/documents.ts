@@ -147,7 +147,7 @@ Answer: [Draft design] Stripe Checkout is not implemented. No Stripe secret is r
 Answer: [To be completed]
 
 6.2 How changes ship
-Answer: [Draft design] Tenant configuration is intended to land through a reviewed pull request, not a self-serve admin console. That tenancy work is separate from this marketing page.
+Answer: [Draft design] Demo credit unions ship as config seeds. The owner console can add, edit, pause, and remove credit unions. It stores the credit-union profile, branding, settings, and aggregate counts. It does not store member worksheets or quote numbers.
 
 6.3 Application logs
 Answer: [Draft design] The intended log line is operational: time, tenant, route, grade, flag identifiers, and latency. It is not intended to include the quote, a vehicle, an IP address, or a user agent. Confirming infrastructure logs is [To be completed].

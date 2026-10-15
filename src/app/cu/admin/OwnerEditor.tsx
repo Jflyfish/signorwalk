@@ -1,0 +1,170 @@
+import {
+  createOwnerTenantAction,
+  removeTenantAction,
+  saveOwnerProfileAction,
+  saveOwnerSettingsAction,
+  setOwnerStatusAction,
+} from '../actions';
+import { BrandingForm } from '../[tenant]/dashboard/BrandingForm';
+import type { StoredTenantProfile } from '@/cu/tenant-directory';
+
+const field = 'mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal';
+const label = 'text-[14px] font-semibold leading-[20px]';
+const button = 'cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto';
+const textButton = 'cu-link text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline';
+
+function TextField({
+  name, title, defaultValue, required,
+}: {
+  name: string;
+  title: string;
+  defaultValue?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className={label}>{title}
+      <input name={name} defaultValue={defaultValue ?? ''} required={required} className={field} />
+    </label>
+  );
+}
+
+export function OwnerEditor({
+  mode,
+  profile,
+  shortName,
+  primary,
+  secondary,
+  logoLight,
+  logoDark,
+  emailEnabled,
+  notifyEmail,
+  notice,
+}: {
+  mode: 'create' | 'edit' | 'confirm';
+  profile: StoredTenantProfile | null;
+  shortName: string;
+  primary: string;
+  secondary: string;
+  logoLight: string;
+  logoDark: string;
+  emailEnabled: boolean;
+  notifyEmail: string;
+  notice: { tone: 'ok' | 'err'; text: string } | null;
+}) {
+  if (mode === 'confirm' && profile) {
+    return (
+      <section aria-labelledby="remove-heading" className="max-w-[560px]">
+        <h1 id="remove-heading" className="text-[32px] font-bold leading-[38px]">Remove {profile.name}?</h1>
+        <p className="mt-4 text-[15px] leading-[24px]">This removes the credit-union profile, branding, settings, and counts. Member data is not stored.</p>
+        <form action={removeTenantAction} className="mt-6 flex flex-col gap-4 md:flex-row md:items-center">
+          <input type="hidden" name="tenant" value={profile.id} />
+          <input type="hidden" name="confirm" value="remove" />
+          <button type="submit" className={button}>Remove</button>
+          <a href={`/cu/admin?cu=${profile.id}`} className={textButton}>Cancel</a>
+        </form>
+      </section>
+    );
+  }
+
+  return (
+    <div className="grid max-w-[560px] gap-10">
+      {notice ? (
+        <p className={notice.tone === 'ok' ? 'cu-ok' : 'cu-err'} role={notice.tone === 'ok' ? 'status' : 'alert'}>{notice.text}</p>
+      ) : null}
+
+      {mode === 'create' ? (
+        <section aria-labelledby="add-heading">
+          <h1 id="add-heading" className="text-[32px] font-bold leading-[38px]">Add credit union</h1>
+          <form action={createOwnerTenantAction} className="mt-6 grid gap-4">
+            <TextField name="id" title="Slug" required />
+            <TextField name="name" title="Name" required />
+            <TextField name="legalName" title="Legal name" />
+            <TextField name="shortName" title="Short name" required />
+            <TextField name="primary" title="Primary" required />
+            <TextField name="tagline" title="Tagline" />
+            <TextField name="preApprovalUrl" title="Pre-approval URL" required />
+            <TextField name="ratesUrl" title="Rates URL" required />
+            <TextField name="supportUrl" title="Support URL" />
+            <TextField name="privacyUrl" title="Privacy URL" />
+            <TextField name="preApprovalLabel" title="Pre-approval label" />
+            <TextField name="ratesLabel" title="Rates label" />
+            <button type="submit" className={button}>Add credit union</button>
+          </form>
+        </section>
+      ) : null}
+
+      {mode === 'edit' && profile ? (
+        <>
+          <section aria-labelledby="profile-heading">
+            <h1 id="profile-heading" className="text-[32px] font-bold leading-[38px]">{profile.name}</h1>
+            <p className="mt-2 text-[14px] leading-[20px] cu-muted">{profile.status === 'paused' ? 'Paused' : 'Active'} · {profile.id}</p>
+            <form action={saveOwnerProfileAction} className="mt-6 grid gap-4">
+              <input type="hidden" name="tenant" value={profile.id} />
+              <TextField name="name" title="Name" defaultValue={profile.name} required />
+              <TextField name="legalName" title="Legal name" defaultValue={profile.legalName} required />
+              <TextField name="tagline" title="Tagline" defaultValue={profile.tagline} required />
+              <TextField name="preApprovalUrl" title="Pre-approval URL" defaultValue={profile.preApprovalUrl} required />
+              <TextField name="ratesUrl" title="Rates URL" defaultValue={profile.ratesUrl} required />
+              <TextField name="supportUrl" title="Support URL" defaultValue={profile.supportUrl} required />
+              <TextField name="privacyUrl" title="Privacy URL" defaultValue={profile.privacyUrl} required />
+              <TextField name="preApprovalLabel" title="Pre-approval label" defaultValue={profile.preApprovalLabel} required />
+              <TextField name="ratesLabel" title="Rates label" defaultValue={profile.ratesLabel} required />
+              <button type="submit" className={button}>Save profile</button>
+            </form>
+          </section>
+
+          <section aria-labelledby="branding-heading">
+            <h2 id="branding-heading" className="text-[24px] font-bold leading-[30px]">Branding</h2>
+            <BrandingForm
+              tenantId={profile.id}
+              shortName={shortName}
+              primary={primary}
+              secondary={secondary}
+              logoLight={logoLight}
+              logoDark={logoDark}
+              returnTo="owner"
+            />
+          </section>
+
+          <section aria-labelledby="settings-heading">
+            <h2 id="settings-heading" className="text-[24px] font-bold leading-[30px]">Settings</h2>
+            <form action={saveOwnerSettingsAction} className="mt-6 grid gap-4">
+              <input type="hidden" name="tenant" value={profile.id} />
+              <label className="flex items-center gap-2 text-[15px] font-semibold">
+                <input type="checkbox" name="emailEnabled" defaultChecked={emailEnabled} />
+                Email aggregate summaries
+              </label>
+              <p className="text-[14px] leading-[20px] cu-muted">Off by default. Summaries contain counts only.</p>
+              <label className={label}>Credit-union inbox
+                <input name="notifyEmail" type="email" defaultValue={notifyEmail} autoComplete="off" className={field} />
+              </label>
+              <label className={label}>Embed allowlist
+                <textarea
+                  name="embedOrigins"
+                  defaultValue={profile.embedOrigins.join('\n')}
+                  rows={4}
+                  className="mt-2 block w-full rounded-lg border cu-line px-4 py-3 text-[16px] font-normal"
+                />
+              </label>
+              <p className="text-[14px] leading-[20px] cu-muted">One https origin per line. This site can always frame the check.</p>
+              <button type="submit" className={button}>Save settings</button>
+            </form>
+          </section>
+
+          <section aria-labelledby="status-heading">
+            <h2 id="status-heading" className="text-[24px] font-bold leading-[30px]">Pause and remove</h2>
+            <p className="mt-2 text-[14px] leading-[20px] cu-muted">Paused credit unions show an unavailable page. The dashboard stays open.</p>
+            <form action={setOwnerStatusAction} className="mt-4">
+              <input type="hidden" name="tenant" value={profile.id} />
+              <input type="hidden" name="status" value={profile.status === 'paused' ? 'active' : 'paused'} />
+              <button type="submit" className={textButton}>{profile.status === 'paused' ? 'Resume' : 'Pause'}</button>
+            </form>
+            <p className="mt-4">
+              <a href={`/cu/admin?cu=${profile.id}&confirm=remove`} className={textButton}>Remove credit union</a>
+            </p>
+          </section>
+        </>
+      ) : null}
+    </div>
+  );
+}
