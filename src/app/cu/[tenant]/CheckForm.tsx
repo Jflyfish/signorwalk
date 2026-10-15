@@ -114,7 +114,19 @@ function Primary({
   return <button type={type} disabled={disabled} className={className} onClick={onClick}>{children}</button>;
 }
 
-export function CheckForm({ tenant, brand, onGrade, embedded = false }: { tenant: CuPublic; brand: DerivedBrand; onGrade?: (grade: string) => void; embedded?: boolean }) {
+export function CheckForm({
+  tenant,
+  brand,
+  onGrade,
+  embedded = false,
+  numbersOnly = false,
+}: {
+  tenant: CuPublic;
+  brand: DerivedBrand;
+  onGrade?: (grade: string) => void;
+  embedded?: boolean;
+  numbersOnly?: boolean;
+}) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [dealType, setDealType] = useState<DealType>('finance');
@@ -270,18 +282,20 @@ export function CheckForm({ tenant, brand, onGrade, embedded = false }: { tenant
           </section>
         )}
 
-        <div className={embedded
-          ? 'static mt-10 w-full'
-          : 'fixed inset-x-0 bottom-0 border-t cu-line bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
-          <Primary
-            wide={embedded}
-            href={tenant.preApprovalUrl}
-            onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
-          >
-            <span className="md:hidden">Get pre-approved</span>
-            <span className="hidden md:inline">Get pre-approved with {tenant.name}</span>
-          </Primary>
-        </div>
+        {tenant.preApprovalUrl ? (
+          <div className={embedded
+            ? 'static mt-10 w-full'
+            : 'fixed inset-x-0 bottom-0 border-t cu-line bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
+            <Primary
+              wide={embedded}
+              href={tenant.preApprovalUrl}
+              onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
+            >
+              <span className="md:hidden">Get pre-approved</span>
+              <span className="hidden md:inline">Get pre-approved with {tenant.name}</span>
+            </Primary>
+          </div>
+        ) : null}
 
         <div className="mt-10 border-t cu-line pt-6">
           <button
@@ -351,6 +365,7 @@ export function CheckForm({ tenant, brand, onGrade, embedded = false }: { tenant
                 {report.disclaimers.map(line => <li key={line}>{line}</li>)}
               </ul>
 
+              {tenant.ratesUrl ? (
               <p className="mt-6">
                 <a
                   href={tenant.ratesUrl}
@@ -360,6 +375,7 @@ export function CheckForm({ tenant, brand, onGrade, embedded = false }: { tenant
                   {tenant.ratesLabel}
                 </a>
               </p>
+              ) : null}
             </div>
           )}
           <p className="mt-6">
@@ -383,23 +399,25 @@ export function CheckForm({ tenant, brand, onGrade, embedded = false }: { tenant
         <div role="status" aria-live="polite" className="sr-only">{busy ? 'Checking the numbers.' : ''}</div>
         {error ? <p id={`${formId}-error`} role="alert" className="mb-6 text-[14px] font-semibold leading-[20px]">{error}</p> : null}
 
-        <div className="mb-6">
-          <label htmlFor="worksheet" className={`${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
-            Upload a dealer worksheet
-          </label>
-          <input
-            id="worksheet"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,application/pdf"
-            className={embedded ? embedFile : 'mt-2 block w-full text-[14px]'}
-            onChange={event => {
-              const file = event.target.files?.[0] ?? null;
-              event.target.value = '';
-              void onUpload(file);
-            }}
-          />
-          <p className="mt-2 text-[14px] leading-[20px] cu-muted" role="status">{uploadNote || UPLOAD_DISCLOSURE}</p>
-        </div>
+        {numbersOnly ? null : (
+          <div className="mb-6">
+            <label htmlFor="worksheet" className={`${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
+              Upload a dealer worksheet
+            </label>
+            <input
+              id="worksheet"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
+              className={embedded ? embedFile : 'mt-2 block w-full text-[14px]'}
+              onChange={event => {
+                const file = event.target.files?.[0] ?? null;
+                event.target.value = '';
+                void onUpload(file);
+              }}
+            />
+            <p className="mt-2 text-[14px] leading-[20px] cu-muted" role="status">{uploadNote || UPLOAD_DISCLOSURE}</p>
+          </div>
+        )}
 
         <fieldset>
           <legend className="mb-4 text-[14px] font-semibold leading-[20px]">Offer type</legend>

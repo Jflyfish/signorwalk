@@ -6,7 +6,7 @@ import { resolveBrand } from '@/cu/brand';
 import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
 import { deepLink, iframeSnippet, requestOriginFrom } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
-import { resendConfirmAction, saveEmbedOriginsAction, saveSettingsAction, sendSummaryAction } from '../../actions';
+import { resendConfirmAction, saveEmbedOriginsAction, saveLoanLinksAction, saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 import { StaffHeader } from '../../StaffHeader';
 import { BrandingForm } from './BrandingForm';
@@ -69,6 +69,7 @@ const NOTICES: Record<string, string> = {
   email: 'Summary sent.',
   confirmed: 'Trial confirmed.',
   origins: 'Website saved.',
+  links: 'Links saved.',
   disabled: 'Email is off for this credit union.',
   'not-configured': 'Email is on, but sending is not configured.',
   'missing-tenant': 'This credit union was not found.',
@@ -96,9 +97,11 @@ export default async function DashboardPage({
     ? 'Check the short name and colors.'
     : query.error === 'email'
       ? 'Check the credit-union email address.'
-      : query.error === 'origins'
+        : query.error === 'origins'
         ? 'Use one https origin per line.'
-        : '';
+        : query.error === 'links'
+          ? 'Use https links for pre-approval and rates.'
+          : '';
   const saved = query.saved ? NOTICES[query.saved] : query.notice === 'sent' ? 'Confirmation email sent.' : '';
   const caution = query.notice === 'mail'
     ? 'Email is not configured on this server.'
@@ -153,6 +156,30 @@ export default async function DashboardPage({
           </form>
         ) : null}
         {trialLine ? <p className="mb-6 text-[14px] leading-[20px] cu-muted">{trialLine}</p> : null}
+        {section === 'usage' ? (
+          <section aria-labelledby="member-link-heading" className="mb-10 max-w-[560px] text-left">
+            <h1 id="member-link-heading" className="text-[32px] font-bold leading-[38px]">Your member link</h1>
+            <p className="mt-4 text-[15px] leading-[24px]">Share this page with members. They enter the numbers from a dealer worksheet.</p>
+            <p className="mt-4 break-all text-[15px] leading-[24px]">
+              <a href={shareUrl} className="underline underline-offset-4 cu-linkline">{shareUrl}</a>
+            </p>
+            <CopyLink url={shareUrl} />
+          </section>
+        ) : null}
+        {section === 'usage' && tenant.loanLinksSet === false ? (
+          <form action={saveLoanLinksAction} className="mb-10 grid max-w-[560px] gap-4">
+            <h2 className="text-[24px] font-bold leading-[30px]">Pre-approval and rates</h2>
+            <p className="text-[14px] leading-[20px] cu-muted">Add the credit union&apos;s own pages. These fields start empty.</p>
+            <label className="text-[14px] font-semibold leading-[20px]">Pre-approval URL
+              <input name="preApprovalUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
+            </label>
+            <label className="text-[14px] font-semibold leading-[20px]">Rates URL
+              <input name="ratesUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
+            </label>
+            <input type="hidden" name="tenant" value={tenant.id} />
+            <button type="submit" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save links</button>
+          </form>
+        ) : null}
         {tenant.verified && tenant.embedOrigins.length === 0 ? (
           <form action={saveEmbedOriginsAction} className="mb-6 grid max-w-[560px] gap-4">
             <input type="hidden" name="tenant" value={tenant.id} />
@@ -168,7 +195,7 @@ export default async function DashboardPage({
         {error ? <Alert tone="err">{error}</Alert> : null}
 
         {section === 'usage' ? <section aria-labelledby="usage-heading">
-          <h1 id="usage-heading" className="text-[32px] font-bold leading-[38px]">Usage</h1>
+          <h2 id="usage-heading" className="text-[24px] font-bold leading-[30px]">Usage</h2>
           <p className="mt-4 text-[14px] leading-[20px] cu-muted">All time</p>
           <div className="mt-8 grid grid-cols-2 gap-6">
             <p>
@@ -183,10 +210,7 @@ export default async function DashboardPage({
           {aggregates.checks === 0 ? (
             <div className="mt-10 max-w-[560px] text-left">
               <h2 className="text-[24px] font-bold leading-[30px]">No checks yet</h2>
-              <p className="mt-2 text-[14px] leading-[20px] cu-muted">
-                Share your link: <a href={shareUrl} className="underline underline-offset-4 cu-linkline">{shareUrl}</a>
-              </p>
-              <CopyLink url={shareUrl} />
+              <p className="mt-2 text-[14px] leading-[20px] cu-muted">Checks appear here after a member uses the link above.</p>
             </div>
           ) : (
             <div className="mt-10">

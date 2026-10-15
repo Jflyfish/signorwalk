@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { resolveBrand } from '@/cu/brand';
+import { numbersOnlyEmbed } from '@/cu/demo-upload';
 import { allowEmbed, deepLink, requestOriginFrom } from '@/cu/embed';
 import { loadCuTenant, tenantUnavailable } from '@/cu/tenant-directory';
 import { toCuPublic } from '@/cu/tenants';
@@ -17,11 +18,19 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant: s
   return {};
 }
 
-export default async function EmbedPage({ params }: { params: Promise<{ tenant: string }> }) {
+export default async function EmbedPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ tenant: string }>;
+  searchParams: Promise<{ entry?: string }>;
+}) {
   const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) notFound();
   if (tenantUnavailable(tenant)) return <Unavailable />;
+  const query = await searchParams;
   const h = await headers();
+  const numbersOnly = numbersOnlyEmbed(tenant.id, query.entry, h.get('referer'));
   const decision = allowEmbed({
     tenantId: tenant.id,
     embedOrigins: tenant.embedOrigins,
@@ -42,6 +51,11 @@ export default async function EmbedPage({ params }: { params: Promise<{ tenant: 
     );
   }
   const brand = await resolveBrand(tenant);
+  const pub = toCuPublic(tenant);
+  if (tenant.loanLinksSet === false) {
+    pub.preApprovalUrl = '';
+    pub.ratesUrl = '';
+  }
   return (
     <div id="sow-embed-root">
       <header className="mx-auto flex min-h-14 w-full max-w-[560px] items-center px-4 py-3">
@@ -54,7 +68,7 @@ export default async function EmbedPage({ params }: { params: Promise<{ tenant: 
           logoAspect={brand.logoAspect}
         />
       </header>
-      <EmbedFrame tenant={toCuPublic(tenant)} brand={brand} targetOrigin={decision.targetOrigin} />
+      <EmbedFrame tenant={pub} brand={brand} targetOrigin={decision.targetOrigin} numbersOnly={numbersOnly} />
     </div>
   );
 }

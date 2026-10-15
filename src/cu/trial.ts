@@ -44,6 +44,7 @@ export async function createTrial(input: {
   secret: string;
   website: string;
   honeypot: string;
+  tier?: 'starter' | 'growth' | 'pro';
   now?: number;
 }): Promise<{ ok: true; id: string; confirmToken: string } | { ok: false; error: TrialError }> {
   if (input.honeypot.trim()) return { ok: false, error: 'honeypot' };
@@ -75,6 +76,8 @@ export async function createTrial(input: {
     contactName: contact,
     trialEndsAt: trialEnd(input.now),
     verified: false,
+    tier: input.tier,
+    loanLinksSet: false,
   });
   if (!profile) return { ok: false, error: 'name' };
   const confirmToken = randomBytes(32).toString('hex');

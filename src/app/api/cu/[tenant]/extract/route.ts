@@ -4,7 +4,8 @@ import { FILE_READ_ERROR } from '@/cu/copy';
 import { formatOcrLog, OCR_PROMPT, pickOcrFields, type OcrOutcome } from '@/cu/ocr';
 import { recordUpload } from '@/cu/cu-store';
 import { missingTenantResponse } from '@/cu/missing-page';
-import { clientAddress, takeExtractSlot } from '@/cu/rate-limit';
+import { marketingDemoReferer, MARKETING_DEMO_TENANT } from '@/cu/demo-upload';
+import { clientAddress, takeDemoExtractSlot, takeExtractSlot } from '@/cu/rate-limit';
 import { loadCuTenant, TENANT_UNAVAILABLE, tenantUnavailable } from '@/cu/tenant-directory';
 
 const MAX_FILE = 5 * 1024 * 1024;
@@ -38,12 +39,27 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
     }));
   };
 
+  if (marketingDemoReferer(req.headers.get('referer'), tenant.id)) {
+    log('rejected');
+    return json(pathname, { success: false, error: 'Enter the numbers instead.' }, 403);
+  }
+
   const limit = takeExtractSlot(clientAddress(req.headers));
   if (!limit.allowed) {
     log('rejected');
     return json(pathname, { success: false, error: 'Too many uploads. Enter the numbers instead.' }, 429, {
       'Retry-After': String(limit.retryAfterSec),
     });
+  }
+
+  if (tenant.id === MARKETING_DEMO_TENANT) {
+    const demo = await takeDemoExtractSlot(clientAddress(req.headers));
+    if (!demo.allowed) {
+      log('rejected');
+      return json(pathname, { success: false, error: 'Too many uploads. Enter the numbers instead.' }, 429, {
+        'Retry-After': String(demo.retryAfterSec),
+      });
+    }
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {

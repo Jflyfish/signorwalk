@@ -32,6 +32,10 @@ export interface StoredTenantProfile {
   /** False until the trial confirmation step. Missing means a seeded or owner-created credit union. */
   verified?: boolean;
   confirmHash?: string;
+  /** Plan chosen at signup. Absent for a seed or an owner-created credit union. */
+  tier?: 'starter' | 'growth' | 'pro';
+  /** False until staff save their own pre-approval and rates URLs. Absent means the stored URLs are real. */
+  loanLinksSet?: boolean;
 }
 
 export interface ResolvedTenant extends CuTenant {
@@ -39,6 +43,8 @@ export interface ResolvedTenant extends CuTenant {
   contactName?: string;
   trialEndsAt?: string;
   verified: boolean;
+  tier?: 'starter' | 'growth' | 'pro';
+  loanLinksSet?: boolean;
 }
 
 export const TENANT_UNAVAILABLE = 'This check is unavailable.';
@@ -140,6 +146,8 @@ export function normalizeProfile(input: {
   trialEndsAt?: string;
   verified?: boolean;
   confirmHash?: string;
+  tier?: 'starter' | 'growth' | 'pro';
+  loanLinksSet?: boolean;
 }): StoredTenantProfile | null {
   const id = input.id.trim().toLowerCase();
   if (!SLUG.test(id) || id.length > 48 || RESERVED.has(id)) return null;
@@ -175,6 +183,8 @@ export function normalizeProfile(input: {
     trialEndsAt: input.trialEndsAt && Number.isFinite(Date.parse(input.trialEndsAt)) ? input.trialEndsAt : undefined,
     verified: input.verified,
     confirmHash: input.confirmHash,
+    tier: input.tier === 'starter' || input.tier === 'growth' || input.tier === 'pro' ? input.tier : undefined,
+    loanLinksSet: input.loanLinksSet === true ? true : input.loanLinksSet === false ? false : undefined,
   };
 }
 
@@ -268,6 +278,8 @@ function materialize(profile: StoredTenantProfile, branding: StoredBranding | nu
     contactName: profile.contactName,
     trialEndsAt: profile.trialEndsAt,
     verified: profile.verified !== false,
+    tier: profile.tier,
+    loanLinksSet: profile.loanLinksSet,
   };
 }
 

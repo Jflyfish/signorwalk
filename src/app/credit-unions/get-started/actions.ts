@@ -42,6 +42,7 @@ export async function startTrialAction(formData: FormData) {
     secret: String(formData.get('password') ?? ''),
     website: String(formData.get('website') ?? ''),
     honeypot: String(formData.get('company') ?? ''),
+    tier: tier === 'starter' || tier === 'growth' || tier === 'pro' ? tier : undefined,
   });
   if (!result.ok) fail(result.error === 'honeypot' ? 'start' : result.error, tier);
   const token = signSession({ role: 'cu', tenantId: result.id, exp: Date.now() + 60 * 60 * 12 * 1000 });
@@ -62,7 +63,7 @@ export async function startTrialAction(formData: FormData) {
       `${origin}/cu/${result.id}/confirm?token=${result.confirmToken}`,
     );
   }
-  await sendSignupNotice(String(formData.get('name') ?? '').trim(), result.id);
+  await sendSignupNotice(String(formData.get('name') ?? '').trim(), result.id, tier);
   await appendAudit('create', result.id, 'tenant');
   redirect(`/cu/${result.id}/dashboard`);
 }

@@ -131,6 +131,29 @@ export async function saveSettingsAction(formData: FormData) {
   redirect(`/cu/${tenant}/dashboard?section=settings&saved=settings`);
 }
 
+export async function saveLoanLinksAction(formData: FormData) {
+  const tenant = String(formData.get('tenant') ?? '');
+  await guardMutable(tenant);
+  const current = await getTenantProfile(tenant);
+  if (!current) redirect(`/cu/${tenant}/dashboard?error=links`);
+  const profile = normalizeProfile({
+    ...current,
+    preApprovalUrl: String(formData.get('preApprovalUrl') ?? ''),
+    ratesUrl: String(formData.get('ratesUrl') ?? ''),
+    loanLinksSet: true,
+  });
+  if (!profile) redirect(`/cu/${tenant}/dashboard?error=links`);
+  profile.confirmHash = current.confirmHash;
+  profile.verified = current.verified;
+  profile.tier = current.tier;
+  try {
+    await saveTenantProfile(profile);
+  } catch {
+    redirect(`/cu/${tenant}/dashboard?error=links`);
+  }
+  redirect(`/cu/${tenant}/dashboard?saved=links`);
+}
+
 export async function saveEmbedOriginsAction(formData: FormData) {
   const tenant = String(formData.get('tenant') ?? '');
   await guardMutable(tenant);
@@ -248,6 +271,10 @@ export async function saveOwnerProfileAction(formData: FormData) {
     shortName: current.name,
   });
   if (!profile) redirect(`/cu/admin?cu=${id}&error=profile`);
+  profile.loanLinksSet = true;
+  profile.tier = current.tier;
+  profile.confirmHash = current.confirmHash;
+  profile.verified = current.verified;
   try {
     await saveTenantProfile(profile);
   } catch {

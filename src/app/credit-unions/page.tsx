@@ -50,7 +50,7 @@ export default function CreditUnionsPage() {
           {HEADLINE}
         </h1>
         <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] cu-muted">{VALUE_LINE}</p>
-        <p className="mt-6 text-[14px] leading-[20px] cu-muted">
+        <p className="mt-6 hidden text-[14px] leading-[20px] cu-muted md:block">
           See it in action.{' '}
           <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
         </p>
@@ -77,6 +77,11 @@ export default function CreditUnionsPage() {
               );
             })}
           </ul>
+
+          <p className="mt-10 text-[14px] leading-[20px] cu-muted md:hidden">
+            See it in action.{' '}
+            <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
+          </p>
 
           <p className="mt-10 text-[14px] leading-[20px] cu-muted">{UPLOAD_DISCLOSURE}</p>
           <p className="mt-4 flex flex-wrap items-baseline gap-x-2 text-[14px] leading-[20px]">

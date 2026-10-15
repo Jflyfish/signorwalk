@@ -35,7 +35,7 @@ export function EmbedDemo() {
       <iframe
         id="sow-cu"
         title="Check a dealer offer"
-        src="/cu/harborlight-cu/embed"
+        src="/cu/harborlight-cu/embed?entry=numbers"
         className="mt-6 w-full border cu-line"
         style={{ height: height ?? 720 }}
       />

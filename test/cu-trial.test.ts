@@ -10,6 +10,7 @@ import { missingCreditUnionResponse } from '../src/middleware';
 import { resetSignupRateLimit, SIGNUP_LIMIT, takeSignupSlot } from '../src/cu/rate-limit';
 import { deleteStaffLogin, staffLoginMatches } from '../src/cu/staff-login';
 import { loadCuTenant, removeTenant, tenantUnavailable } from '../src/cu/tenant-directory';
+import { signupNotifyAddress } from '../src/cu/notify';
 import { createTrial, TRIAL_MS } from '../src/cu/trial';
 
 test('a trial creates a hashed staff login and a 90-day end', async () => {
@@ -24,6 +25,7 @@ test('a trial creates a hashed staff login and a 90-day end', async () => {
     secret,
     website: 'www.riverbend.example',
     honeypot: '',
+    tier: 'growth',
     now,
   });
   assert.equal(created.ok, true);
@@ -44,7 +46,9 @@ test('a trial creates a hashed staff login and a 90-day end', async () => {
   assert.match(staff?.hash ?? '', /^scrypt:/);
   assert.equal(await staffLoginMatches(created.id, email, secret), true);
   assert.equal(await staffLoginMatches(created.id, email, ephemeralSecret()), false);
-  const profile = await readStoreJson<{ confirmHash?: string }>(storeKey(created.id, 'profile'));
+  const profile = await readStoreJson<{ confirmHash?: string; tier?: string; loanLinksSet?: boolean }>(storeKey(created.id, 'profile'));
+  assert.equal(profile?.tier, 'growth');
+  assert.equal(profile?.loanLinksSet, false);
   assert.equal(profile?.confirmHash, createHash('sha256').update(created.confirmToken).digest('hex'));
   assert.equal(JSON.stringify(profile).includes(secret), false);
   const again = await createTrial({
@@ -135,6 +139,19 @@ test('signup is limited to five an hour and an ended trial is unavailable', asyn
   assert.match(rate, /incrementWindow/);
   assert.match(rate, /Do not add a production Firewall rule for signup yet/);
   assert.match(readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8'), /await takeSignupSlot/);
+  const signup = readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8');
+  assert.match(signup, /appendAudit\('create', result\.id, 'tenant'\)/);
+  assert.match(signup, /sendSignupNotice\(/);
+  assert.match(readFileSync('src/cu/notify.ts', 'utf8'), /CU_SIGNUP_NOTIFY_EMAIL/);
+  const savedNotify = process.env.CU_SIGNUP_NOTIFY_EMAIL;
+  delete process.env.CU_SIGNUP_NOTIFY_EMAIL;
+  assert.equal(signupNotifyAddress(), 'team@signorwalk.com');
+  process.env.CU_SIGNUP_NOTIFY_EMAIL = 'ops@example.com';
+  assert.equal(signupNotifyAddress(), 'ops@example.com');
+  process.env.CU_SIGNUP_NOTIFY_EMAIL = 'not-an-email';
+  assert.equal(signupNotifyAddress(), 'team@signorwalk.com');
+  if (savedNotify === undefined) delete process.env.CU_SIGNUP_NOTIFY_EMAIL;
+  else process.env.CU_SIGNUP_NOTIFY_EMAIL = savedNotify;
   const middleware = readFileSync('src/middleware.ts', 'utf8');
   assert.equal(middleware.includes(`return "'self'"`), false);
   assert.match(middleware, /missingCreditUnionResponse/);

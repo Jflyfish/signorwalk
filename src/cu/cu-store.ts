@@ -332,7 +332,7 @@ export async function incrementWindow(
   windowSec: number,
   command?: (parts: string[]) => Promise<unknown>,
 ): Promise<{ count: number; ttl: number } | null> {
-  if (!/^cu:rate:signup:[a-f0-9]{24}$/.test(key)) return null;
+  if (!/^cu:rate:(?:signup|demo):[a-f0-9]{24}$/.test(key)) return null;
   if (!Number.isInteger(windowSec) || windowSec < 1 || windowSec > 86_400) return null;
   const run = command ?? (restConfig() ? restCommand : null);
   if (!run) return null;

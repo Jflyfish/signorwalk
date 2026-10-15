@@ -112,3 +112,41 @@ export async function takeSignupSlot(
 export function resetSignupRateLimit(): void {
   signupBuckets.clear();
 }
+
+/**
+ * Hard cap for the public Harborlight demo, which still accepts a worksheet
+ * on the member page. Marketing embed requests are refused before this runs.
+ * The shared store is used when KV is set. The map is the local fallback.
+ */
+export const DEMO_EXTRACT_LIMIT = 2;
+export const DEMO_EXTRACT_WINDOW_MS = 60 * 60 * 1000;
+const demoExtractBuckets = new Map<string, number[]>();
+
+export async function takeDemoExtractSlot(
+  ip: string,
+  now = Date.now(),
+  shared: typeof incrementWindow = incrementWindow,
+): Promise<{ allowed: boolean; retryAfterSec: number }> {
+  const key = `cu:rate:demo:${bucketKey(`demo:${ip}`)}`;
+  const windowSec = Math.ceil(DEMO_EXTRACT_WINDOW_MS / 1000);
+  const fromStore = await shared(key, windowSec);
+  if (fromStore) {
+    if (fromStore.count > DEMO_EXTRACT_LIMIT) {
+      return { allowed: false, retryAfterSec: Math.max(1, fromStore.ttl) };
+    }
+    return { allowed: true, retryAfterSec: 0 };
+  }
+  const recent = (demoExtractBuckets.get(key) ?? []).filter(ts => now - ts < DEMO_EXTRACT_WINDOW_MS);
+  if (recent.length >= DEMO_EXTRACT_LIMIT) {
+    const retryAfterSec = Math.max(1, Math.ceil((DEMO_EXTRACT_WINDOW_MS - (now - recent[0])) / 1000));
+    demoExtractBuckets.set(key, recent);
+    return { allowed: false, retryAfterSec };
+  }
+  recent.push(now);
+  demoExtractBuckets.set(key, recent);
+  return { allowed: true, retryAfterSec: 0 };
+}
+
+export function resetDemoExtractRateLimit(): void {
+  demoExtractBuckets.clear();
+}

@@ -200,6 +200,15 @@ test('worksheet route does not read or log a file when OCR is not configured', a
     body.set('file', new File([Uint8Array.from([1, 2, 3])], `${marker}.png`, { type: 'image/png' }));
     const req = new NextRequest('https://signorwalk.com/api/cu/harborlight-cu/extract', { method: 'POST', body });
     const res = await POST(req, { params: Promise.resolve({ tenant: 'harborlight-cu' }) });
+    const demoBody = new FormData();
+    demoBody.set('file', new File([Uint8Array.from([1, 2, 3])], `${marker}.png`, { type: 'image/png' }));
+    const demo = await POST(new NextRequest('https://signorwalk.com/api/cu/harborlight-cu/extract', {
+      method: 'POST',
+      body: demoBody,
+      headers: { referer: 'https://signorwalk.com/credit-unions/embed-demo' },
+    }), { params: Promise.resolve({ tenant: 'harborlight-cu' }) });
+    assert.equal(demo.status, 403);
+    assert.equal((await demo.text()).includes(marker), false);
     assert.equal(res.status, 503);
     const payload = await res.text();
     assert.equal(payload.includes(marker), false);
@@ -246,6 +255,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(page, /Start 90-day free trial/);
   assert.match(page, /See it in action/);
   assert.match(page, /Open live demo/);
+  assert.match(page, /hidden text-\[14px\] leading-\[20px\] cu-muted md:block/);
+  assert.match(page, /mt-10 text-\[14px\] leading-\[20px\] cu-muted md:hidden/);
   assert.match(page, /\/credit-unions\/embed-demo/);
   assert.match(page, /Free for 90 days\. No card\./);
   assert.equal(page.includes('Cancel anytime'), false);
@@ -262,6 +273,13 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(dashboard.includes('Since pilot start'), false);
   assert.match(dashboard, /All time/);
   assert.match(dashboard, /href=\{shareUrl\}/);
+  assert.match(dashboard, /Your member link/);
+  const memberAt = dashboard.indexOf('Your member link');
+  const loanAt = dashboard.indexOf('name="preApprovalUrl"');
+  const settingsAt = dashboard.indexOf('settings-heading');
+  assert.ok(memberAt >= 0 && loanAt > memberAt && settingsAt > loanAt);
+  assert.match(dashboard, /These fields start empty/);
+  assert.equal(dashboard.includes('defaultValue={tenant.preApprovalUrl}'), false);
   assert.match(dashboard, /text-left/);
   assert.equal(dashboard.includes('text-center'), false);
   assert.match(dashboard, /CopyLink/);
@@ -304,4 +322,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(extract, /export async function POST/);
   assert.match(form, /FILE_READ_ERROR/);
   assert.match(form, /UPLOAD_DISCLOSURE/);
+  assert.match(form, /numbersOnly/);
+  assert.match(readFileSync('src/app/credit-unions/embed-demo/EmbedDemo.tsx', 'utf8'), /entry=numbers/);
+  assert.match(readFileSync('src/app/cu/[tenant]/embed/page.tsx', 'utf8'), /numbersOnlyEmbed/);
+  assert.equal(readFileSync('src/app/cu/actions.ts', 'utf8').includes('verified = true'), false);
 });

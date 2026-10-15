@@ -17,19 +17,27 @@ export function summaryText(name: string, agg: Aggregates): string {
   ].join('\n');
 }
 
+/** Inbox for a new trial. `CU_SIGNUP_NOTIFY_EMAIL` when it is an address, otherwise the team inbox. */
+export function signupNotifyAddress(): string {
+  const configured = process.env.CU_SIGNUP_NOTIFY_EMAIL?.trim() ?? '';
+  if (configured.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(configured)) return configured;
+  return TALK_TO_US_EMAIL;
+}
+
 /** Tells the team a trial started. Returns false when Resend is unset. Does not log addresses. */
-export async function sendSignupNotice(name: string, id: string): Promise<boolean> {
+export async function sendSignupNotice(name: string, id: string, tier?: string): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM;
   if (!apiKey || !from || !name || !id) return false;
+  const plan = tier === 'starter' || tier === 'growth' || tier === 'pro' ? tier : 'not chosen';
   try {
     const { Resend } = await import('resend');
     const resend = new Resend(apiKey);
     await resend.emails.send({
       from,
-      to: TALK_TO_US_EMAIL,
+      to: signupNotifyAddress(),
       subject: `New Sign or Walk trial — ${name}`,
-      text: `${name} started a 90-day trial.\nSlug: ${id}\n`,
+      text: `${name} started a 90-day trial.\nSlug: ${id}\nTier: ${plan}\n`,
     });
     return true;
   } catch {

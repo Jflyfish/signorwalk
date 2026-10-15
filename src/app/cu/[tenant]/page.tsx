@@ -20,6 +20,11 @@ export default async function CuPage({ params }: { params: Promise<{ tenant: str
   if (!tenant) notFound();
   if (tenantUnavailable(tenant)) return <Unavailable />;
   const brand = await resolveBrand(tenant);
+  const pub = toCuPublic(tenant);
+  if (tenant.loanLinksSet === false) {
+    pub.preApprovalUrl = '';
+    pub.ratesUrl = '';
+  }
   return (
     <>
       <header className="mx-auto flex min-h-16 w-full max-w-[560px] items-center px-4 py-4">
@@ -32,7 +37,7 @@ export default async function CuPage({ params }: { params: Promise<{ tenant: str
           logoAspect={brand.logoAspect}
         />
       </header>
-      <CheckForm tenant={toCuPublic(tenant)} brand={brand} />
+      <CheckForm tenant={pub} brand={brand} />
     </>
   );
 }
