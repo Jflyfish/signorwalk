@@ -45,7 +45,9 @@ export interface StaffLabel {
 
 const EMPTY_GRADES: GradeCounts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
 
-const memory = new Map<string, string>();
+const globalStore = globalThis as typeof globalThis & { __sowCuStore?: Map<string, string> };
+const memory = globalStore.__sowCuStore ?? new Map<string, string>();
+globalStore.__sowCuStore = memory;
 
 const BANNED = /sellingprice|msrp|vin|ssn|socialsecurity|dateofbirth|membername|worksheet|base64|password|monthlypayment|documenttext|imagebytes/i;
 const SSN = /\b\d{3}-\d{2}-\d{4}\b/;
@@ -221,6 +223,41 @@ export async function deleteTenantData(tenantId: string): Promise<void> {
 
 export function storeKey(tenantId: string, kind: string): string {
   return keyFor(tenantId, kind);
+}
+
+/** One line: time, action, credit-union id. No names, emails, or origins. */
+export interface AuditLine {
+  t: string;
+  action: string;
+  id: string;
+}
+
+const AUDIT_KEY = 'cu:directory:audit';
+
+export async function appendAudit(action: string, id: string): Promise<void> {
+  if (!/^[a-z]{3,16}$/.test(action) || !/^[a-z0-9-]+$/.test(id)) return;
+  try {
+    const current = (await readStoreJson<AuditLine[]>(AUDIT_KEY)) ?? [];
+    const next = [...current, { t: new Date().toISOString(), action, id }].slice(-40);
+    await writeStoreJson(AUDIT_KEY, next);
+  } catch {
+    /* A rejected line is dropped. The owner action still completes. */
+  }
+}
+
+export async function readAudit(): Promise<AuditLine[]> {
+  try {
+    const parsed = await readStoreJson<AuditLine[]>(AUDIT_KEY);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(line => (
+      Boolean(line)
+      && typeof line.t === 'string'
+      && typeof line.action === 'string'
+      && typeof line.id === 'string'
+    ));
+  } catch {
+    return [];
+  }
 }
 
 export function resetCuStore(): void {

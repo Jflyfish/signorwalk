@@ -2,7 +2,7 @@
 
 A credit union can place the check on its own site or open it inside a mobile app. The page is `/cu/{tenant}/embed`. It has the credit union's brand and none of the marketing site navigation.
 
-Only origins on that tenant's allowlist may frame the page. The allowlist is set in the tenant config and sent as `Content-Security-Policy: frame-ancestors` on the embed route alone. Other `/cu` and `/credit-unions` pages stay `frame-ancestors 'none'` with `X-Frame-Options: DENY`. An unknown tenant, or a parent origin that is not on the list, does not render the form.
+Only origins on that tenant's allowlist may frame the page. The allowlist is the stored credit-union profile (`embedOrigins`). Config seeds are the fallback when the store cannot be read. The list is sent as `Content-Security-Policy: frame-ancestors` on the embed route alone. Other `/cu` and `/credit-unions` pages stay `frame-ancestors 'none'` with `X-Frame-Options: DENY`. An unknown tenant, or a parent origin that is not on the list, does not render the form.
 
 The page posts two messages to the parent. It never uses `*` as the target origin.
 
@@ -11,11 +11,11 @@ The page posts two messages to the parent. It never uses `*` as the target origi
 | `signorwalk.cu.resize` | `{ type, height }` with height in pixels |
 | `signorwalk.cu.completed` | `{ type, grade }` where grade is `A`, `B`, `C`, `D`, or `F` |
 
-`signorwalk.cu.completed` is the letter only. It does not include the worksheet, a name, or any other member data. Read a message only after `event.origin` is `https://signorwalk.com`.
+`signorwalk.cu.completed` is the letter only. It does not include the worksheet, a name, or any other member data. The completed event only includes the grade (A–F). Read a message only after `event.origin` matches the host the snippet was copied from. On the production host that is `https://signorwalk.com`.
 
 ## Web iframe
 
-Copy the iframe snippet from the dashboard Embed tab. It loads `https://signorwalk.com/cu/{tenant}/embed` and sets the frame height from `signorwalk.cu.resize`. The page that hosts the iframe must be served from an allowlisted origin. The same site can also frame it, because the embed policy includes `'self'`.
+Copy the iframe snippet from the dashboard Embed tab. The snippet and the deep link use the host you are on, and the script checks that same origin. The page that hosts the iframe must be served from an allowlisted origin. The same site can also frame it, because the embed policy includes `'self'`.
 
 A local look at the framed page is at `/credit-unions/embed-demo`. That host embeds Harborlight Credit Union and prints the resize height and the completed grade.
 

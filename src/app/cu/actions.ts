@@ -3,7 +3,7 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { canOpenTenant, checkCredentials, CU_SESSION_COOKIE, demoTenantId, signSession, verifySession, type CuSession } from '@/cu/auth';
-import { getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
+import { appendAudit, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
 import { readLogoFile } from '@/cu/logo-file';
 import { sendAggregateSummary } from '@/cu/notify';
 import {
@@ -12,6 +12,7 @@ import {
   normalizeProfile,
   parseEmbedOrigins,
   removalConfirmed,
+  removalIdMatches,
   removeTenant,
   replaceEmbedOrigins,
   saveTenantProfile,
@@ -130,6 +131,7 @@ export async function saveBrandingAction(formData: FormData) {
   } catch {
     redirect(brandingError);
   }
+  if (owner) await appendAudit('branding', tenant);
   redirect(owner ? `/cu/admin?cu=${tenant}&saved=branding` : `/cu/${tenant}/dashboard?section=branding&saved=branding`);
 }
 
@@ -179,6 +181,7 @@ export async function createOwnerTenantAction(formData: FormData) {
   } catch {
     redirect('/cu/admin?cu=new&error=profile');
   }
+  await appendAudit('create', profile.id);
   redirect(`/cu/admin?cu=${profile.id}&saved=profile`);
 }
 
@@ -206,6 +209,7 @@ export async function saveOwnerProfileAction(formData: FormData) {
   } catch {
     redirect(`/cu/admin?cu=${id}&error=profile`);
   }
+  await appendAudit('profile', id);
   redirect(`/cu/admin?cu=${id}&saved=profile`);
 }
 
@@ -224,6 +228,7 @@ export async function saveOwnerSettingsAction(formData: FormData) {
     await saveSettings(id, previous);
     redirect(`/cu/admin?cu=${id}&error=settings`);
   }
+  await appendAudit('settings', id);
   redirect(`/cu/admin?cu=${id}&saved=settings`);
 }
 
@@ -232,19 +237,27 @@ export async function setOwnerStatusAction(formData: FormData) {
   const id = String(formData.get('tenant') ?? '');
   const status = formData.get('status') === 'paused' ? 'paused' : formData.get('status') === 'active' ? 'active' : null;
   if (!status || !(await loadCuTenant(id))) redirect('/cu/admin?error=missing');
+  if (status === 'paused' && String(formData.get('confirm') ?? '') !== 'pause') {
+    redirect(`/cu/admin?cu=${id}&confirm=pause`);
+  }
   try {
     await setTenantStatus(id, status);
   } catch {
     redirect(`/cu/admin?cu=${id}&error=profile`);
   }
+  await appendAudit(status === 'paused' ? 'pause' : 'resume', id);
   redirect(`/cu/admin?cu=${id}&saved=${status === 'paused' ? 'paused' : 'resumed'}`);
 }
 
 export async function removeTenantAction(formData: FormData) {
   await ownerOnly();
   const id = String(formData.get('tenant') ?? '');
-  if (!removalConfirmed(String(formData.get('confirm') ?? ''))) redirect(`/cu/admin?cu=${id}&confirm=remove`);
+  const typed = String(formData.get('confirmId') ?? '');
+  if (!removalConfirmed(String(formData.get('confirm') ?? '')) || !removalIdMatches(typed, id)) {
+    redirect(`/cu/admin?cu=${id}&confirm=remove&error=confirm`);
+  }
   if (!(await loadCuTenant(id))) redirect('/cu/admin?error=missing');
   await removeTenant(id);
+  await appendAudit('remove', id);
   redirect('/cu/admin?removed=1');
 }

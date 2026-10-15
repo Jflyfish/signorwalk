@@ -32,6 +32,8 @@ export interface ResolvedTenant extends CuTenant {
 }
 
 export const TENANT_UNAVAILABLE = 'This check is unavailable.';
+export const STATUS_PAUSED = 'Paused. Members see an unavailable page.';
+export const STATUS_ACTIVE = 'Active. Members can use the check.';
 
 const INDEX_KEY = 'cu:directory:index';
 const SEEDED_KEY = 'cu:directory:seeded';
@@ -59,6 +61,10 @@ export function parseEmbedOrigins(text: string): string[] | null {
 
 export function removalConfirmed(value: string): boolean {
   return value === 'remove';
+}
+
+export function removalIdMatches(typed: string, id: string): boolean {
+  return typed.trim() === id;
 }
 
 function httpsUrl(value: string): boolean {

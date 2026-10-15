@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { resolveBrand } from '@/cu/brand';
-import { allowEmbed, requestOriginFrom } from '@/cu/embed';
+import { allowEmbed, deepLink, requestOriginFrom } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
 import { toCuPublic } from '@/cu/tenants';
 import { Unavailable } from '../../Unavailable';
@@ -30,10 +30,14 @@ export default async function EmbedPage({ params }: { params: Promise<{ tenant: 
     requestOrigin: requestOriginFrom(name => h.get(name)),
   });
   if (!decision.ok) {
+    const origin = requestOriginFrom(name => h.get(name)) ?? 'https://signorwalk.com';
+    const link = deepLink(tenant.id, origin);
     return (
       <main className="mx-auto w-full max-w-[560px] px-4 py-16">
-        <h1 className="text-[24px] font-bold leading-[30px]">This page can&apos;t be shown here</h1>
-        <p className="mt-4 text-[15px] leading-[24px] cu-muted">Open the check in the browser, or ask the credit union to allow this site.</p>
+        <h1 className="text-[24px] font-bold leading-[30px]">This check isn&apos;t set up for this website.</h1>
+        <p className="mt-4 text-[15px] leading-[24px] cu-muted">
+          Open it at <a href={link} className="underline underline-offset-4 cu-linkline">{link}</a>
+        </p>
       </main>
     );
   }
@@ -48,7 +52,6 @@ export default async function EmbedPage({ params }: { params: Promise<{ tenant: 
           mark={tenant.logo}
           logoLight={brand.logoLight}
           logoAspect={brand.logoAspect}
-          beside={false}
         />
       </header>
       <EmbedFrame tenant={toCuPublic(tenant)} brand={brand} targetOrigin={decision.targetOrigin} />

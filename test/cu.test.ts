@@ -121,10 +121,13 @@ test('due diligence packet is one zip containing every draft', () => {
   const fees = packet.match(/\bfees?\b/gi) ?? [];
   assert.deepEqual(fees, ['fee', 'fee']);
   assert.equal(packet.split('There is no setup fee.').length - 1, 2);
+  assert.match(packet, /subdomain only/);
+  assert.match(packet, /source of truth/);
+  assert.match(packet, /owner approval before merge/);
 });
 
-test('credit-union headers deny framing and payment, and member pages skip third-party fonts', () => {
-  const cu = securityHeaderList('/cu/harborlight-cu');
+test('credit-union headers deny framing and payment, and member pages skip third-party fonts', async () => {
+  const cu = await securityHeaderList('/cu/harborlight-cu');
   const csp = cu.find(h => h.key === 'Content-Security-Policy')!.value;
   assert.match(csp, /frame-ancestors 'none'/);
   assert.match(csp, /object-src 'none'/);
@@ -132,7 +135,7 @@ test('credit-union headers deny framing and payment, and member pages skip third
   assert.equal(csp.includes('fonts.googleapis'), false);
   assert.match(cu.find(h => h.key === 'Permissions-Policy')!.value, /payment=\(\)/);
   assert.equal(cu.find(h => h.key === 'X-Frame-Options')!.value, 'DENY');
-  assert.match(securityHeaderList('/credit-unions').find(h => h.key === 'Content-Security-Policy')!.value, /fonts.googleapis.com/);
+  assert.match((await securityHeaderList('/credit-unions')).find(h => h.key === 'Content-Security-Policy')!.value, /fonts.googleapis.com/);
 });
 
 test('analyze route is rules-only, drops free text, and rate limits without logging it', async () => {

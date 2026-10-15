@@ -4,7 +4,7 @@ import test from 'node:test';
 import { NextRequest } from 'next/server';
 import { POST as analyze } from '../src/app/api/cu/[tenant]/analyze/route';
 import { POST as extract } from '../src/app/api/cu/[tenant]/extract/route';
-import { resetCuStore } from '../src/cu/cu-store';
+import { appendAudit, readAudit, resetCuStore } from '../src/cu/cu-store';
 import { getCuTenant } from '../src/cu/tenants';
 import {
   listCuTenants,
@@ -12,6 +12,7 @@ import {
   normalizeProfile,
   parseEmbedOrigins,
   removalConfirmed,
+  removalIdMatches,
   removeTenant,
   saveTenantProfile,
   setTenantStatus,
@@ -61,6 +62,14 @@ test('the owner can add and remove a credit union without dropping the seeds', a
   assert.equal((await loadCuTenant('summit-ridge-fcu'))?.status, 'active');
   assert.equal(removalConfirmed('remove'), true);
   assert.equal(removalConfirmed('yes'), false);
+  assert.equal(removalIdMatches('north-pier-cu', 'north-pier-cu'), true);
+  assert.equal(removalIdMatches('north-pier', 'north-pier-cu'), false);
+  await appendAudit('create', 'north-pier-cu');
+  await appendAudit('remove', 'north-pier-cu');
+  const audit = await readAudit();
+  assert.deepEqual(audit.map(line => line.action), ['create', 'remove']);
+  assert.equal(audit.every(line => line.id === 'north-pier-cu' && !line.t.includes('@')), true);
+  assert.equal(JSON.stringify(audit).includes('example'), false);
   assert.deepEqual(parseEmbedOrigins('https://www.northpiercu.example\n'), ['https://www.northpiercu.example']);
   assert.equal(parseEmbedOrigins('*'), null);
   assert.equal(parseEmbedOrigins('https://evil.example/path'), null);
@@ -98,7 +107,12 @@ test('a paused credit union is unavailable on the page and returns 404 from the 
   assert.match(embed, /status === 'paused'/);
   assert.match(editor, /BrandingForm/);
   assert.match(editor, /confirm=remove/);
+  assert.match(editor, /confirm=pause/);
+  assert.match(editor, /confirmId/);
+  assert.match(editor, /cu-danger/);
   assert.match(editor, /'Pause'/);
+  assert.match(readFileSync('src/cu/tenant-directory.ts', 'utf8'), /Paused\. Members see an unavailable page\./);
+  assert.match(admin, /STATUS_PAUSED/);
   assert.match(admin, /Add credit union/);
   assert.match(admin, /section=usage/);
   assert.equal(admin.includes('Tenants'), false);

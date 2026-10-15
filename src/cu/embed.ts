@@ -62,13 +62,33 @@ export function frameAncestorSources(origins: readonly string[]): string {
   return ["'self'", ...extra].join(' ');
 }
 
-/** 'none' for every path that is not a known tenant embed. */
-export function frameAncestorsForPath(pathname: string): string {
+/** Accept a CSP source list that this module produced. Rejects wildcards and extra directives. */
+export function acceptAncestors(value: unknown): string | null {
+  if (typeof value !== 'string' || value.length > 2048 || /[;,*]/.test(value)) return null;
+  const parts = value.split(' ');
+  if (parts.length === 1 && (parts[0] === "'none'" || parts[0] === "'self'")) return parts[0];
+  if (parts[0] !== "'self'") return null;
+  if (parts.slice(1).some(part => !isEmbedOrigin(part))) return null;
+  return parts.join(' ');
+}
+
+/**
+ * Embed routes use the stored allowlist. Config seeds are the fallback when the
+ * store cannot be read. A seeded directory that does not list the id stays 'none'.
+ */
+export async function frameAncestorsForPath(pathname: string): Promise<string> {
   const id = embedTenantId(pathname);
   if (!id) return "'none'";
-  const tenant = getCuTenant(id);
-  if (!tenant) return "'none'";
-  return frameAncestorSources(tenant.embedOrigins);
+  try {
+    const { loadCuTenant } = await import('./tenant-directory');
+    const tenant = await loadCuTenant(id);
+    if (!tenant) return "'none'";
+    return frameAncestorSources(tenant.embedOrigins);
+  } catch {
+    const seed = getCuTenant(id);
+    if (!seed) return "'none'";
+    return frameAncestorSources(seed.embedOrigins);
+  }
 }
 
 export function allowEmbed(input: {
@@ -105,17 +125,19 @@ export function completedMessage(grade: string): CompletedMessage {
   return { type: EMBED_COMPLETED, grade };
 }
 
-export function deepLink(tenantId: string): string {
+export function deepLink(tenantId: string, origin = EMBED_SITE): string {
   if (!/^[a-z0-9-]+$/.test(tenantId)) throw new Error('tenant');
-  return `${EMBED_SITE}/cu/${tenantId}/embed`;
+  const base = isEmbedOrigin(origin) ? origin : EMBED_SITE;
+  return `${base}/cu/${tenantId}/embed`;
 }
 
-export function iframeSnippet(tenantId: string): string {
-  const src = deepLink(tenantId);
+export function iframeSnippet(tenantId: string, origin = EMBED_SITE): string {
+  const base = isEmbedOrigin(origin) ? origin : EMBED_SITE;
+  const src = deepLink(tenantId, base);
   return `<iframe id="sow-cu" src="${src}" style="width:100%;border:0" title="Check a dealer offer"></iframe>
 <script>
 window.addEventListener('message', function (event) {
-  if (event.origin !== '${EMBED_SITE}') return;
+  if (event.origin !== '${base}') return;
   var frame = document.getElementById('sow-cu');
   if (frame && event.data && event.data.type === '${EMBED_RESIZE}' && typeof event.data.height === 'number') {
     frame.style.height = event.data.height + 'px';

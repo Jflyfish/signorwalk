@@ -42,6 +42,9 @@ const inputClass =
 const textLink =
   'cu-link text-[15px] font-semibold hover:underline underline-offset-4';
 
+const embedFile =
+  'cu-ring mt-2 block w-full text-[14px] font-normal cu-muted file:mr-3 file:h-12 file:cursor-pointer file:rounded-lg file:border file:border-solid file:border-[#E5E5E5] file:bg-white file:px-4 file:text-[15px] file:font-semibold file:text-[#111] md:file:h-11';
+
 function Field({
   id, label, hint, value, onChange,
 }: {
@@ -93,22 +96,25 @@ function trackSafe(name: 'analysis_completed' | 'cta_clicked', props: Record<str
 }
 
 function Primary({
-  children, type = 'button', disabled, onClick, href,
+  children, type = 'button', disabled, onClick, href, wide,
 }: {
   children: React.ReactNode;
   type?: 'button' | 'submit';
   disabled?: boolean;
   onClick?: () => void;
   href?: string;
+  wide?: boolean;
 }) {
-  const className = 'cu-primary inline-flex items-center justify-center text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60';
+  const className = wide
+    ? 'cu-primary inline-flex items-center justify-center text-center min-h-12 w-full px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60'
+    : 'cu-primary inline-flex items-center justify-center text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60';
   if (href) {
     return <a href={href} className={className} onClick={onClick}>{children}</a>;
   }
   return <button type={type} disabled={disabled} className={className} onClick={onClick}>{children}</button>;
 }
 
-export function CheckForm({ tenant, brand, onGrade }: { tenant: CuPublic; brand: DerivedBrand; onGrade?: (grade: string) => void }) {
+export function CheckForm({ tenant, brand, onGrade, embedded = false }: { tenant: CuPublic; brand: DerivedBrand; onGrade?: (grade: string) => void; embedded?: boolean }) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [dealType, setDealType] = useState<DealType>('finance');
@@ -235,7 +241,9 @@ export function CheckForm({ tenant, brand, onGrade }: { tenant: CuPublic; brand:
     const rest = report.itemsToReview.slice(3);
     const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
     return (
-      <div className="mx-auto w-full max-w-[560px] px-4 pb-[120px] pt-16 md:pb-16 md:pt-24">
+      <div className={embedded
+        ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
+        : 'mx-auto w-full max-w-[560px] px-4 pb-[120px] pt-16 md:pb-16 md:pt-24'}>
         <div className="flex flex-col md:flex-row md:items-center md:gap-4">
           <p className="text-[14px] leading-[20px] cu-muted md:hidden">Grade</p>
           <p
@@ -262,8 +270,11 @@ export function CheckForm({ tenant, brand, onGrade }: { tenant: CuPublic; brand:
           </section>
         )}
 
-        <div className="fixed inset-x-0 bottom-0 border-t cu-line bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0">
+        <div className={embedded
+          ? 'static mt-10 w-full'
+          : 'fixed inset-x-0 bottom-0 border-t cu-line bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
           <Primary
+            wide={embedded}
             href={tenant.preApprovalUrl}
             onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
           >
@@ -373,14 +384,19 @@ export function CheckForm({ tenant, brand, onGrade }: { tenant: CuPublic; brand:
         {error ? <p id={`${formId}-error`} role="alert" className="mb-6 text-[14px] font-semibold leading-[20px]">{error}</p> : null}
 
         <div className="mb-6">
-          <label htmlFor="worksheet" className={`${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
-            Upload a dealer worksheet
-          </label>
+          <div className={embedded ? 'flex flex-nowrap items-baseline justify-between gap-2' : ''}>
+            <label htmlFor="worksheet" className={embedded
+              ? 'cu-link shrink-0 text-[14px] font-semibold underline decoration-1 underline-offset-4 cu-linkline'
+              : `${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
+              Upload a dealer worksheet
+            </label>
+            {embedded ? <p className="shrink-0 whitespace-nowrap text-[14px] leading-[20px] cu-muted">Powered by Sign or Walk</p> : null}
+          </div>
           <input
             id="worksheet"
             type="file"
             accept="image/jpeg,image/png,image/webp,application/pdf"
-            className="mt-2 block w-full text-[14px]"
+            className={embedded ? embedFile : 'mt-2 block w-full text-[14px]'}
             onChange={event => {
               const file = event.target.files?.[0] ?? null;
               event.target.value = '';

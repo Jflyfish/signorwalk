@@ -44,6 +44,7 @@ export function EmbedFrame({
     <CheckForm
       tenant={tenant}
       brand={brand}
+      embedded
       onGrade={grade => {
         if (!targetOrigin || !isEmbedOrigin(targetOrigin) || window.parent === window) return;
         try {

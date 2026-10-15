@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
 import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
-import { deepLink, iframeSnippet } from '@/cu/embed';
+import { deepLink, iframeSnippet, requestOriginFrom } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
 import { saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
@@ -88,8 +88,10 @@ export default async function DashboardPage({
   const caution = query.notice ? NOTICES[query.notice] : '';
   const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
   const shareUrl = `https://signorwalk.com/cu/${tenant.id}`;
-  const embedUrl = deepLink(tenant.id);
-  const snippet = iframeSnippet(tenant.id);
+  const requestHeaders = await headers();
+  const origin = requestOriginFrom(name => requestHeaders.get(name)) ?? 'https://signorwalk.com';
+  const embedUrl = deepLink(tenant.id, origin);
+  const snippet = iframeSnippet(tenant.id, origin);
   const tabs: { id: Section; label: string }[] = [
     { id: 'usage', label: 'Usage' },
     { id: 'branding', label: 'Branding' },
@@ -215,7 +217,7 @@ export default async function DashboardPage({
 
           <h2 className="mt-10 text-[24px] font-bold leading-[30px]">Iframe</h2>
           <p className="mt-2 max-w-[560px] text-[14px] leading-[20px] cu-muted">Paste this on a page whose origin is on your allowlist. The script sets the height from signorwalk.cu.resize.</p>
-          <pre className="mt-4 max-w-full overflow-x-auto whitespace-pre rounded-lg border cu-line bg-[#FAFAFA] p-4 text-[13px] leading-[20px]">{snippet}</pre>
+          <pre className="mt-4 max-w-full overflow-x-auto whitespace-pre rounded-lg border cu-line bg-[#FAFAFA] p-4 font-mono text-[14px] leading-[20px]">{snippet}</pre>
           <CopyLink text={snippet} label="Copy snippet" />
 
           <h2 className="mt-10 text-[24px] font-bold leading-[30px]">App deep link</h2>
@@ -227,11 +229,12 @@ export default async function DashboardPage({
 
           <h2 className="mt-10 text-[24px] font-bold leading-[30px]">Web, iOS, and Android</h2>
           <ul className="mt-4 max-w-[560px] list-disc space-y-4 pl-4 text-[15px] leading-[24px]">
-            <li>Web: use the iframe on an allowlisted origin. Listen for signorwalk.cu.resize and signorwalk.cu.completed. The completed payload is the grade letter only.</li>
+            <li>Web: use the iframe on an allowlisted origin. Listen for signorwalk.cu.resize and signorwalk.cu.completed.</li>
             <li>iOS: load the deep link as the WKWebView document, or iframe it from a page you host and read the same messages there.</li>
-            <li>Android: load the deep link in a WebView with JavaScript on, or iframe it from a page you host. Do not expect member fields on the completed event.</li>
+            <li>Android: load the deep link in a WebView with JavaScript on, or iframe it from a page you host.</li>
           </ul>
-          <p className="mt-4 max-w-[560px] text-[14px] leading-[20px] cu-muted">Check that event.origin is https://signorwalk.com before reading a message. A framed local copy is at /credit-unions/embed-demo.</p>
+          <p className="mt-4 max-w-[560px] text-[15px] leading-[24px]">The completed event only includes the grade (A–F).</p>
+          <p className="mt-4 max-w-[560px] text-[14px] leading-[20px] cu-muted">Check that event.origin is {origin} before reading a message. A framed local copy is at /credit-unions/embed-demo.</p>
         </section> : null}
       </main>
     </>

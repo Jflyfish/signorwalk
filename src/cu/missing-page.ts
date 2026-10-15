@@ -31,7 +31,7 @@ const PAGE = `<!DOCTYPE html>
 `;
 
 /** Full document, so the root layout’s consumer chrome is not rendered. */
-export function missingTenantResponse(pathname: string): NextResponse {
+export async function missingTenantResponse(pathname: string): Promise<NextResponse> {
   const res = new NextResponse(PAGE, {
     status: 404,
     headers: {

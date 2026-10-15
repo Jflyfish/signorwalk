@@ -5,7 +5,7 @@ import { frameAncestorsForPath } from './embed';
  * Response headers for /cu and /credit-unions only.
  * The consumer site keeps the headers it already has on main.
  */
-export function securityHeaderList(pathname: string): { key: string; value: string }[] {
+export async function securityHeaderList(pathname: string, ancestors?: string): Promise<{ key: string; value: string }[]> {
   const marketing = pathname === '/credit-unions' || pathname.startsWith('/credit-unions/');
   const script = ["'self'", "'unsafe-inline'", 'https://va.vercel-scripts.com'];
   if (process.env.NODE_ENV !== 'production') script.push("'unsafe-eval'");
@@ -15,7 +15,7 @@ export function securityHeaderList(pathname: string): { key: string; value: stri
     style.push('https://fonts.googleapis.com');
     font.push('https://fonts.gstatic.com');
   }
-  const ancestors = frameAncestorsForPath(pathname);
+  const resolved = ancestors ?? await frameAncestorsForPath(pathname);
   const csp = [
     "default-src 'self'",
     `script-src ${script.join(' ')}`,
@@ -23,7 +23,7 @@ export function securityHeaderList(pathname: string): { key: string; value: stri
     `font-src ${font.join(' ')}`,
     "img-src 'self' data: blob:",
     "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
-    `frame-ancestors ${ancestors}`,
+    `frame-ancestors ${resolved}`,
     "base-uri 'self'",
     "form-action 'self'",
     "object-src 'none'",
@@ -36,11 +36,11 @@ export function securityHeaderList(pathname: string): { key: string; value: stri
     { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
     { key: 'Content-Security-Policy', value: csp },
   ];
-  if (ancestors === "'none'") return headers;
+  if (resolved === "'none'") return headers;
   return headers.filter(header => header.key !== 'X-Frame-Options');
 }
 
-export function applySecurityHeaders(res: NextResponse, pathname = '/cu'): NextResponse {
-  for (const header of securityHeaderList(pathname)) res.headers.set(header.key, header.value);
+export async function applySecurityHeaders(res: NextResponse, pathname = '/cu'): Promise<NextResponse> {
+  for (const header of await securityHeaderList(pathname)) res.headers.set(header.key, header.value);
   return res;
 }

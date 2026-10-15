@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, demoTenantId, verifySession } from '@/cu/auth';
-import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
+import { getAggregates, getBranding, getSettings, readAudit, type AuditLine } from '@/cu/cu-store';
 import { resolveBrand } from '@/cu/brand';
-import { getTenantProfile, listCreditUnions, type ResolvedTenant } from '@/cu/tenant-directory';
+import { getTenantProfile, listCreditUnions, STATUS_ACTIVE, STATUS_PAUSED, type ResolvedTenant } from '@/cu/tenant-directory';
 import { StaffHeader } from '../StaffHeader';
 import { OwnerEditor } from './OwnerEditor';
 
@@ -31,6 +31,7 @@ function noticeFor(query: { saved?: string; error?: string; removed?: string }):
   if (query.error === 'profile') return { tone: 'err', text: 'Check the name, links, and colors.' };
   if (query.error === 'settings') return { tone: 'err', text: 'Check the credit-union email and the embed origins.' };
   if (query.error === 'missing') return { tone: 'err', text: 'This credit union was not found.' };
+  if (query.error === 'confirm') return { tone: 'err', text: 'Type the credit union id to remove it.' };
   return null;
 }
 
@@ -65,11 +66,14 @@ export default async function AdminPage({
         {query.cu === 'new' ? <OwnerEditor mode="create" profile={null} shortName="" primary="#111111" secondary="" logoLight="" logoDark="" emailEnabled={false} notifyEmail="" notice={notice} /> : null}
         {query.cu && query.cu !== 'new' && !selected ? <p className="cu-err" role="alert">This credit union was not found.</p> : null}
         {selected && query.confirm === 'remove' ? (
-          <OwnerEditor mode="confirm" profile={(await getTenantProfile(selected.id))!} shortName="" primary="" secondary="" logoLight="" logoDark="" emailEnabled={false} notifyEmail="" notice={null} />
+          <OwnerEditor mode="confirm" profile={(await getTenantProfile(selected.id))!} shortName="" primary="" secondary="" logoLight="" logoDark="" emailEnabled={false} notifyEmail="" notice={notice} />
         ) : null}
-        {selected && query.confirm !== 'remove' ? <EditTenant tenant={selected} notice={notice} /> : null}
+        {selected && query.confirm === 'pause' ? (
+          <OwnerEditor mode="pause" profile={(await getTenantProfile(selected.id))!} shortName="" primary="" secondary="" logoLight="" logoDark="" emailEnabled={false} notifyEmail="" notice={null} />
+        ) : null}
+        {selected && query.confirm !== 'remove' && query.confirm !== 'pause' ? <EditTenant tenant={selected} notice={notice} /> : null}
         {!query.cu && usage ? <Usage tenants={tenants} /> : null}
-        {!query.cu && !usage ? <Directory tenants={tenants} notice={notice} /> : null}
+        {!query.cu && !usage ? <Directory tenants={tenants} notice={notice} audit={await readAudit()} /> : null}
       </main>
     </>
   );
@@ -107,9 +111,11 @@ async function EditTenant({
 function Directory({
   tenants,
   notice,
+  audit,
 }: {
   tenants: ResolvedTenant[];
   notice: { tone: 'ok' | 'err'; text: string } | null;
+  audit: AuditLine[];
 }) {
   return (
     <>
@@ -119,6 +125,16 @@ function Directory({
         <a href="/cu/admin?cu=new" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Add credit union</a>
       </div>
       <DirectoryTable tenants={tenants} />
+      {audit.length > 0 ? (
+        <section className="mt-10" aria-labelledby="audit-heading">
+          <h2 id="audit-heading" className="text-[24px] font-bold leading-[30px]">Audit</h2>
+          <ul className="mt-4 max-w-full space-y-2 overflow-x-auto font-mono text-[14px] leading-[20px]">
+            {audit.map(line => (
+              <li key={`${line.t}-${line.action}-${line.id}`} className="whitespace-nowrap">{line.t} {line.action} {line.id}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </>
   );
 }
@@ -166,7 +182,7 @@ async function DirectoryTable({ tenants }: { tenants: ResolvedTenant[] }) {
                 <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.checks}</td>
                 <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.uploads}</td>
                 <td className="hidden py-3 pr-4 md:table-cell">{row.settings.emailEnabled ? 'On' : 'Off'}</td>
-                <td className="py-3 pr-4">{row.tenant.status === 'paused' ? 'Paused' : 'Active'}</td>
+                <td className="py-3 pr-4">{row.tenant.status === 'paused' ? STATUS_PAUSED : STATUS_ACTIVE}</td>
                 <td className="py-3"><a className="font-semibold underline underline-offset-4 cu-linkline" href={`/cu/admin?cu=${row.tenant.id}`}>Edit</a></td>
               </tr>
             ))}
