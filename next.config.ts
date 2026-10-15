@@ -1,6 +1,23 @@
 import type { NextConfig } from 'next';
 
+/** Route-group Open Graph files are published with this suffix. /opengraph-image stays the public URL. */
+function groupSuffix(parentPath: string): string {
+  let hash = 5381;
+  for (let i = 0; i < parentPath.length; i++) {
+    hash = (hash << 5) + hash + parentPath.charCodeAt(i) & 0xffffffff;
+  }
+  return (hash >>> 0).toString(36).slice(0, 6);
+}
+
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/opengraph-image',
+        destination: `/opengraph-image-${groupSuffix('/(site)')}`,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
