@@ -1,4 +1,4 @@
-import { TALK_TO_US_EMAIL } from '@/app/credit-unions/pricing';
+import { TALK_TO_US_EMAIL } from '@/app/(cu)/credit-unions/pricing';
 import { getAggregates, getSettings, type Aggregates } from './cu-store';
 import { loadCuTenant } from './tenant-directory';
 

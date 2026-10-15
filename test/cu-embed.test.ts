@@ -19,7 +19,7 @@ import {
   resolveFrameAncestors,
 } from '../src/cu/embed';
 import { securityHeaderList } from '../src/cu/headers';
-import { GET as framePolicy } from '../src/app/api/cu/frame-ancestors/route';
+import { GET as framePolicy } from '../src/app/(cu)/api/cu/frame-ancestors/route';
 import { markCuStoreUnavailable, resetCuStore } from '../src/cu/cu-store';
 import { NextRequest } from 'next/server';
 import { normalizeProfile, removeTenant, replaceEmbedOrigins, saveTenantProfile } from '../src/cu/tenant-directory';

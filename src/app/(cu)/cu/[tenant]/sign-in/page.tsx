@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { resolveBrand } from '@/cu/brand';
 import { loadCuTenant } from '@/cu/tenant-directory';
-import { TALK_TO_US_EMAIL } from '@/app/credit-unions/pricing';
+import { TALK_TO_US_EMAIL } from '@/app/(cu)/credit-unions/pricing';
 import { signIn } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 

@@ -1,6 +1,6 @@
 # Analyze API rate limit
 
-The security questionnaire in the due-diligence packet states this limit in section 6.5. This note describes the same route as implemented in `src/cu/rate-limit.ts` and `src/app/api/cu/[tenant]/analyze/route.ts`. These figures have not been load-tested.
+The security questionnaire in the due-diligence packet states this limit in section 6.5. This note describes the same route as implemented in `src/cu/rate-limit.ts` and `src/app/(cu)/api/cu/[tenant]/analyze/route.ts`. These figures have not been load-tested.
 
 What exists:
 

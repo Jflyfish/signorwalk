@@ -92,7 +92,7 @@ function walk(dir: string): string[] {
 }
 
 test('credit-union UI says Sign or Walk only in the header line', () => {
-  const files = walk('src/app/cu');
+  const files = walk('src/app/(cu)/cu');
   const seen = new Set<string>();
   for (const file of files) {
     if (seen.has(file) || !file.endsWith('.tsx')) continue;

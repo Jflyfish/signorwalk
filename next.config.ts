@@ -1,9 +1,6 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // The root layout reads a pathname header, so pages render dynamically.
-  // Blocking metadata keeps title, icons, and social tags inside <head>.
-  htmlLimitedBots: /.*/,
   images: {
     remotePatterns: [
       {

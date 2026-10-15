@@ -58,9 +58,7 @@ export async function middleware(req: NextRequest) {
     ancestorsForEmbed(pathname),
   ]);
   if (blocked) return blocked;
-  const requestHeaders = new Headers(req.headers);
-  requestHeaders.set('x-pathname', pathname);
-  const res = NextResponse.next({ request: { headers: requestHeaders } });
+  const res = NextResponse.next();
   for (const header of await securityHeaderList(pathname, stored ?? undefined)) {
     res.headers.set(header.key, header.value);
   }

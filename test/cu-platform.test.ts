@@ -9,7 +9,7 @@ import { getAggregates, getBranding, recordCheck, resetCuStore, saveBranding, sa
 import { readLogoFile } from '../src/cu/logo-file';
 import { formatOcrLog, pickOcrFields } from '../src/cu/ocr';
 import { sendAggregateSummary, summaryText } from '../src/cu/notify';
-import { POST } from '../src/app/api/cu/[tenant]/extract/route';
+import { POST } from '../src/app/(cu)/api/cu/[tenant]/extract/route';
 
 const ENV_KEYS = ['CU_DEMO_EMAIL', 'CU_DEMO_PASSWORD', 'CU_DEMO_TENANT', 'CU_ADMIN_EMAIL', 'CU_ADMIN_PASSWORD', 'CU_SESSION_SECRET', 'ANTHROPIC_API_KEY'] as const;
 
@@ -222,8 +222,8 @@ test('worksheet route does not read or log a file when OCR is not configured', a
 });
 
 test('stripe checkout stays unwired', () => {
-  assert.equal(existsSync('src/app/credit-unions/get-started/checkout-stubs.ts'), false);
-  const src = readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8');
+  assert.equal(existsSync('src/app/(cu)/credit-unions/get-started/checkout-stubs.ts'), false);
+  const src = readFileSync('src/app/(cu)/credit-unions/get-started/actions.ts', 'utf8');
   assert.match(src, /PAYMENTS ARE NOT BUILT/);
   assert.equal(src.includes('sk_live'), false);
   assert.equal(src.includes('sk_test'), false);
@@ -231,15 +231,15 @@ test('stripe checkout stays unwired', () => {
 });
 
 test('growth copy and the worksheet route stay on the approved words', () => {
-  const page = readFileSync('src/app/credit-unions/page.tsx', 'utf8');
-  const started = readFileSync('src/app/credit-unions/get-started/page.tsx', 'utf8');
-  const privacy = readFileSync('src/app/credit-unions/privacy/page.tsx', 'utf8');
+  const page = readFileSync('src/app/(cu)/credit-unions/page.tsx', 'utf8');
+  const started = readFileSync('src/app/(cu)/credit-unions/get-started/page.tsx', 'utf8');
+  const privacy = readFileSync('src/app/(cu)/credit-unions/privacy/page.tsx', 'utf8');
   const copy = readFileSync('src/cu/copy.ts', 'utf8');
-  const dashboard = readFileSync('src/app/cu/[tenant]/dashboard/page.tsx', 'utf8');
-  const admin = readFileSync('src/app/cu/admin/page.tsx', 'utf8');
-  const actions = readFileSync('src/app/cu/actions.ts', 'utf8');
-  const extract = readFileSync('src/app/api/cu/[tenant]/extract/route.ts', 'utf8');
-  const form = readFileSync('src/app/cu/[tenant]/CheckForm.tsx', 'utf8');
+  const dashboard = readFileSync('src/app/(cu)/cu/[tenant]/dashboard/page.tsx', 'utf8');
+  const admin = readFileSync('src/app/(cu)/cu/admin/page.tsx', 'utf8');
+  const actions = readFileSync('src/app/(cu)/cu/actions.ts', 'utf8');
+  const extract = readFileSync('src/app/(cu)/api/cu/[tenant]/extract/route.ts', 'utf8');
+  const form = readFileSync('src/app/(cu)/cu/[tenant]/CheckForm.tsx', 'utf8');
   const value = 'Members enter or upload a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
   assert.equal(page.includes('Most chosen'), false);
   assert.equal(/\bfees?\b/i.test(page), false);
@@ -268,7 +268,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(page.includes('DemoFrame'), false);
   assert.match(page, /\/cu\/harborlight-cu\/embed\?entry=numbers/);
   assert.match(page, /<LiveEmbed/);
-  const iframe = readFileSync('src/app/credit-unions/LiveEmbed.tsx', 'utf8');
+  const iframe = readFileSync('src/app/(cu)/credit-unions/LiveEmbed.tsx', 'utf8');
   assert.match(iframe, /<iframe/);
   assert.match(iframe, /EMBED_RESIZE/);
   assert.equal(iframe.includes('h-[720px]'), false);
@@ -293,9 +293,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(privacy, /Due-diligence packet/);
   assert.match(privacy, /Not the worksheet and not the numbers from it/);
   assert.match(privacy, /AI_FACTS/);
-  assert.match(readFileSync('src/app/credit-unions/terms/page.tsx', 'utf8'), /Pending counsel review/);
-  assert.match(readFileSync('src/app/credit-unions/terms/page.tsx', 'utf8'), /\{PILOT_MARK\}/);
-  assert.match(readFileSync('src/app/credit-unions/[...slug]/page.tsx', 'utf8'), /creditUnionAlias/);
+  assert.match(readFileSync('src/app/(cu)/credit-unions/terms/page.tsx', 'utf8'), /Pending counsel review/);
+  assert.match(readFileSync('src/app/(cu)/credit-unions/terms/page.tsx', 'utf8'), /\{PILOT_MARK\}/);
+  assert.match(readFileSync('src/app/(cu)/credit-unions/[...slug]/page.tsx', 'utf8'), /creditUnionAlias/);
   assert.equal(started.includes('AiDisclosure'), false);
   assert.match(started, /UploadDisclosure/);
   assert.match(started, /href="\/credit-unions\/privacy"/);
@@ -317,8 +317,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(dashboard, /whitespace-pre overflow-x-auto/);
   assert.match(dashboard, /text-\[14px\]/);
   assert.match(dashboard, /md:w-auto/);
-  assert.match(readFileSync('src/app/cu/[tenant]/dashboard/CopyLink.tsx', 'utf8'), /Copy link/);
-  const account = readFileSync('src/app/cu/AccountMenu.tsx', 'utf8');
+  assert.match(readFileSync('src/app/(cu)/cu/[tenant]/dashboard/CopyLink.tsx', 'utf8'), /Copy link/);
+  const account = readFileSync('src/app/(cu)/cu/AccountMenu.tsx', 'utf8');
   assert.match(account, />\s*Account\s*</);
   assert.equal(account.includes('md:hidden'), false);
   assert.match(form, /safe-area-inset-bottom/);
@@ -338,7 +338,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(admin, /hidden py-3 pr-4 font-semibold md:table-cell">Email/);
   assert.match(admin, /text-right font-semibold">Checks/);
   assert.match(admin, /text-right tabular-nums/);
-  const branding = readFileSync('src/app/cu/[tenant]/dashboard/BrandingForm.tsx', 'utf8');
+  const branding = readFileSync('src/app/(cu)/cu/[tenant]/dashboard/BrandingForm.tsx', 'utf8');
   assert.match(branding, /h-8 /);
   assert.match(branding, /#111111/);
   assert.match(branding, /file:border-\[#E5E5E5\]/);
@@ -358,7 +358,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(started, /cu-ring/);
   assert.equal(started.toLowerCase().includes('stripe'), false);
   assert.equal(started.includes('card number'), false);
-  const signup = readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8');
+  const signup = readFileSync('src/app/(cu)/credit-unions/get-started/actions.ts', 'utf8');
   assert.match(signup, /takeSignupSlot/);
   assert.match(signup, /createTrial/);
   assert.equal(signup.includes('console.'), false);
@@ -373,20 +373,25 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(rateNote, /have not been load-tested/);
   assert.match(rateNote, /Open item: there is no shared limit across instances/);
   assert.equal(rateNote.toLowerCase().includes('firewall rule is configured'), false);
-  assert.match(readFileSync('src/app/credit-unions/demo/preapproval/page.tsx', 'utf8'), /<DemoPage demo title=\{title\} body=\{body\} \/>/);
-  assert.match(readFileSync('src/app/credit-unions/demo/rates/page.tsx', 'utf8'), /Your auto rates page goes here/);
-  assert.match(readFileSync('src/app/credit-unions/demo/help/page.tsx', 'utf8'), /Your help page goes here/);
-  assert.match(readFileSync('src/app/credit-unions/demo/privacy/page.tsx', 'utf8'), /Your privacy page goes here/);
-  assert.match(readFileSync('src/app/credit-unions/demo/DemoPage.tsx', 'utf8'), /href="\/cu\/harborlight-cu"/);
+  assert.match(readFileSync('src/app/(cu)/credit-unions/demo/preapproval/page.tsx', 'utf8'), /<DemoPage demo title=\{title\} body=\{body\} \/>/);
+  assert.match(readFileSync('src/app/(cu)/credit-unions/demo/rates/page.tsx', 'utf8'), /Your auto rates page goes here/);
+  assert.match(readFileSync('src/app/(cu)/credit-unions/demo/help/page.tsx', 'utf8'), /Your help page goes here/);
+  assert.match(readFileSync('src/app/(cu)/credit-unions/demo/privacy/page.tsx', 'utf8'), /Your privacy page goes here/);
+  assert.match(readFileSync('src/app/(cu)/credit-unions/demo/DemoPage.tsx', 'utf8'), /href="\/cu\/harborlight-cu"/);
   assert.match(form, /Partial grade — add more figures/);
   assert.match(form, /Sample C/);
   assert.match(form, /errorRef/);
-  const rootLayout = readFileSync('src/app/layout.tsx', 'utf8');
-  assert.match(rootLayout, /impactcdn/);
-  assert.match(rootLayout, /x-pathname/);
-  assert.match(rootLayout, /href="\/cu\/icon"/);
-  assert.equal(readFileSync('src/app/(site)/layout.tsx', 'utf8').includes('<head>'), false);
-  assert.match(readFileSync('src/middleware.ts', 'utf8'), /x-pathname/);
+  const siteLayout = readFileSync('src/app/(site)/layout.tsx', 'utf8');
+  assert.match(siteLayout, /<html lang="en">/);
+  assert.match(siteLayout, /impactcdn/);
+  assert.match(siteLayout, /application\/ld\+json/);
+  const cuLayout = readFileSync('src/app/(cu)/layout.tsx', 'utf8');
+  assert.match(cuLayout, /<html lang="en">/);
+  assert.match(cuLayout, /href="\/cu\/icon"/);
+  assert.equal(cuLayout.includes('impactcdn'), false);
+  assert.equal(existsSync('src/app/layout.tsx'), false);
+  assert.equal(readFileSync('src/middleware.ts', 'utf8').includes('x-pathname'), false);
+  assert.equal(readFileSync('next.config.ts', 'utf8').includes('htmlLimitedBots'), false);
   assert.equal(existsSync('src/app/favicon.ico'), false);
   assert.match(form, /href="\/credit-unions\/privacy"/);
   assert.equal(form.includes('AI_FACTS'), false);
@@ -402,9 +407,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(dashboard, /border cu-line bg-white/);
   assert.match(dashboard, /Save links/);
   assert.match(dashboard, /Save website/);
-  assert.match(readFileSync('src/app/credit-unions/embed-demo/EmbedDemo.tsx', 'utf8'), /entry=numbers/);
-  const embedPage = readFileSync('src/app/cu/[tenant]/embed/page.tsx', 'utf8');
+  assert.match(readFileSync('src/app/(cu)/credit-unions/embed-demo/EmbedDemo.tsx', 'utf8'), /entry=numbers/);
+  const embedPage = readFileSync('src/app/(cu)/cu/[tenant]/embed/page.tsx', 'utf8');
   assert.match(embedPage, /numbersOnlyEmbed/);
   assert.match(embedPage, /demoSample=\{query\.entry === 'numbers'\}/);
-  assert.equal(readFileSync('src/app/cu/actions.ts', 'utf8').includes('verified = true'), false);
+  assert.equal(readFileSync('src/app/(cu)/cu/actions.ts', 'utf8').includes('verified = true'), false);
 });

@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { NextRequest } from 'next/server';
-import { POST as analyze } from '../src/app/api/cu/[tenant]/analyze/route';
-import { POST as extract } from '../src/app/api/cu/[tenant]/extract/route';
+import { POST as analyze } from '../src/app/(cu)/api/cu/[tenant]/analyze/route';
+import { POST as extract } from '../src/app/(cu)/api/cu/[tenant]/extract/route';
 import { appendAudit, formatAuditLine, readAudit, readFrameAncestorCache, resetCuStore, writeFrameAncestorCache } from '../src/cu/cu-store';
 import { getCuTenant } from '../src/cu/tenants';
 import {
@@ -150,10 +150,10 @@ test('a paused credit union is unavailable on the page and returns 404 from the 
     params: Promise.resolve({ tenant: 'larkspur-cu' }),
   });
   assert.equal(extractRes.status, 404);
-  const page = readFileSync('src/app/cu/[tenant]/page.tsx', 'utf8');
-  const embed = readFileSync('src/app/cu/[tenant]/embed/page.tsx', 'utf8');
-  const editor = readFileSync('src/app/cu/admin/OwnerEditor.tsx', 'utf8');
-  const admin = readFileSync('src/app/cu/admin/page.tsx', 'utf8');
+  const page = readFileSync('src/app/(cu)/cu/[tenant]/page.tsx', 'utf8');
+  const embed = readFileSync('src/app/(cu)/cu/[tenant]/embed/page.tsx', 'utf8');
+  const editor = readFileSync('src/app/(cu)/cu/admin/OwnerEditor.tsx', 'utf8');
+  const admin = readFileSync('src/app/(cu)/cu/admin/page.tsx', 'utf8');
   assert.match(page, /tenantUnavailable/);
   assert.match(embed, /tenantUnavailable/);
   assert.match(editor, /BrandingForm/);
@@ -165,14 +165,14 @@ test('a paused credit union is unavailable on the page and returns 404 from the 
   assert.match(editor, /Add at least one website that can show the tool\./);
   assert.match(editor, /Add website/);
   assert.match(editor, /Staff who start a trial sign in with the email and password from signup\./);
-  assert.match(readFileSync('src/app/cu/actions.ts', 'utf8'), /need=site#embed-allowlist/);
+  assert.match(readFileSync('src/app/(cu)/cu/actions.ts', 'utf8'), /need=site#embed-allowlist/);
   assert.equal(admin.includes('font-mono'), false);
   assert.match(readFileSync('src/cu/tenant-directory.ts', 'utf8'), /Paused\. Members see an unavailable page\./);
   assert.match(admin, /STATUS_PAUSED/);
   assert.match(admin, /'Paused'/);
   assert.match(admin, /'Active'/);
   assert.match(admin, /formatAuditLine/);
-  assert.match(readFileSync('src/app/cu/actions.ts', 'utf8'), /appendAudit\('branding', tenant, owner \? 'owner' : 'tenant'\)/);
+  assert.match(readFileSync('src/app/(cu)/cu/actions.ts', 'utf8'), /appendAudit\('branding', tenant, owner \? 'owner' : 'tenant'\)/);
   assert.match(admin, /Add credit union/);
   assert.match(admin, /section=usage/);
   assert.equal(admin.includes('Tenants'), false);

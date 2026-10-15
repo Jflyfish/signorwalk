@@ -128,14 +128,14 @@ test('signup is limited to five an hour and an ended trial is unavailable', asyn
   assert.equal(tenantUnavailable({ status: 'active' }), false);
   assert.equal(tenantUnavailable({ status: 'paused' }), true);
   assert.equal(tenantUnavailable({ status: 'active', verified: false }), true);
-  const actions = readFileSync('src/app/cu/actions.ts', 'utf8');
+  const actions = readFileSync('src/app/(cu)/cu/actions.ts', 'utf8');
   assert.match(actions, /staffLoginMatches/);
   assert.match(actions, /verified === false/);
   assert.match(actions, /notice=confirm/);
   assert.equal(actions.includes('verified = true'), false);
   assert.match(actions, /resendConfirmAction/);
-  const confirmPage = readFileSync('src/app/cu/[tenant]/confirm/page.tsx', 'utf8');
-  const confirmAction = readFileSync('src/app/cu/[tenant]/confirm/actions.ts', 'utf8');
+  const confirmPage = readFileSync('src/app/(cu)/cu/[tenant]/confirm/page.tsx', 'utf8');
+  const confirmAction = readFileSync('src/app/(cu)/cu/[tenant]/confirm/actions.ts', 'utf8');
   assert.match(confirmPage, /<button type="submit"[\s\S]*Confirm\s*<\/button>/);
   assert.match(confirmPage, /action=\{confirmTrial\}/);
   assert.equal(confirmPage.includes('method="get"'), false);
@@ -143,13 +143,13 @@ test('signup is limited to five an hour and an ended trial is unavailable', asyn
   assert.equal(confirmPage.includes('saveTenantProfile'), false);
   assert.match(confirmAction, /confirmTrialToken/);
   assert.match(readFileSync('src/cu/trial-confirm.ts', 'utf8'), /profile\.verified = true/);
-  assert.equal(existsSync('src/app/cu/[tenant]/confirm/route.ts'), false);
-  assert.match(readFileSync('src/app/cu/[tenant]/dashboard/page.tsx', 'utf8'), /Check your email to confirm/);
+  assert.equal(existsSync('src/app/(cu)/cu/[tenant]/confirm/route.ts'), false);
+  assert.match(readFileSync('src/app/(cu)/cu/[tenant]/dashboard/page.tsx', 'utf8'), /Check your email to confirm/);
   const rate = readFileSync('src/cu/rate-limit.ts', 'utf8');
   assert.match(rate, /incrementWindow/);
   assert.match(rate, /Do not add a production Firewall rule for signup yet/);
-  assert.match(readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8'), /await takeSignupSlot/);
-  const signup = readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8');
+  assert.match(readFileSync('src/app/(cu)/credit-unions/get-started/actions.ts', 'utf8'), /await takeSignupSlot/);
+  const signup = readFileSync('src/app/(cu)/credit-unions/get-started/actions.ts', 'utf8');
   assert.match(signup, /appendAudit\('create', result\.id, 'tenant'\)/);
   assert.match(signup, /sendSignupNotice\(/);
   assert.match(readFileSync('src/cu/notify.ts', 'utf8'), /CU_SIGNUP_NOTIFY_EMAIL/);
@@ -225,7 +225,7 @@ test('missing and removed credit unions answer 404', async () => {
   assert.equal(await missingCreditUnionResponse('/credit-unions', async () => false), null);
 
   resetCuStore();
-  const { GET } = await import('../src/app/api/cu/present/route');
+  const { GET } = await import('../src/app/(cu)/api/cu/present/route');
   const headers = { [FRAME_ANCESTORS_HEADER]: frameAncestorsToken() };
   const secret = ephemeralSecret();
   const email = `gone-${randomBytes(4).toString('hex')}@example.com`;

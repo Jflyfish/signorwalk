@@ -1,4 +1,4 @@
-import { DOCUMENT_VERSION_LABEL, TALK_TO_US_EMAIL } from '../../app/credit-unions/pricing';
+import { DOCUMENT_VERSION_LABEL, TALK_TO_US_EMAIL } from '../../app/(cu)/credit-unions/pricing';
 import { OWNER_BLANK, OWNER_OPEN_ITEMS } from '../owner-open-items';
 
 export interface DueDiligenceDoc {
