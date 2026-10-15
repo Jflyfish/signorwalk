@@ -3,6 +3,8 @@ import type { NextRequest } from 'next/server';
 import { readFrameAncestorCache } from '@/cu/cu-store';
 import { FRAME_ANCESTORS_HEADER, acceptAncestors, embedTenantId, frameAncestorsToken } from '@/cu/embed';
 import { securityHeaderList } from '@/cu/headers';
+import { missingTenantResponse } from '@/cu/missing-page';
+import { cuPathDisposition } from '@/cu/not-found-path';
 
 /**
  * Runs only for the credit-union marketing page and /cu/[tenant].
@@ -35,9 +37,45 @@ async function ancestorsFromNode(req: NextRequest): Promise<string | null> {
   }
 }
 
+/** 404 HTML for a missing credit union, or null when the page should render. */
+export async function missingCreditUnionResponse(
+  pathname: string,
+  present: (id: string) => Promise<boolean | null>,
+): Promise<NextResponse | null> {
+  const disposition = cuPathDisposition(pathname);
+  if (disposition.kind === 'missing') return missingTenantResponse(pathname);
+  if (disposition.kind === 'lookup') {
+    const found = await present(disposition.id);
+    if (found === false) return missingTenantResponse(pathname);
+  }
+  return null;
+}
+
+async function tenantIsPresent(req: NextRequest, id: string): Promise<boolean | null> {
+  try {
+    const url = req.nextUrl.clone();
+    url.pathname = '/api/cu/present';
+    url.search = `?id=${encodeURIComponent(id)}`;
+    const res = await fetch(url, {
+      cache: 'no-store',
+      headers: { [FRAME_ANCESTORS_HEADER]: frameAncestorsToken() },
+      signal: AbortSignal.timeout(1500),
+    });
+    if (res.status === 204) return true;
+    if (res.status === 404) return false;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
-  const stored = await ancestorsFromNode(req);
+  const [blocked, stored] = await Promise.all([
+    missingCreditUnionResponse(pathname, id => tenantIsPresent(req, id)),
+    ancestorsFromNode(req),
+  ]);
+  if (blocked) return blocked;
   const res = NextResponse.next();
   for (const header of await securityHeaderList(pathname, stored ?? undefined)) {
     res.headers.set(header.key, header.value);

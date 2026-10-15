@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
 import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
@@ -82,7 +82,7 @@ export default async function DashboardPage({
   searchParams: Promise<{ section?: string; saved?: string; error?: string; notice?: string }>;
 }) {
   const tenant = await loadCuTenant((await params).tenant);
-  if (!tenant) return null;
+  if (!tenant) notFound();
   const jar = await cookies();
   const session = verifySession(jar.get(CU_SESSION_COOKIE)?.value);
   if (!canOpenTenant(session, tenant.id)) redirect(`/cu/${tenant.id}/sign-in`);

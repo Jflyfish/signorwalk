@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { resolveBrand } from '@/cu/brand';
 import { allowEmbed, deepLink, requestOriginFrom } from '@/cu/embed';
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant: s
 
 export default async function EmbedPage({ params }: { params: Promise<{ tenant: string }> }) {
   const tenant = await loadCuTenant((await params).tenant);
-  if (!tenant) return null;
+  if (!tenant) notFound();
   if (tenantUnavailable(tenant)) return <Unavailable />;
   const h = await headers();
   const decision = allowEmbed({

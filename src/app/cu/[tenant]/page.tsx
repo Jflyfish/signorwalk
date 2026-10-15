@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { resolveBrand } from '@/cu/brand';
 import { loadCuTenant, tenantUnavailable } from '@/cu/tenant-directory';
 import { toCuPublic } from '@/cu/tenants';
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant: s
 
 export default async function CuPage({ params }: { params: Promise<{ tenant: string }> }) {
   const tenant = await loadCuTenant((await params).tenant);
-  if (!tenant) return null;
+  if (!tenant) notFound();
   if (tenantUnavailable(tenant)) return <Unavailable />;
   const brand = await resolveBrand(tenant);
   return (

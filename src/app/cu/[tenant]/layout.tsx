@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { CU_TENANTS } from '@/cu/tenants';
 import { loadCuTenant } from '@/cu/tenant-directory';
 import { resolveBrand } from '@/cu/brand';
@@ -18,7 +19,6 @@ export async function generateMetadata({
   if (!tenant) {
     return {
       title: 'Page not found',
-      description: 'This credit union page does not exist.',
       robots: { index: false, follow: false },
     };
   }
@@ -38,10 +38,7 @@ export default async function CuLayout({
   params: Promise<{ tenant: string }>;
 }) {
   const tenant = await loadCuTenant((await params).tenant);
-  if (!tenant) {
-    const { MissingTenant } = await import('../MissingTenant');
-    return <MissingTenant />;
-  }
+  if (!tenant) notFound();
   const brand = await resolveBrand(tenant);
   return (
     <div

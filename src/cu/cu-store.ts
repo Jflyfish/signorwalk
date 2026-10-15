@@ -321,3 +321,31 @@ export function resetCuStore(): void {
   frameCache.clear();
   storeUnavailable = false;
 }
+
+/**
+ * Atomic fixed window for signup. Returns null when KV is unset or the call fails,
+ * so the caller can use a process-local fallback. A failure here does not mark the
+ * store unavailable: embed CSP stays on its own read.
+ */
+export async function incrementWindow(
+  key: string,
+  windowSec: number,
+  command?: (parts: string[]) => Promise<unknown>,
+): Promise<{ count: number; ttl: number } | null> {
+  if (!/^cu:rate:signup:[a-f0-9]{24}$/.test(key)) return null;
+  if (!Number.isInteger(windowSec) || windowSec < 1 || windowSec > 86_400) return null;
+  const run = command ?? (restConfig() ? restCommand : null);
+  if (!run) return null;
+  try {
+    const count = Number(await run(['INCR', key]));
+    if (!Number.isFinite(count) || count < 1) return null;
+    let ttl = Number(await run(['TTL', key]));
+    if (count === 1 || !Number.isFinite(ttl) || ttl < 1) {
+      await run(['EXPIRE', key, String(windowSec)]);
+      ttl = windowSec;
+    }
+    return { count, ttl };
+  } catch {
+    return null;
+  }
+}

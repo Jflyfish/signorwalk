@@ -34,7 +34,7 @@ async function secureCookie(): Promise<boolean> {
 export async function startTrialAction(formData: FormData) {
   const tier = tierParam(String(formData.get('tier') ?? ''));
   const h = await headers();
-  if (!takeSignupSlot(clientAddress(h)).allowed) fail('rate', tier);
+  if (!(await takeSignupSlot(clientAddress(h))).allowed) fail('rate', tier);
   const result = await createTrial({
     name: String(formData.get('name') ?? ''),
     contactName: String(formData.get('contact') ?? ''),

@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { incrementWindow } from './cu-store';
 
 /**
  * Per-instance sliding window for POST /api/cu/[tenant]/analyze.
@@ -74,16 +75,29 @@ export function resetExtractRateLimit(): void {
 }
 
 /**
- * Signup window. The map stores a hash of the address, not the address.
- * TODO: move this to a shared KV limit before production. Do not add a
- * production Firewall rule for signup yet.
+ * Signup window. The key is a hash of the address, not the address.
+ * When Upstash or Vercel KV is set, INCR on that store is the shared counter
+ * across isolates. With no store, or when the call fails, the map below is
+ * the local fallback. Do not add a production Firewall rule for signup yet.
  */
 export const SIGNUP_WINDOW_MS = 60 * 60 * 1000;
 export const SIGNUP_LIMIT = 5;
 const signupBuckets = new Map<string, number[]>();
 
-export function takeSignupSlot(ip: string, now = Date.now()): { allowed: boolean; retryAfterSec: number } {
-  const key = bucketKey(`signup:${ip}`);
+export async function takeSignupSlot(
+  ip: string,
+  now = Date.now(),
+  shared: typeof incrementWindow = incrementWindow,
+): Promise<{ allowed: boolean; retryAfterSec: number }> {
+  const key = `cu:rate:signup:${bucketKey(`signup:${ip}`)}`;
+  const windowSec = Math.ceil(SIGNUP_WINDOW_MS / 1000);
+  const fromStore = await shared(key, windowSec);
+  if (fromStore) {
+    if (fromStore.count > SIGNUP_LIMIT) {
+      return { allowed: false, retryAfterSec: Math.max(1, fromStore.ttl) };
+    }
+    return { allowed: true, retryAfterSec: 0 };
+  }
   const recent = (signupBuckets.get(key) ?? []).filter(ts => now - ts < SIGNUP_WINDOW_MS);
   if (recent.length >= SIGNUP_LIMIT) {
     const retryAfterSec = Math.max(1, Math.ceil((SIGNUP_WINDOW_MS - (now - recent[0])) / 1000));
