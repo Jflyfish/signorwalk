@@ -147,6 +147,7 @@ export function CheckForm({
 }) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const returnToApr = useRef(false);
   const [dealType, setDealType] = useState<DealType>('finance');
   const [term, setTerm] = useState('60');
@@ -159,6 +160,10 @@ export function CheckForm({
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<TenantReport | null>(null);
   const [needsApr, setNeedsApr] = useState(false);
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
 
   useEffect(() => {
     if (needsApr) {
@@ -385,7 +390,7 @@ export function CheckForm({
               <span className="sr-only">{report.grade}. </span>{report.headline}
             </h1>
             {aprBlank || report.limitedData ? (
-              <p className="mt-4 inline-flex rounded-full border cu-line px-3 py-1 text-[13px] font-semibold leading-[18px]">Partial grade — add APR</p>
+              <p className="mt-4 inline-flex rounded-full border cu-line px-3 py-1 text-[13px] font-semibold leading-[18px]">{aprBlank ? 'Partial grade — add APR' : 'Partial grade — add more figures'}</p>
             ) : null}
             <p className="mt-4 text-[18px] leading-[28px]">{report.gradeExplanation}</p>
             {caption ? <p className="mt-4 text-[15px] font-semibold leading-[24px]">{caption}</p> : null}
@@ -547,15 +552,15 @@ export function CheckForm({
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button type="button" className={`${textLink} cu-ring`} onClick={() => applySample('a')}>Try a sample deal</button>
-            <button type="button" className="cu-ring inline-flex h-8 items-center rounded-full border cu-line px-3 text-[14px] font-semibold" onClick={() => applySample('c')}>C</button>
-            <button type="button" className="cu-ring inline-flex h-8 items-center rounded-full border cu-line px-3 text-[14px] font-semibold" onClick={() => applySample('d')}>D</button>
+            <button type="button" className="cu-ring inline-flex h-8 items-center rounded-full border cu-line px-3 text-[14px] font-semibold" onClick={() => applySample('c')}>Sample C</button>
+            <button type="button" className="cu-ring inline-flex h-8 items-center rounded-full border cu-line px-3 text-[14px] font-semibold" onClick={() => applySample('d')}>Sample D</button>
           </div>
         </>
       ) : null}
 
       <form onSubmit={onSubmit} className="mt-10" aria-describedby={error ? `${formId}-error` : undefined}>
         <div role="status" aria-live="polite" className="sr-only">{busy ? 'Checking the numbers.' : ''}</div>
-        {error ? <p id={`${formId}-error`} role="alert" className="cu-err mb-6">{error}</p> : null}
+        {error ? <p ref={errorRef} tabIndex={-1} id={`${formId}-error`} role="alert" className="cu-err mb-6 outline-none">{error}</p> : null}
 
         <div className="mb-6">
           {numbersOnly ? (
@@ -638,7 +643,9 @@ export function CheckForm({
           {dealType === 'finance' ? (
             <>
               <p className="text-[15px] font-semibold leading-[24px] sm:col-span-2">
-                Add the APR for a full grade. A blank APR stays incomplete and does not show a letter.
+                {embedded || numbersOnly
+                  ? 'Add the APR for a full grade.'
+                  : 'Add the APR for a full grade. A blank APR stays incomplete and does not show a letter.'}
               </p>
               <Field id="apr" label="APR" hint="Percent from the worksheet, such as 5.9" value={fields.apr} onChange={v => setField('apr', v)} />
               <Field id="amountFinanced" label="Amount financed" value={fields.amountFinanced} onChange={v => setField('amountFinanced', v)} />

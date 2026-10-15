@@ -5,7 +5,7 @@ export function CopyLink({ url, text, label = 'Copy link' }: { url?: string; tex
   return (
     <button
       type="button"
-      className="mt-4 text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline cu-ink"
+      className="cu-ring mt-4 inline-flex h-12 items-center justify-center rounded-lg border cu-line bg-white px-4 text-[15px] font-semibold cu-ink md:h-11"
       onClick={() => {
         void navigator.clipboard.writeText(value).catch(() => undefined);
       }}

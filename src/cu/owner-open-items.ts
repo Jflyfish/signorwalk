@@ -2,8 +2,14 @@
  * Titles only. The packet and the terms page name these so the owner can supply them.
  * This file does not answer them.
  */
-/** Blank answers in the packet and privacy page. Not a fact and not a certification. */
+/** Blank answers in the packet. Not a fact and not a certification. */
 export const OWNER_BLANK = 'TO BE PROVIDED BY OWNER/COUNSEL';
+
+/** Quiet mark for the marketing pages. It means OWNER_BLANK. */
+export const OWNER_BLANK_MARK = '[To be provided]';
+
+export const OWNER_BLANK_NOTE =
+  'Each line below is still open. [To be provided] stands for the packet mark TO BE PROVIDED BY OWNER/COUNSEL. It is not an answer.';
 
 export const OWNER_OPEN_ITEMS = [
   'Legal entity name of the provider',

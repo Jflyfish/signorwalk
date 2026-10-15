@@ -218,6 +218,8 @@ test('missing and removed credit unions answer 404', async () => {
   assert.equal(index?.status, 404);
   const adminExtra = await missingCreditUnionResponse('/cu/admin/tools', async () => true);
   assert.equal(adminExtra?.status, 404);
+  assert.equal(await missingCreditUnionResponse('/cu/icon', async () => false), null);
+  assert.equal(await missingCreditUnionResponse('/cu/apple-icon', async () => false), null);
   assert.equal(await missingCreditUnionResponse('/cu/harborlight-cu', async () => true), null);
   assert.equal(await missingCreditUnionResponse('/cu/admin', async () => false), null);
   assert.equal(await missingCreditUnionResponse('/credit-unions', async () => false), null);

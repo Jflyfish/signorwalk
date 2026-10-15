@@ -1,11 +1,15 @@
 import type { Metadata } from 'next';
 import { DemoPage } from '../DemoPage';
 
+const title = 'Your help page goes here';
+const body = 'A live credit union sends members to its own help URL, which it sets in the dashboard.';
+
 export const metadata: Metadata = {
-  title: 'Your pre-approval page goes here',
+  title,
+  description: body,
   robots: { index: false, follow: false },
 };
 
 export default function DemoHelpPage() {
-  return <DemoPage />;
+  return <DemoPage title={title} body={body} />;
 }

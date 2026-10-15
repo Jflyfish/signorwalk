@@ -21,6 +21,9 @@ export function cuPathDisposition(pathname: string): CuPathDisposition {
   id = id.toLowerCase();
   const rest = match[2].replace(/\/+$/, '').replace(/^\//, '');
   if (id === 'admin') return rest === '' ? { kind: 'continue' } : { kind: 'missing' };
+  if (rest === '' && (id === 'icon' || id === 'apple-icon' || id === 'opengraph-image' || id === 'twitter-image')) {
+    return { kind: 'continue' };
+  }
   if (!/^[a-z0-9-]{2,48}$/.test(id)) return { kind: 'missing' };
   if (!KNOWN_SUBPATH.has(rest)) return { kind: 'missing' };
   return { kind: 'lookup', id };
