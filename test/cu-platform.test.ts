@@ -195,7 +195,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   const actions = readFileSync('src/app/cu/actions.ts', 'utf8');
   const extract = readFileSync('src/app/api/cu/[tenant]/extract/route.ts', 'utf8');
   const form = readFileSync('src/app/cu/[tenant]/CheckForm.tsx', 'utf8');
-  const value = 'Members enter a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
+  const value = 'Members enter or upload a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
   assert.equal(page.includes('Most chosen'), false);
   assert.equal(/\bfees?\b/i.test(page), false);
   assert.equal(/\bfees?\b/i.test(started), false);

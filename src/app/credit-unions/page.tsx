@@ -5,7 +5,7 @@ import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type 
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
 const HEADLINE = 'Help your members spot a bad car deal before they sign.';
-const VALUE_LINE = 'Members enter a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
+const VALUE_LINE = 'Members enter or upload a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
 
 const ASSETS: Record<PricedTierId, string> = {
   starter: 'Under $250M in assets',
