@@ -64,12 +64,37 @@ export const HEADLINES = {
 } as const;
 
 export const GRADE_EXPLANATIONS = {
-  GE_A: t('GE_A', 'Grade A means the numbers entered compare favorably with this tool\'s benchmarks. The grade is a comparison, not a recommendation to sign and not a credit decision.'),
-  GE_B: t('GE_B', 'Grade B means the numbers are near this tool\'s benchmarks. Review any item marked for a closer look. The grade is not a credit decision.'),
-  GE_B_NEAR: t('GE_B_NEAR', 'Grade B means the numbers are near this tool\'s benchmarks. The grade is a comparison, not a recommendation to sign and not a credit decision.'),
-  GE_C: t('GE_C', 'Grade C means some numbers sit outside this tool\'s benchmarks. Reviewing those items with the dealer is a reasonable next step. The grade is not a credit decision.'),
-  GE_D: t('GE_D', 'Grade D means several numbers sit well outside this tool\'s benchmarks. The grade compares figures you entered. It is not a credit decision and not an instruction.'),
-  GE_F: t('GE_F', 'Grade F means the combination of numbers compares unfavorably with this tool\'s benchmarks. You may want to ask for a revised written offer. The grade is not a credit decision.'),
+  GE_A: t('GE_A', 'An A is this tool\'s top mark. Nothing entered pulled the result down. This is a comparison, not a recommendation to sign and not a credit decision.'),
+  GE_B: t('GE_B', 'A B means the result is short of this tool\'s top mark. The items below are what the rules calculated. The grade is not a credit decision.'),
+  GE_B_NEAR: t('GE_B_NEAR', 'A B means the result is short of this tool\'s top mark. The grade is a comparison, not a recommendation to sign and not a credit decision.'),
+  GE_C: t('GE_C', 'A C means the gaps are wider than on a B. Take the items below to the dealer. The grade is not a credit decision.'),
+  GE_D: t('GE_D', 'A D means the gaps are wide. The grade compares the figures you entered. It is not a credit decision and not an instruction.'),
+  GE_F: t('GE_F', 'An F is this tool\'s lowest mark. You may want to ask for a revised written offer. The grade is not a credit decision.'),
+} as const;
+
+/** Why a grade stopped short of A when no flag fired. Thresholds match the rules engine. */
+export const HOLDBACKS = {
+  HB_APR_HEAD: t('HB_APR_HEAD', 'The APR entered is {apr}, above the 6% level this tool treats as strong.', ['apr']),
+  HB_APR_ISSUE: t('HB_APR_ISSUE', 'The APR entered is {apr}. This tool adds the most when the rate is at or below 6%.', ['apr']),
+  HB_APR_ACTION: t('HB_APR_ACTION', 'You can ask the dealer to show the rate in writing and compare it with the rate on your credit union\'s published rate page.'),
+  HB_DISCOUNT_HEAD: t('HB_DISCOUNT_HEAD', 'The price is {discountPct} under MSRP, short of the 8% this tool treats as a strong discount.', ['discountPct']),
+  HB_DISCOUNT_ISSUE: t('HB_DISCOUNT_ISSUE', 'The selling price is {discountPct} under MSRP.', ['discountPct']),
+  HB_DISCOUNT_ACTION: t('HB_DISCOUNT_ACTION', 'This tool treats a discount of 8% or more as strong. You can ask the dealer to put a lower selling price in writing.'),
+  HB_RATE_MISSING_HEAD: t('HB_RATE_MISSING_HEAD', 'No APR was entered, so the rate could not move this to the top mark.'),
+  HB_RATE_MISSING_ISSUE: t('HB_RATE_MISSING_ISSUE', 'APR was left blank.'),
+  HB_RATE_MISSING_ACTION: t('HB_RATE_MISSING_ACTION', 'You can add the APR from the worksheet and check the offer again.'),
+  HB_PRICE_MISSING_HEAD: t('HB_PRICE_MISSING_HEAD', 'Selling price or MSRP was left blank, so the price comparison could not raise this grade.'),
+  HB_PRICE_MISSING_ISSUE: t('HB_PRICE_MISSING_ISSUE', 'Selling price or MSRP was left blank.'),
+  HB_PRICE_MISSING_ACTION: t('HB_PRICE_MISSING_ACTION', 'You can add both numbers from the worksheet and check the offer again.'),
+  HB_LIMITED_HEAD: t('HB_LIMITED_HEAD', 'Only a few figures were entered, so this stays short of the top mark.'),
+  HB_LIMITED_ISSUE: t('HB_LIMITED_ISSUE', 'Fewer than three figures were entered.'),
+  HB_LIMITED_ACTION: t('HB_LIMITED_ACTION', 'Adding the price, rate, and term from the worksheet makes the comparison closer.'),
+  HB_RESIDUAL_HEAD: t('HB_RESIDUAL_HEAD', 'The residual is {residualPct} of MSRP, short of the 55% this tool treats as strong.', ['residualPct']),
+  HB_RESIDUAL_ISSUE: t('HB_RESIDUAL_ISSUE', 'The residual is {residualPct} of MSRP.', ['residualPct']),
+  HB_RESIDUAL_ACTION: t('HB_RESIDUAL_ACTION', 'This tool treats a residual of 55% or more as strong. You can ask how the mileage limit changes that percent.'),
+  HB_SHORT_HEAD: t('HB_SHORT_HEAD', 'These figures stay short of this tool\'s top mark.'),
+  HB_SHORT_ISSUE: t('HB_SHORT_ISSUE', 'The figures entered did not reach this tool\'s top mark.'),
+  HB_SHORT_ACTION: t('HB_SHORT_ACTION', 'You can add any blank price, rate, or term from the worksheet and check again.'),
 } as const;
 
 export const SUMMARIES = {
@@ -250,6 +275,7 @@ export const FLAG_COPY: Record<FlagId, { issue: Template; action: Template }> = 
 export const ALL_TEMPLATES: Template[] = [
   ...Object.values(HEADLINES),
   ...Object.values(GRADE_EXPLANATIONS),
+  ...Object.values(HOLDBACKS),
   ...Object.values(SUMMARIES),
   ...Object.values(RECOMMENDATION_LABELS),
   ...Object.values(QUESTIONS),

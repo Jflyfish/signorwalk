@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
 import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
-import { deepLink, iframeSnippet, requestOriginFrom } from '@/cu/embed';
+import { deepLink, iframeSnippet, memberOrigin } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
 import { resendConfirmAction, saveEmbedOriginsAction, saveLoanLinksAction, saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
@@ -108,9 +108,9 @@ export default async function DashboardPage({
     : query.notice && query.notice !== 'confirm' && query.notice !== 'sent' ? NOTICES[query.notice] : '';
   const trialLine = tenant.trialEndsAt ? trialCopy(tenant.trialEndsAt) : '';
   const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
-  const shareUrl = `https://signorwalk.com/cu/${tenant.id}`;
   const requestHeaders = await headers();
-  const origin = requestOriginFrom(name => requestHeaders.get(name)) ?? 'https://signorwalk.com';
+  const origin = memberOrigin(name => requestHeaders.get(name), process.env.VERCEL_URL);
+  const shareUrl = `${origin}/cu/${tenant.id}`;
   const embedUrl = deepLink(tenant.id, origin);
   const snippet = iframeSnippet(tenant.id, origin);
   const tabs: { id: Section; label: string }[] = [

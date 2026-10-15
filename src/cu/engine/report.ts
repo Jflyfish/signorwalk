@@ -6,6 +6,7 @@ import {
   FLAG_COPY,
   GRADE_EXPLANATIONS,
   HEADLINES,
+  HOLDBACKS,
   QUESTIONS,
   RECOMMENDATION_LABELS,
   STRUCTURE_NOTES,
@@ -72,6 +73,47 @@ function has(result: EngineResult, id: FlagId): boolean {
   return result.flags.some(f => f.id === id);
 }
 
+interface GradeNote {
+  id: string;
+  weight: number;
+  headline: Template;
+  issue: Template;
+  action: Template;
+}
+
+/** Factors the rules already score, for a grade that has no flag. */
+function holdbacks(input: EngineInput, result: EngineResult): GradeNote[] {
+  if (result.grade === 'A' || result.flags.length > 0) return [];
+  const notes: GradeNote[] = [];
+  if (result.limitedData) {
+    notes.push({ id: 'limited', weight: 30, headline: HOLDBACKS.HB_LIMITED_HEAD, issue: HOLDBACKS.HB_LIMITED_ISSUE, action: HOLDBACKS.HB_LIMITED_ACTION });
+  }
+  const discount = result.calc.discountPct;
+  if (discount !== undefined && discount >= 1 && discount < 8) {
+    const weight = discount >= 6 ? 4 : discount >= 3 ? 8 : 12;
+    notes.push({ id: 'discount', weight, headline: HOLDBACKS.HB_DISCOUNT_HEAD, issue: HOLDBACKS.HB_DISCOUNT_ISSUE, action: HOLDBACKS.HB_DISCOUNT_ACTION });
+  }
+  if (input.dealType === 'finance' && input.apr !== undefined && input.apr > 6 && input.apr <= 8) {
+    notes.push({ id: 'apr', weight: 7, headline: HOLDBACKS.HB_APR_HEAD, issue: HOLDBACKS.HB_APR_ISSUE, action: HOLDBACKS.HB_APR_ACTION });
+  }
+  if (input.dealType === 'finance' && !(input.apr !== undefined && input.apr > 0)) {
+    notes.push({ id: 'rate-missing', weight: 10, headline: HOLDBACKS.HB_RATE_MISSING_HEAD, issue: HOLDBACKS.HB_RATE_MISSING_ISSUE, action: HOLDBACKS.HB_RATE_MISSING_ACTION });
+  }
+  const priced = input.sellingPrice !== undefined && input.msrp !== undefined && input.msrp > 0;
+  if (!priced) {
+    notes.push({ id: 'price-missing', weight: 12, headline: HOLDBACKS.HB_PRICE_MISSING_HEAD, issue: HOLDBACKS.HB_PRICE_MISSING_ISSUE, action: HOLDBACKS.HB_PRICE_MISSING_ACTION });
+  }
+  const residual = result.calc.residualPercent;
+  if (input.dealType === 'lease' && residual !== undefined && residual >= 50 && residual < 55) {
+    notes.push({ id: 'residual', weight: 6, headline: HOLDBACKS.HB_RESIDUAL_HEAD, issue: HOLDBACKS.HB_RESIDUAL_ISSUE, action: HOLDBACKS.HB_RESIDUAL_ACTION });
+  }
+  if (notes.length === 0) {
+    notes.push({ id: 'short', weight: 1, headline: HOLDBACKS.HB_SHORT_HEAD, issue: HOLDBACKS.HB_SHORT_ISSUE, action: HOLDBACKS.HB_SHORT_ACTION });
+  }
+  notes.sort((a, b) => b.weight - a.weight || a.id.localeCompare(b.id));
+  return notes.slice(0, 2);
+}
+
 function headline(result: EngineResult): Template {
   if (result.grade === 'F') return HEADLINES.HL_F;
   if (has(result, 'FLAG_NEGATIVE_EQUITY')) return HEADLINES.HL_D_EQUITY;
@@ -86,7 +128,6 @@ function headline(result: EngineResult): Template {
   if (['LEASE_ADDONS', 'FIN_ADDONS'].includes(result.archetype)) return HEADLINES.HL_ADDONS;
   if (['LEASE_HIGH_FEES', 'FIN_HIGH_FEES'].includes(result.archetype)) return HEADLINES.HL_C_FEES;
   if (result.grade === 'A') return HEADLINES.HL_A;
-  if (result.grade === 'B' && result.flags.length === 0) return HEADLINES.HL_B_NEAR;
   if (result.grade === 'B') return HEADLINES.HL_B;
   return HEADLINES.HL_C_MIXED;
 }
@@ -243,11 +284,15 @@ export function buildTenantReport(input: EngineInput, creditUnionName: string): 
       : { assessment: 'good' as const, headline: fill(TRADE.posHead, values), details: fill(TRADE.posDetail, values) }
     : null;
 
+  const notes = holdbacks(input, result);
+  const headlineTemplate = result.grade === 'B' && result.flags.length === 0
+    ? notes[0]?.headline ?? HOLDBACKS.HB_SHORT_HEAD
+    : headline(result);
   return {
     grade: result.grade,
     recommendation: result.recommendation,
     recommendationLabel: fill(RECOMMENDATION_LABELS[result.recommendation], values),
-    headline: fill(headline(result), values),
+    headline: fill(headlineTemplate, values),
     gradeExplanation: fill(
       result.grade === 'B' && result.flags.length === 0 ? GRADE_EXPLANATIONS.GE_B_NEAR : GRADE_EXPLANATIONS[`GE_${result.grade}`],
       values,
@@ -259,6 +304,11 @@ export function buildTenantReport(input: EngineInput, creditUnionName: string): 
       id: f.id,
       issue: fill(FLAG_COPY[f.id].issue, values),
       action: fill(FLAG_COPY[f.id].action, values),
+    })),
+    notes: notes.map(note => ({
+      id: note.id,
+      issue: fill(note.issue, values),
+      action: fill(note.action, values),
     })),
     questionsToAsk: fill(questions(result), values),
     tradeIn,

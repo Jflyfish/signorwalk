@@ -298,6 +298,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(dashboard.includes('Since pilot start'), false);
   assert.match(dashboard, /All time/);
   assert.match(dashboard, /href=\{shareUrl\}/);
+  assert.match(dashboard, /memberOrigin/);
+  assert.equal(dashboard.includes('https://signorwalk.com/cu/${'), false);
   assert.match(dashboard, /Your member link/);
   const memberAt = dashboard.indexOf('Your member link');
   const loanAt = dashboard.indexOf('name="preApprovalUrl"');

@@ -55,6 +55,26 @@ test('every golden fixture renders a template report without free text', () => {
   }
 });
 
+test('a typical B names the calculated shortfall instead of repeating the letter', () => {
+  const fixture = cases.find(item => item.name === 'fin-average');
+  assert.ok(fixture);
+  const report = buildTenantReport(fixture.input, 'Harborlight Credit Union');
+  assert.equal(report.grade, 'B');
+  assert.equal(report.itemsToReview.length, 0);
+  assert.ok(report.notes.length >= 1 && report.notes.length <= 2);
+  assert.match(report.headline, /4\.3%/);
+  assert.match(report.headline, /8%/);
+  assert.equal(report.headline.includes(report.gradeExplanation), false);
+  assert.equal(report.gradeExplanation.includes('4.3%'), false);
+  assert.equal(report.gradeExplanation.includes('near this tool'), false);
+  const inline = report.notes.map(note => `${note.issue} ${note.action}`).join(' ');
+  assert.match(inline, /6\.9%/);
+  assert.match(inline, /6%/);
+  const strong = buildTenantReport(cases.find(item => item.name === 'fin-clean-strong')!.input, 'Harborlight Credit Union');
+  assert.equal(strong.grade, 'A');
+  assert.equal(strong.notes.length, 0);
+});
+
 test('free-text fields are dropped and do not appear in the report', () => {
   const report = gradePayload({
     dealType: 'finance',

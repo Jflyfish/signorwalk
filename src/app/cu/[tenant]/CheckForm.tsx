@@ -250,11 +250,10 @@ export function CheckForm({
   }
 
   if (report) {
-    const shown = report.itemsToReview.slice(0, 2);
-    const rest = report.itemsToReview.slice(2);
-    const caption = report.grade === 'A' || shown.length > 0 || report.recommendation !== 'sign'
-      ? report.recommendationLabel
-      : '';
+    const usingFlags = report.itemsToReview.length > 0;
+    const shown = (usingFlags ? report.itemsToReview : report.notes).slice(0, 2);
+    const rest = usingFlags ? report.itemsToReview.slice(2) : [];
+    const caption = report.grade === 'A' || report.recommendation !== 'sign' ? report.recommendationLabel : '';
     const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
     return (
       <div className={embedded

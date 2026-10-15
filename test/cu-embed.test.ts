@@ -9,6 +9,7 @@ import {
   completedMessage,
   deepLink,
   embedTenantId,
+  memberOrigin,
   frameAncestorSources,
   frameAncestorsForPath,
   frameAncestorsToken,
@@ -62,6 +63,19 @@ test('embed CSP allowlist is per tenant and only on the embed route', async () =
   assert.match(await csp('/credit-unions/embed-demo'), /frame-ancestors 'none'/);
   assert.equal(await frameOptions('/credit-unions/embed-demo'), 'DENY');
   assert.match(await csp('/cu/harborlight-cu/dashboard'), /frame-ancestors 'none'/);
+});
+
+test('member links use the request host, then VERCEL_URL', () => {
+  const preview = memberOrigin(() => null, 'signorwalk-git-example.vercel.app');
+  assert.equal(preview, 'https://signorwalk-git-example.vercel.app');
+  const fromHost = memberOrigin(name => {
+    if (name === 'x-forwarded-host') return 'signorwalk-git-example.vercel.app';
+    if (name === 'x-forwarded-proto') return 'https';
+    return null;
+  }, 'other.vercel.app');
+  assert.equal(fromHost, 'https://signorwalk-git-example.vercel.app');
+  assert.equal(memberOrigin(() => null, ''), 'https://signorwalk.com');
+  assert.equal(memberOrigin(() => null, 'not a host'), 'https://signorwalk.com');
 });
 
 test('embed messages are namespaced and carry only height or a grade letter', () => {

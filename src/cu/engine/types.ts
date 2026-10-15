@@ -121,6 +121,8 @@ export interface TenantReport {
   archetype: Archetype;
   breakdown: ReportRow[];
   itemsToReview: { id: FlagId; issue: string; action: string }[];
+  /** Shown when no flag fired but the grade is still short of A. Not logged as flags. */
+  notes: { id: string; issue: string; action: string }[];
   questionsToAsk: string;
   tradeIn: { assessment: 'good' | 'warn' | 'bad'; headline: string; details: string } | null;
   stateTaxNote: string | null;

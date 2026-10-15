@@ -28,6 +28,19 @@ export type EmbedDecision =
 
 const FRAMED = new Set(['iframe', 'frame', 'embed', 'object']);
 
+/** Public site origin for member links. Request host first, then VERCEL_URL, then production. */
+export function memberOrigin(get: (name: string) => string | null, envUrl?: string | null): string {
+  const fromRequest = requestOriginFrom(get);
+  if (fromRequest) return fromRequest;
+  const raw = (envUrl ?? '').trim();
+  if (raw) {
+    const host = raw.replace(/^https?:\/\//i, '').split('/')[0]?.trim().toLowerCase() ?? '';
+    const origin = host ? `https://${host}` : '';
+    if (origin && isEmbedOrigin(origin)) return origin;
+  }
+  return 'https://signorwalk.com';
+}
+
 export function requestOriginFrom(get: (name: string) => string | null): string | null {
   const host = (get('x-forwarded-host') ?? get('host') ?? '').split(',')[0]?.trim().toLowerCase() ?? '';
   if (!host || /[\s/]/.test(host)) return null;
