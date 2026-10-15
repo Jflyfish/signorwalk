@@ -10,7 +10,7 @@ export function summaryText(name: string, agg: Aggregates): string {
   return [
     name,
     `Checks: ${agg.checks}`,
-    `Uploads read: ${agg.uploads}`,
+    `Worksheet uploads: ${agg.uploads}`,
     `Grades: A ${agg.grades.A}, B ${agg.grades.B}, C ${agg.grades.C}, D ${agg.grades.D}, F ${agg.grades.F}`,
     'No member information is included.',
   ].join('\n');

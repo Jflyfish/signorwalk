@@ -184,3 +184,18 @@ test('stripe checkout stays unwired', () => {
   assert.equal(src.includes('sk_live'), false);
   assert.equal(src.includes('sk_test'), false);
 });
+
+test('growth copy and the worksheet route stay on the approved words', () => {
+  const page = readFileSync('src/app/credit-unions/page.tsx', 'utf8');
+  const started = readFileSync('src/app/credit-unions/get-started/page.tsx', 'utf8');
+  const extract = readFileSync('src/app/api/cu/[tenant]/extract/route.ts', 'utf8');
+  const form = readFileSync('src/app/cu/[tenant]/CheckForm.tsx', 'utf8');
+  assert.equal(page.includes('Most chosen'), false);
+  assert.match(page, /UPLOAD_DISCLOSURE/);
+  assert.match(page, /DOCUMENT_VERSION_LABEL/);
+  assert.match(started, /Email us to start your pilot and we'll set it up within 1 business day\./);
+  assert.equal(extract.includes('export const GET'), false);
+  assert.match(extract, /export async function POST/);
+  assert.match(form, /FILE_READ_ERROR/);
+  assert.match(form, /UPLOAD_DISCLOSURE/);
+});

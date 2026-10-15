@@ -39,9 +39,9 @@ export default async function CuLayout({
   const tenant = getCuTenant((await params).tenant);
   if (!tenant) {
     return (
-      <div className="cu-missing min-h-screen bg-white text-[#111]">
+      <div className="cu-missing min-h-screen bg-white cu-ink">
         <style>{`
-          .cu-missing :focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+          .cu-missing :focus-visible { outline: 2px solid var(--cu-ink); outline-offset: 2px; }
         `}</style>
         {children}
       </div>
@@ -50,7 +50,7 @@ export default async function CuLayout({
   const brand = await resolveBrand(tenant);
   return (
     <div
-      className={`cu-shell min-h-screen bg-white text-[#111] ${brand.font === 'serif' ? 'cu-serif' : ''}`}
+      className={`cu-shell min-h-screen bg-white cu-ink ${brand.font === 'serif' ? 'cu-serif' : ''}`}
       style={{
         ['--cu-fill' as string]: brand.brandFill,
         ['--cu-on' as string]: brand.onBrand,

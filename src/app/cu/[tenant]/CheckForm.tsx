@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState } from 'react';
 import { track } from '@vercel/analytics';
+import { FILE_READ_ERROR, UPLOAD_DISCLOSURE } from '@/cu/copy';
 import type { DerivedBrand } from '@/cu/contrast';
 import { GRADE_FILL } from '@/cu/grades';
 import type { TenantReport } from '@/cu/engine/types';
@@ -36,7 +37,7 @@ type FieldKey = keyof typeof EMPTY;
 type DealType = 'lease' | 'finance';
 
 const inputClass =
-  'w-full h-12 px-4 rounded-lg border border-[#E5E5E5] bg-white text-[18px] leading-[28px] text-[#111]';
+  'w-full h-12 px-4 rounded-lg border cu-line bg-white text-[18px] leading-[28px] cu-ink';
 
 const textLink =
   'cu-link text-[15px] font-semibold hover:underline underline-offset-4';
@@ -54,7 +55,7 @@ function Field({
   return (
     <div>
       <label htmlFor={id} className="mb-2 block text-[14px] font-semibold leading-[20px]">{label}</label>
-      {hint ? <p id={hintId} className="mb-2 text-[14px] leading-[20px] text-[#555]">{hint}</p> : null}
+      {hint ? <p id={hintId} className="mb-2 text-[14px] leading-[20px] cu-muted">{hint}</p> : null}
       <input
         id={id}
         name={id}
@@ -133,7 +134,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
       const res = await fetch(`/api/cu/${tenant.id}/extract`, { method: 'POST', body });
       const data = await res.json();
       if (!res.ok || !data.success || !data.fields || typeof data.fields !== 'object') {
-        setUploadNote(typeof data.error === 'string' ? data.error : 'Enter the numbers instead.');
+        setUploadNote(typeof data.error === 'string' ? data.error : FILE_READ_ERROR);
         return;
       }
       if (data.dealType === 'lease' || data.dealType === 'finance') switchType(data.dealType);
@@ -147,7 +148,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
       if (next.extendedWarranty || next.gapInsurance || next.tireWheel || next.paintInterior) setShowAddons(true);
       setUploadNote('Numbers filled from the worksheet. The file was not stored.');
     } catch {
-      setUploadNote('Enter the numbers instead.');
+      setUploadNote(FILE_READ_ERROR);
     }
   }
 
@@ -235,7 +236,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
     return (
       <div className="mx-auto w-full max-w-[560px] px-4 pb-24 pt-16 md:pb-16 md:pt-24">
         <div className="flex flex-col md:flex-row md:items-center md:gap-4">
-          <p className="text-[14px] leading-[20px] text-[#555] md:hidden">Grade</p>
+          <p className="text-[14px] leading-[20px] cu-muted md:hidden">Grade</p>
           <p
             aria-hidden="true"
             className="mt-4 flex h-24 w-24 shrink-0 items-center justify-center rounded-[16px] text-[64px] font-extrabold leading-none md:mt-0"
@@ -244,7 +245,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
             {report.grade}
           </p>
           <div className="mt-4 md:mt-0">
-            <p className="hidden text-[14px] leading-[20px] text-[#555] md:block">Grade</p>
+            <p className="hidden text-[14px] leading-[20px] cu-muted md:block">Grade</p>
             <h1 ref={headingRef} tabIndex={-1} className="text-[18px] leading-[28px] md:mt-4">
               <span className="sr-only">{report.grade}. </span>{report.headline}
             </h1>
@@ -260,7 +261,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
           </section>
         )}
 
-        <div className="fixed inset-x-0 bottom-0 border-t border-[#E5E5E5] bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0">
+        <div className="fixed inset-x-0 bottom-0 border-t cu-line bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0">
           <Primary
             href={tenant.preApprovalUrl}
             onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
@@ -270,7 +271,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
           </Primary>
         </div>
 
-        <div className="mt-10 border-t border-[#E5E5E5] pt-6">
+        <div className="mt-10 border-t cu-line pt-6">
           <button
             type="button"
             className={`${textLink} inline-flex items-center gap-1`}
@@ -287,13 +288,13 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
                   <h2 id="breakdown-heading" className="text-[24px] font-bold leading-[30px]">Figures you entered</h2>
                   <ul className="mt-4">
                     {report.breakdown.map(row => (
-                      <li key={row.label} className="border-t border-[#E5E5E5] py-4">
+                      <li key={row.label} className="border-t cu-line py-4">
                         <div className="flex items-baseline justify-between gap-4">
                           <p className="text-[18px] leading-[28px]">{row.label}</p>
                           <p className="text-[18px] font-semibold leading-[28px] tabular-nums">{row.value}</p>
                         </div>
-                        <p className="text-[14px] leading-[20px] text-[#555]">{statusText(row.status)}</p>
-                        <p className="mt-2 text-[14px] leading-[20px] text-[#555]">{row.explanation}</p>
+                        <p className="text-[14px] leading-[20px] cu-muted">{statusText(row.status)}</p>
+                        <p className="mt-2 text-[14px] leading-[20px] cu-muted">{row.explanation}</p>
                       </li>
                     ))}
                   </ul>
@@ -307,34 +308,34 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
                     {rest.map(item => (
                       <li key={item.id}>
                         {item.issue}
-                        <span className="mt-2 block text-[14px] leading-[20px] text-[#555]">{item.action}</span>
+                        <span className="mt-2 block text-[14px] leading-[20px] cu-muted">{item.action}</span>
                       </li>
                     ))}
                   </ul>
                 </section>
               )}
 
-              <section className="mt-10 border-t border-[#E5E5E5] pt-6" aria-labelledby="questions-heading">
+              <section className="mt-10 border-t cu-line pt-6" aria-labelledby="questions-heading">
                 <h2 id="questions-heading" className="text-[24px] font-bold leading-[30px]">Questions you can ask</h2>
                 <p className="mt-4 text-[18px] leading-[28px]">{report.questionsToAsk}</p>
-                <p className="mt-4 text-[14px] leading-[20px] text-[#555]">{report.structureNote}</p>
+                <p className="mt-4 text-[14px] leading-[20px] cu-muted">{report.structureNote}</p>
               </section>
 
               {report.tradeIn && (
-                <section className="mt-10 border-t border-[#E5E5E5] pt-6" aria-labelledby="trade-heading">
+                <section className="mt-10 border-t cu-line pt-6" aria-labelledby="trade-heading">
                   <h2 id="trade-heading" className="text-[24px] font-bold leading-[30px]">{report.tradeIn.headline}</h2>
                   <p className="mt-4 text-[18px] leading-[28px]">{report.tradeIn.details}</p>
                 </section>
               )}
 
               {report.stateTaxNote && (
-                <section className="mt-10 border-t border-[#E5E5E5] pt-6" aria-labelledby="tax-heading">
+                <section className="mt-10 border-t cu-line pt-6" aria-labelledby="tax-heading">
                   <h2 id="tax-heading" className="text-[24px] font-bold leading-[30px]">Trade-in and tax</h2>
                   <p className="mt-4 text-[18px] leading-[28px]">{report.stateTaxNote}</p>
                 </section>
               )}
 
-              <ul className="mt-10 space-y-4 border-t border-[#E5E5E5] pt-6 text-[14px] leading-[20px] text-[#555]">
+              <ul className="mt-10 space-y-4 border-t cu-line pt-6 text-[14px] leading-[20px] cu-muted">
                 {report.disclaimers.map(line => <li key={line}>{line}</li>)}
               </ul>
 
@@ -364,14 +365,14 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
   return (
     <div className="mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pb-24 md:pt-24">
       <h1 className="text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px]">Check a dealer offer</h1>
-      <p className="mt-6 text-[18px] leading-[28px] text-[#555]">Enter the numbers from the dealer worksheet.</p>
+      <p className="mt-6 text-[18px] leading-[28px] cu-muted">Enter the numbers from the dealer worksheet.</p>
 
       <form onSubmit={onSubmit} className="mt-10" aria-describedby={error ? `${formId}-error` : undefined}>
         <div role="status" aria-live="polite" className="sr-only">{busy ? 'Checking the numbers.' : ''}</div>
         {error ? <p id={`${formId}-error`} role="alert" className="mb-6 text-[14px] font-semibold leading-[20px]">{error}</p> : null}
 
         <div className="mb-6">
-          <label htmlFor="worksheet" className={`${textLink} underline decoration-[#555] decoration-1 underline-offset-4`}>
+          <label htmlFor="worksheet" className={`${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
             Upload a dealer worksheet
           </label>
           <input
@@ -385,7 +386,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
               void onUpload(file);
             }}
           />
-          <p className="mt-2 text-[14px] leading-[20px] text-[#555]" role="status">{uploadNote || 'The file is read for numbers and then discarded. It is not stored.'}</p>
+          <p className="mt-2 text-[14px] leading-[20px] cu-muted" role="status">{uploadNote || UPLOAD_DISCLOSURE}</p>
         </div>
 
         <fieldset>
@@ -400,7 +401,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
                   style={{
                     borderStyle: 'solid',
                     borderWidth: selected ? 2 : 1,
-                    borderColor: selected ? accent : '#E5E5E5',
+                    borderColor: selected ? accent : 'var(--cu-line)',
                     backgroundColor: selected ? brand.tint : '#fff',
                   }}
                 >
@@ -453,7 +454,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
           )}
         </div>
 
-        <div className="mt-6 border-t border-[#E5E5E5] pt-6">
+        <div className="mt-6 border-t cu-line pt-6">
           <label className="flex items-center gap-2 text-[15px] font-semibold">
             <input type="checkbox" checked={showTrade} onChange={e => setShowTrade(e.target.checked)} />
             Include a trade-in
@@ -466,7 +467,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
           )}
         </div>
 
-        <div className="mt-6 border-t border-[#E5E5E5] pt-6">
+        <div className="mt-6 border-t cu-line pt-6">
           <label className="flex items-center gap-2 text-[15px] font-semibold">
             <input type="checkbox" checked={showAddons} onChange={e => setShowAddons(e.target.checked)} />
             Include optional products

@@ -3,9 +3,10 @@ import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
-import { getAggregates, getBranding, getSettings, staffDirectory } from '@/cu/cu-store';
+import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
 import { getCuTenant } from '@/cu/tenants';
-import { saveSettingsAction, sendSummaryAction, signOut } from '../../actions';
+import { AccountMenu } from '../../AccountMenu';
+import { saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 import { BrandingForm } from './BrandingForm';
 
@@ -52,14 +53,15 @@ export default async function DashboardPage({
   const stored = await getBranding(tenant.id);
   const query = await searchParams;
   const section = sectionFrom(query);
-  const notice = NOTICES[query.saved ?? ''] || NOTICES[query.notice ?? ''];
   const error = query.error === 'branding'
     ? 'Check the short name and colors.'
     : query.error === 'email'
       ? 'Check the credit-union email address.'
       : '';
-  const staff = staffDirectory().filter(row => row.tenantId === tenant.id);
+  const saved = query.saved ? NOTICES[query.saved] : '';
+  const caution = query.notice ? NOTICES[query.notice] : '';
   const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
+  const shareUrl = `https://signorwalk.com/cu/${tenant.id}`;
   const tabs: { id: Section; label: string }[] = [
     { id: 'usage', label: 'Usage' },
     { id: 'branding', label: 'Branding' },
@@ -68,7 +70,7 @@ export default async function DashboardPage({
 
   return (
     <>
-      <header className="border-b border-[#E5E5E5]">
+      <header className="border-b cu-line">
         <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-4">
           <BrandLockup
             name={tenant.name}
@@ -79,25 +81,16 @@ export default async function DashboardPage({
             logoAspect={brand.logoAspect}
             fullNameOnPhone
           />
-          <details className="relative shrink-0">
-            <summary className="cursor-pointer text-[15px] font-semibold">Account</summary>
-            <div className="absolute right-0 z-10 mt-2 w-56 border border-[#E5E5E5] bg-white p-4">
-              <p className="text-[14px] leading-[20px] text-[#555]">{session?.role === 'admin' ? 'Admin' : 'Credit union account'}</p>
-              <form action={signOut}>
-                <input type="hidden" name="tenant" value={tenant.id} />
-                <button type="submit" className="cu-link mt-3 text-[15px] font-semibold underline decoration-[#555] underline-offset-4">Sign out</button>
-              </form>
-            </div>
-          </details>
+          <AccountMenu tenant={tenant.id} linkClassName="cu-link text-[15px] font-semibold underline underline-offset-4 cu-linkline" />
         </div>
       </header>
-      <nav className="border-b border-[#E5E5E5]">
+      <nav className="border-b cu-line">
         <div className="mx-auto flex w-full max-w-[1120px] gap-6 px-4">
           {tabs.map(tab => (
             <a
               key={tab.id}
               href={`/cu/${tenant.id}/dashboard?section=${tab.id}`}
-              className={`py-3 text-[15px] font-semibold ${section === tab.id ? 'cu-nav-active' : 'text-[#555]'}`}
+              className={`py-3 text-[15px] font-semibold ${section === tab.id ? 'cu-nav-active' : 'cu-muted'}`}
               aria-current={section === tab.id ? 'page' : undefined}
             >
               {tab.label}
@@ -106,59 +99,49 @@ export default async function DashboardPage({
         </div>
       </nav>
       <main className="mx-auto w-full max-w-[1120px] px-4 py-10">
-        {notice ? <p className="mb-6 text-[14px] font-semibold leading-[20px]" role="status">{notice}</p> : null}
-        {error ? <p className="mb-6 text-[14px] font-semibold leading-[20px]" role="alert">{error}</p> : null}
+        {saved ? <p className="cu-ok mb-6 rounded-lg px-4 py-3 text-[14px] font-semibold leading-[20px]" role="status">{saved}</p> : null}
+        {caution ? <p className="cu-err mb-6 rounded-lg px-4 py-3 text-[14px] font-semibold leading-[20px]" role="status">{caution}</p> : null}
+        {error ? <p className="cu-err mb-6 rounded-lg px-4 py-3 text-[14px] font-semibold leading-[20px]" role="alert">{error}</p> : null}
 
         {section === 'usage' ? <section aria-labelledby="usage-heading">
           <h1 id="usage-heading" className="text-[32px] font-bold leading-[38px]">Usage</h1>
-          <div className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-3">
+          <p className="mt-4 text-[14px] leading-[20px] cu-muted">Since pilot start</p>
+          <div className="mt-8 grid grid-cols-2 gap-6">
             <p>
               <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{aggregates.checks}</span>
-              <span className="mt-2 block text-[14px] leading-[20px] text-[#555]">Checks</span>
+              <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Checks</span>
             </p>
             <p>
               <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{aggregates.uploads}</span>
-              <span className="mt-2 block text-[14px] leading-[20px] text-[#555]">Uploads read</span>
-            </p>
-            <p>
-              <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{staff.length}</span>
-              <span className="mt-2 block text-[14px] leading-[20px] text-[#555]">Accounts</span>
+              <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Worksheet uploads</span>
             </p>
           </div>
-          <div className="mt-10">
-            <table className="w-full max-w-[560px] border-collapse text-left">
-              <thead>
-                <tr className="border-b border-[#E5E5E5] text-[14px] leading-[20px] text-[#555]">
-                  <th className="py-3 pr-4 font-semibold">Grade</th>
-                  <th className="py-3 text-right font-semibold">Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
-                  <tr key={grade} className="border-b border-[#E5E5E5] text-[15px]">
-                    <td className="py-3 pr-4">{grade}</td>
-                    <td className="py-3 text-right tabular-nums">{aggregates.grades[grade]}</td>
+          {aggregates.checks === 0 ? (
+            <p className="mt-10 max-w-[560px] text-[15px] leading-[24px]">
+              No checks yet. Share your link: <a href={shareUrl} className="cu-link underline underline-offset-4 cu-linkline">{shareUrl}</a>
+            </p>
+          ) : (
+            <div className="mt-10">
+              <table className="w-full max-w-[560px] border-collapse text-left">
+                <thead>
+                  <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
+                    <th className="py-3 pr-4 font-semibold">Grade</th>
+                    <th className="py-3 text-right font-semibold">Count</th>
+                    <th className="py-3 pl-4 text-right font-semibold">Share</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <table className="mt-10 w-full border-collapse text-left">
-            <thead>
-              <tr className="border-b border-[#E5E5E5] text-[14px] leading-[20px] text-[#555]">
-                <th className="py-3 pr-4 font-semibold">Account</th>
-                <th className="py-3 font-semibold">Role</th>
-              </tr>
-            </thead>
-            <tbody>
-              {staff.map(row => (
-                <tr key={row.label} className="border-b border-[#E5E5E5] text-[15px]">
-                  <td className="py-3 pr-4">{row.label}</td>
-                  <td className="py-3">Credit union</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
+                    <tr key={grade} className="border-b cu-line text-[15px]">
+                      <td className="py-3 pr-4">{grade}</td>
+                      <td className="py-3 text-right tabular-nums">{aggregates.grades[grade]}</td>
+                      <td className="py-3 pl-4 text-right tabular-nums">{Math.round((aggregates.grades[grade] / aggregates.checks) * 100)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section> : null}
 
         {section === 'branding' ? <section aria-labelledby="branding-heading">
@@ -181,17 +164,17 @@ export default async function DashboardPage({
               <input type="checkbox" name="emailEnabled" defaultChecked={settings.emailEnabled} />
               Email aggregate summaries
             </label>
-            <p className="text-[14px] leading-[20px] text-[#555]">Off by default. Summaries contain counts only.</p>
+            <p className="text-[14px] leading-[20px] cu-muted">Off by default. Summaries contain counts only.</p>
             <label className="text-[14px] font-semibold leading-[20px]">Credit-union inbox
-              <input name="notifyEmail" type="email" defaultValue={settings.notifyEmail ?? ''} autoComplete="off" className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal" />
+              <input name="notifyEmail" type="email" defaultValue={settings.notifyEmail ?? ''} autoComplete="off" className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
             </label>
             <button type="submit" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save settings</button>
           </form>
           <div className="mt-6">
-            <p className="text-[14px] leading-[20px] text-[#555]">Emails the counts to the credit-union inbox.</p>
+            <p className="text-[14px] leading-[20px] cu-muted">Emails the counts to the credit-union inbox.</p>
             <form action={sendSummaryAction} className="mt-2">
               <input type="hidden" name="tenant" value={tenant.id} />
-              <button type="submit" className="cu-link text-[15px] font-semibold underline decoration-[#555] decoration-1 underline-offset-4">Send summary</button>
+              <button type="submit" className="cu-link text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline">Send summary</button>
             </form>
           </div>
         </section> : null}

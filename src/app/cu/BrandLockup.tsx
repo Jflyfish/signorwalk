@@ -20,7 +20,7 @@ export function BrandLockup({
 }) {
   const custom = Boolean(logoLight && !logoLight.startsWith('/cu-brand/'));
   const productLine = beside ? (
-    <p className={`min-w-0 text-[14px] leading-[20px] text-[#555] ${fullNameOnPhone ? 'hidden md:block' : ''}`}>
+    <p className={`min-w-0 text-[14px] leading-[20px] cu-muted ${fullNameOnPhone ? 'hidden md:block' : ''}`}>
       {custom || mark ? null : <span className="sr-only">{name} </span>}with Sign or Walk
     </p>
   ) : null;
@@ -43,9 +43,9 @@ export function BrandLockup({
         </span>
       ) : null}
       {fullNameOnPhone ? (
-        <span className="min-w-0 text-[15px] font-semibold leading-[20px] text-[#111] md:hidden">{name}</span>
+        <span className="min-w-0 text-[15px] font-semibold leading-[20px] cu-ink md:hidden">{name}</span>
       ) : null}
-      <span className={`min-w-0 truncate text-[15px] font-semibold leading-[20px] text-[#111] ${fullNameOnPhone ? 'hidden md:inline' : ''}`}>{shortName}</span>
+      <span className={`min-w-0 truncate text-[15px] font-semibold leading-[20px] cu-ink ${fullNameOnPhone ? 'hidden md:inline' : ''}`}>{shortName}</span>
       {productLine}
     </div>
   );

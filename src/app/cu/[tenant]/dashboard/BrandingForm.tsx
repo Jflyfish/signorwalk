@@ -20,7 +20,7 @@ function Swatch({ label, color }: { label: string; color: string }) {
   return (
     <div>
       <span className="block h-6 w-6" style={{ backgroundColor: color }} aria-hidden="true" />
-      <span className="mt-2 block text-[14px] leading-[20px] text-[#555]">{label}</span>
+      <span className="mt-2 block text-[14px] leading-[20px] cu-muted">{label}</span>
     </div>
   );
 }
@@ -28,7 +28,7 @@ function Swatch({ label, color }: { label: string; color: string }) {
 function LogoStage({ src, dark }: { src: string; dark?: boolean }) {
   if (!src) return null;
   return (
-    <div className={`mt-2 inline-flex items-center ${dark ? 'bg-[#111] px-3 py-2' : 'bg-white'}`}>
+    <div className={`mt-2 inline-flex items-center ${dark ? 'cu-solid px-3 py-2' : 'bg-white'}`}>
       <img src={src} alt="" className="h-8 w-auto max-w-[160px] object-contain" />
     </div>
   );
@@ -86,7 +86,7 @@ export function BrandingForm({
           onChange={event => setName(event.target.value)}
           maxLength={24}
           required
-          className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal"
+          className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal"
         />
       </label>
       <label className="text-[14px] font-semibold leading-[20px]">Primary
@@ -95,11 +95,11 @@ export function BrandingForm({
           value={color}
           onChange={event => setColor(event.target.value.trim())}
           required
-          className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal"
+          className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal"
         />
       </label>
       <label className="text-[14px] font-semibold leading-[20px]">Secondary
-        <input name="secondary" defaultValue={secondary} className="mt-2 block h-12 w-full rounded-lg border border-[#E5E5E5] px-4 text-[16px] font-normal" />
+        <input name="secondary" defaultValue={secondary} className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
       </label>
       <div>
         <label className="text-[14px] font-semibold leading-[20px]">Logo

@@ -1,6 +1,6 @@
 /**
  * PAYMENTS ARE NOT BUILT.
- * /credit-unions/get-started only says self-serve checkout is coming.
+ * /credit-unions/get-started asks the credit union to email us to start the pilot.
  * Nothing here calls Stripe, reads a secret, stores a form, or writes a tenant.
  *
  * Planned approach, not implemented:

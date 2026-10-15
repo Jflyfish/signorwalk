@@ -186,7 +186,7 @@ export function staffDirectory(): StaffLabel[] {
   const demo = (process.env.CU_DEMO_TENANT || 'harborlight-cu').trim().toLowerCase();
   return [
     { label: 'Demo credit union account', role: 'cu', tenantId: demo },
-    { label: 'Sign or Walk admin', role: 'admin', tenantId: '*' },
+    { label: 'Sign or Walk admin', role: 'admin', tenantId: 'all' },
   ];
 }
 

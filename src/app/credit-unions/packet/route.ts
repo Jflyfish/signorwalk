@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { dueDiligenceDocs } from '@/cu/packet/documents';
 import { buildZip } from '@/cu/packet/zip';
+import { DOCUMENT_VERSION_LABEL } from '../pricing';
 
-const FILENAME = 'sign-or-walk-cu-due-diligence-draft-v0.9.zip';
+const FILENAME = `sign-or-walk-cu-due-diligence-${DOCUMENT_VERSION_LABEL.replace(/ /g, '-')}.zip`;
 
 const README = `Sign or Walk credit-union due diligence packet
-Draft v0.9 — 2026-10-14
+${DOCUMENT_VERSION_LABEL.replace(/^draft/, 'Draft')} — 2026-10-14
 
 These files are placeholders for counsel and vendor risk.
 They are not a signed contract, not an audit, and not a certification.

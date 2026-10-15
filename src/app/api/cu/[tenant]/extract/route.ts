@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applySecurityHeaders } from '@/cu/headers';
+import { FILE_READ_ERROR } from '@/cu/copy';
 import { formatOcrLog, OCR_PROMPT, pickOcrFields, type OcrOutcome } from '@/cu/ocr';
 import { recordUpload } from '@/cu/cu-store';
 import { missingTenantResponse } from '@/cu/missing-page';
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
     const content = message.content.find(part => part.type === 'text');
     if (!content || content.type !== 'text') {
       log('error');
-      return json(pathname, { success: false, error: 'Enter the numbers instead.' }, 502);
+      return json(pathname, { success: false, error: FILE_READ_ERROR }, 502);
     }
     let text = content.text;
     let parsed: unknown;
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
     text = '';
     if (!parsed) {
       log('invalid');
-      return json(pathname, { success: false, error: 'Enter the numbers instead.' }, 422);
+      return json(pathname, { success: false, error: FILE_READ_ERROR }, 422);
     }
     const picked = pickOcrFields(parsed);
     await recordUpload(tenant.id).catch(() => undefined);
@@ -108,11 +109,6 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
     return json(pathname, { success: true, ...picked }, 200);
   } catch {
     log('error');
-    return json(pathname, { success: false, error: 'Enter the numbers instead.' }, 500);
+    return json(pathname, { success: false, error: FILE_READ_ERROR }, 500);
   }
 }
-
-export const GET = POST;
-export const PUT = POST;
-export const PATCH = POST;
-export const DELETE = POST;
