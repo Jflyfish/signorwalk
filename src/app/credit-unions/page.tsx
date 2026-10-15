@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { AiDisclosure } from './AiDisclosure';
+import { LiveEmbed } from './LiveEmbed';
 import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
@@ -61,11 +62,7 @@ export default function CreditUnionsPage() {
           See it in action.{' '}
           <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
         </p>
-        <iframe
-          title="Check a dealer offer"
-          src="/cu/harborlight-cu/embed?entry=numbers"
-          className="mt-4 h-[720px] w-full border cu-line"
-        />
+        <LiveEmbed title="Check a dealer offer" src="/cu/harborlight-cu/embed?entry=numbers" />
       </div>
 
       <div className="mt-16 cu-band py-16 md:mt-24">

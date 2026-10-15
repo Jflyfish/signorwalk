@@ -50,6 +50,7 @@ function t(id: string, text: string, slots: readonly Slot[] = []): Template {
 
 export const HEADLINES = {
   HL_A: t('HL_A', 'These numbers compare favorably with typical benchmarks.'),
+  HL_B_NEAR: t('HL_B_NEAR', 'These numbers are near this tool\'s benchmarks.'),
   HL_B: t('HL_B', 'These numbers are close to typical benchmarks, with a few items to review.'),
   HL_C_RATE: t('HL_C_RATE', 'The rate on this offer is above the ranges this tool uses as a benchmark.'),
   HL_C_FEES: t('HL_C_FEES', 'A fee on this offer sits outside the range this tool treats as typical.'),
@@ -65,6 +66,7 @@ export const HEADLINES = {
 export const GRADE_EXPLANATIONS = {
   GE_A: t('GE_A', 'Grade A means the numbers entered compare favorably with this tool\'s benchmarks. The grade is a comparison, not a recommendation to sign and not a credit decision.'),
   GE_B: t('GE_B', 'Grade B means the numbers are near this tool\'s benchmarks. Review any item marked for a closer look. The grade is not a credit decision.'),
+  GE_B_NEAR: t('GE_B_NEAR', 'Grade B means the numbers are near this tool\'s benchmarks. The grade is a comparison, not a recommendation to sign and not a credit decision.'),
   GE_C: t('GE_C', 'Grade C means some numbers sit outside this tool\'s benchmarks. Reviewing those items with the dealer is a reasonable next step. The grade is not a credit decision.'),
   GE_D: t('GE_D', 'Grade D means several numbers sit well outside this tool\'s benchmarks. The grade compares figures you entered. It is not a credit decision and not an instruction.'),
   GE_F: t('GE_F', 'Grade F means the combination of numbers compares unfavorably with this tool\'s benchmarks. You may want to ask for a revised written offer. The grade is not a credit decision.'),

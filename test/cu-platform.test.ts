@@ -266,10 +266,12 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(page.includes('Cancel anytime'), false);
   assert.equal(page.includes('DemoFrame'), false);
   assert.match(page, /\/cu\/harborlight-cu\/embed\?entry=numbers/);
-  const iframe = page.match(/<iframe[\s\S]*?\/>/);
-  assert.ok(iframe);
-  assert.equal(iframe[0].includes('hidden'), false);
-  assert.equal(iframe[0].includes('md:hidden'), false);
+  assert.match(page, /<LiveEmbed/);
+  const iframe = readFileSync('src/app/credit-unions/LiveEmbed.tsx', 'utf8');
+  assert.match(iframe, /<iframe/);
+  assert.match(iframe, /EMBED_RESIZE/);
+  assert.equal(iframe.includes('h-[720px]'), false);
+  assert.equal(iframe.includes('hidden'), false);
   assert.match(page, /Recommended/);
   assert.equal(page.includes('Most chosen'), false);
   assert.match(page, /Over \$5B\? Email us\./);

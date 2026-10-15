@@ -86,6 +86,7 @@ function headline(result: EngineResult): Template {
   if (['LEASE_ADDONS', 'FIN_ADDONS'].includes(result.archetype)) return HEADLINES.HL_ADDONS;
   if (['LEASE_HIGH_FEES', 'FIN_HIGH_FEES'].includes(result.archetype)) return HEADLINES.HL_C_FEES;
   if (result.grade === 'A') return HEADLINES.HL_A;
+  if (result.grade === 'B' && result.flags.length === 0) return HEADLINES.HL_B_NEAR;
   if (result.grade === 'B') return HEADLINES.HL_B;
   return HEADLINES.HL_C_MIXED;
 }
@@ -247,7 +248,10 @@ export function buildTenantReport(input: EngineInput, creditUnionName: string): 
     recommendation: result.recommendation,
     recommendationLabel: fill(RECOMMENDATION_LABELS[result.recommendation], values),
     headline: fill(headline(result), values),
-    gradeExplanation: fill(GRADE_EXPLANATIONS[`GE_${result.grade}`], values),
+    gradeExplanation: fill(
+      result.grade === 'B' && result.flags.length === 0 ? GRADE_EXPLANATIONS.GE_B_NEAR : GRADE_EXPLANATIONS[`GE_${result.grade}`],
+      values,
+    ),
     summary: fill(summary(result), values),
     archetype: result.archetype,
     breakdown: rows,

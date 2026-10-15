@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
-import { ConsumerTrackers } from '@/components/ConsumerTrackers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -26,9 +25,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <ConsumerTrackers />
-      </head>
       <body className="min-h-screen bg-slate-50">
         {children}
         <Analytics />

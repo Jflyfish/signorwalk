@@ -250,8 +250,11 @@ export function CheckForm({
   }
 
   if (report) {
-    const shown = report.itemsToReview.slice(0, 3);
-    const rest = report.itemsToReview.slice(3);
+    const shown = report.itemsToReview.slice(0, 2);
+    const rest = report.itemsToReview.slice(2);
+    const caption = report.grade === 'A' || shown.length > 0 || report.recommendation !== 'sign'
+      ? report.recommendationLabel
+      : '';
     const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
     return (
       <div className={embedded
@@ -272,7 +275,7 @@ export function CheckForm({
               <span className="sr-only">{report.grade}. </span>{report.headline}
             </h1>
             <p className="mt-4 text-[18px] leading-[28px]">{report.gradeExplanation}</p>
-            <p className="mt-4 text-[15px] font-semibold leading-[24px]">{report.recommendationLabel}</p>
+            {caption ? <p className="mt-4 text-[15px] font-semibold leading-[24px]">{caption}</p> : null}
           </div>
         </div>
 
@@ -280,7 +283,12 @@ export function CheckForm({
           <section className="mt-10" aria-labelledby="review-heading">
             <h2 id="review-heading" className="text-[24px] font-bold leading-[30px]">Items to review</h2>
             <ul className="mt-4 list-disc space-y-4 pl-4 text-[18px] leading-[28px]">
-              {shown.map(item => <li key={item.id}>{item.issue}</li>)}
+              {shown.map(item => (
+                <li key={item.id}>
+                  {item.issue}
+                  <span className="mt-2 block text-[14px] leading-[20px] cu-muted">{item.action}</span>
+                </li>
+              ))}
             </ul>
           </section>
         )}
