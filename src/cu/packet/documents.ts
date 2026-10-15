@@ -324,9 +324,9 @@ The Customer supplies:
 
 The Customer is responsible for the accuracy of those URLs and for the rates and disclosures on the Customer's own pages. Provider does not publish the Customer's annual percentage rate and does not add Reg Z trigger terms of its own. [Counsel to confirm this allocation.]
 
-## 4. Fees
+## 4. Prices
 
-List prices, in United States dollars, billed annually. Every priced tier is the same product. The tier follows total assets. There is no per-member fee, no monthly price, and no setup fee.
+List prices, in United States dollars, billed annually. Every priced tier is the same product. The tier follows total assets. There is no monthly price.
 
 | Tier | Total assets | Annual |
 | --- | --- | --- |
@@ -340,7 +340,7 @@ The public website's consumer footer says the consumer grader is free. That sent
 
 ## 5. Billing
 
-Prices in section 4 are annual. There is no monthly price and no setup fee. Online checkout is not built. This sample does not authorize Provider to charge a card. An invoice process for a term after the pilot is [To be completed].
+Prices in section 4 are annual. There is no monthly price. Online checkout is not built. This sample does not authorize Provider to charge a card. An invoice process for a term after the pilot is [To be completed].
 
 ## 6. 90-day free pilot
 
@@ -416,7 +416,7 @@ If a person types that kind of data into a numeric field, the field should rejec
 
 ## 4. Data that may be processed
 
-[Draft design] Dealer-quote figures the person chooses to type (for example price, rate, term, and fees), for long enough to build the on-screen result, and not as a retained member record.
+[Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record.
 
 [To be completed] Incidental technical data in host or edge logs (which may include IP address). The application log is intended to exclude quote inputs, IP address, and user agent. Retention of any platform log is not answered in this draft.
 

@@ -6,6 +6,7 @@ import { ANALYZE_LOG_KEYS, formatAnalyzeLog } from '../src/cu/log';
 import { GRADE_FILL } from '../src/cu/grades';
 import { securityHeaderList } from '../src/cu/headers';
 import { dueDiligenceDocs } from '../src/cu/packet/documents';
+import { pricedTiers } from '../src/app/credit-unions/pricing';
 import { buildZip } from '../src/cu/packet/zip';
 import { ANALYZE_LIMIT, resetAnalyzeRateLimit, takeAnalyzeSlot } from '../src/cu/rate-limit';
 import { clearDealStorage, DEAL_STORAGE_KEYS } from '../src/cu/storage';
@@ -112,6 +113,9 @@ test('due diligence packet is one zip containing every draft', () => {
   assert.equal(zip.subarray(local + 30, local + 30 + nameLen).equals(name), true);
   const inflated = inflateRawSync(zip.subarray(local + 30 + nameLen, local + 30 + nameLen + compressedSize));
   assert.equal(inflated.equals(Buffer.from(first.body)), true);
+  for (const tier of pricedTiers) assert.equal(tier.setupUsd, 0, tier.id);
+  const packet = dueDiligenceDocs.map(doc => `${doc.title}\n${doc.description}\n${doc.body}`).join('\n');
+  assert.equal(/\bfees?\b/i.test(packet), false);
 });
 
 test('credit-union headers deny framing and payment, and member pages skip third-party fonts', () => {

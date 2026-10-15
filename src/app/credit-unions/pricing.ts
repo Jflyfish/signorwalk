@@ -37,14 +37,14 @@ export const pricedTiers: readonly PricedTier[] = [
     name: 'Growth',
     assets: '$250 million–$1 billion',
     annualUsd: 12_000,
-    setupUsd: 1_500,
+    setupUsd: 0,
   },
   {
     id: 'pro',
     name: 'Pro',
     assets: '$1 billion–$5 billion',
     annualUsd: 24_000,
-    setupUsd: 3_000,
+    setupUsd: 0,
   },
 ];
 

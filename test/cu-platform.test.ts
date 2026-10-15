@@ -191,6 +191,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   const extract = readFileSync('src/app/api/cu/[tenant]/extract/route.ts', 'utf8');
   const form = readFileSync('src/app/cu/[tenant]/CheckForm.tsx', 'utf8');
   assert.equal(page.includes('Most chosen'), false);
+  assert.equal(/\bfees?\b/i.test(page), false);
+  assert.equal(/\bfees?\b/i.test(started), false);
   assert.match(page, /UPLOAD_DISCLOSURE/);
   assert.match(page, /DOCUMENT_VERSION_LABEL/);
   assert.match(started, /Email us to start your pilot and we'll set it up within 1 business day\./);
