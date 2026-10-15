@@ -6,6 +6,7 @@ import {
   setOwnerStatusAction,
 } from '../actions';
 import { BrandingForm } from '../[tenant]/dashboard/BrandingForm';
+import { deriveBrand, parseHex } from '@/cu/contrast';
 import { STATUS_ACTIVE, STATUS_PAUSED, type StoredTenantProfile } from '@/cu/tenant-directory';
 
 const field = 'mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal';
@@ -41,6 +42,7 @@ export function OwnerEditor({
   emailEnabled,
   notifyEmail,
   notice,
+  askForSite = false,
 }: {
   mode: 'create' | 'edit' | 'confirm' | 'pause';
   profile: StoredTenantProfile | null;
@@ -52,6 +54,7 @@ export function OwnerEditor({
   emailEnabled: boolean;
   notifyEmail: string;
   notice: { tone: 'ok' | 'err'; text: string } | null;
+  askForSite?: boolean;
 }) {
   if (mode === 'pause' && profile) {
     return (
@@ -150,8 +153,9 @@ export function OwnerEditor({
             />
           </section>
 
-          <section aria-labelledby="settings-heading">
+          <section id="settings" aria-labelledby="settings-heading">
             <h2 id="settings-heading" className="text-[24px] font-bold leading-[30px]">Settings</h2>
+            {profile.embedOrigins.length === 0 ? <SiteBanner primary={primary} id={profile.id} name={profile.name} shortName={shortName} /> : null}
             <form action={saveOwnerSettingsAction} className="mt-6 grid gap-4">
               <input type="hidden" name="tenant" value={profile.id} />
               <label className="flex items-center gap-2 text-[15px] font-semibold">
@@ -164,15 +168,22 @@ export function OwnerEditor({
               </label>
               <label className={label}>Embed allowlist
                 <textarea
+                  id="embed-allowlist"
                   name="embedOrigins"
                   defaultValue={profile.embedOrigins.join('\n')}
                   rows={4}
+                  autoFocus={askForSite}
                   className="mt-2 block w-full rounded-lg border cu-line px-4 py-3 text-[16px] font-normal"
                 />
               </label>
               <p className="text-[14px] leading-[20px] cu-muted">One https origin per line. This site can always frame the check.</p>
               <button type="submit" className={button}>Save settings</button>
             </form>
+          </section>
+
+          <section aria-labelledby="staff-heading">
+            <h2 id="staff-heading" className="text-[24px] font-bold leading-[30px]">Staff access</h2>
+            <p className="mt-2 text-[14px] leading-[20px] text-[#555]">Until launch, only Sign or Walk admins can sign in. CU staff logins come later.</p>
           </section>
 
           <section aria-labelledby="status-heading">
@@ -195,6 +206,34 @@ export function OwnerEditor({
           </section>
         </>
       ) : null}
+    </div>
+  );
+}
+
+function SiteBanner({
+  primary, id, name, shortName,
+}: {
+  primary: string;
+  id: string;
+  name: string;
+  shortName: string;
+}) {
+  const derived = deriveBrand(id, {
+    name,
+    shortName: shortName || name,
+    primary: /^#[0-9a-fA-F]{6}$/.test(primary) ? primary : '#111111',
+    logoAspect: 1,
+  }, () => undefined);
+  const rgb = parseHex(derived.primary);
+  const tint = rgb ? `rgb(${rgb[0]} ${rgb[1]} ${rgb[2]} / 0.06)` : 'rgb(17 17 17 / 0.06)';
+  return (
+    <div
+      className="mt-4 rounded-lg border px-4 py-4 text-[14px] leading-[20px]"
+      style={{ background: tint, borderColor: derived.brandText }}
+      role="status"
+    >
+      <p>Add at least one website that can show the tool.</p>
+      <label htmlFor="embed-allowlist" className={`${button} mt-3`}>Add website</label>
     </div>
   );
 }

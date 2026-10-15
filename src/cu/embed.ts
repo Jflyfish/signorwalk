@@ -102,8 +102,8 @@ export function frameAncestorsAuthorized(header: string | null): boolean {
 
 /**
  * Stored allowlist for an embed route. A missing tenant is 'none'.
- * A thrown lookup, a KV error, or a timeout is 'self' and is not cached.
- * Config seeds are never the CSP fallback.
+ * A store failure is 'none' and is not cached. A thrown lookup or a timeout
+ * is 'self' and is not cached. Config seeds are never the CSP fallback.
  */
 export async function resolveFrameAncestors(
   pathname: string,
@@ -130,7 +130,8 @@ export async function resolveFrameAncestors(
     const value = frameAncestorSources(tenant.embedOrigins);
     writeFrameAncestorCache(id, value, now + FRAME_CACHE_MS);
     return value;
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === 'store-unavailable') return "'none'";
     return "'self'";
   } finally {
     if (timer) clearTimeout(timer);

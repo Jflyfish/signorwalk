@@ -210,7 +210,7 @@ test('embed CSP fails closed and does not fall back to the config seeds', async 
 
   markCuStoreUnavailable();
   const kv = await frameAncestorsForPath(path);
-  assert.equal(kv, "'self'");
+  assert.equal(kv, "'none'");
   assert.equal(kv.includes('harborlightcu.example'), false);
 
   const savedUrl = process.env.KV_REST_API_URL;
@@ -220,7 +220,7 @@ test('embed CSP fails closed and does not fall back to the config seeds', async 
   resetCuStore();
   try {
     const down = await frameAncestorsForPath(path);
-    assert.equal(down, "'self'");
+    assert.equal(down, "'none'");
     assert.equal(down.includes('harborlightcu.example'), false);
   } finally {
     if (savedUrl === undefined) delete process.env.KV_REST_API_URL;
@@ -256,6 +256,18 @@ test('embed ancestor lookups are cached for about 30s and the route requires the
   assert.equal(await resolveFrameAncestors(path, fail, now, 50), "'self'");
   assert.equal(await resolveFrameAncestors(path, fail, now + 1_000, 50), "'self'");
   assert.equal(failures, 2);
+
+  resetCuStore();
+  let storeCalls = 0;
+  const storeDown = async () => {
+    storeCalls += 1;
+    if (storeCalls === 1) throw new Error('store-unavailable');
+    return { embedOrigins: ['https://www.harborlightcu.example'] };
+  };
+  assert.equal(await resolveFrameAncestors(path, storeDown, now, 50), "'none'");
+  const recovered = await resolveFrameAncestors(path, storeDown, now + 1_000, 50);
+  assert.match(recovered, /https:\/\/www\.harborlightcu\.example/);
+  assert.equal(storeCalls, 2);
 
   resetCuStore();
   let misses = 0;

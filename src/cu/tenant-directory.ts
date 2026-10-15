@@ -276,6 +276,7 @@ export async function setTenantStatus(id: string, status: 'active' | 'paused'): 
   if (!profile) throw new Error('missing');
   profile.status = status;
   await writeStoreJson(storeKey(id, 'profile'), profile);
+  clearFrameAncestorCache(id);
 }
 
 export async function replaceEmbedOrigins(id: string, origins: string[]): Promise<void> {

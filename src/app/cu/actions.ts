@@ -182,7 +182,7 @@ export async function createOwnerTenantAction(formData: FormData) {
     redirect('/cu/admin?cu=new&error=profile');
   }
   await appendAudit('create', profile.id, 'owner');
-  redirect(`/cu/admin?cu=${profile.id}&saved=profile`);
+  redirect(`/cu/admin?cu=${profile.id}&need=site#embed-allowlist`);
 }
 
 export async function saveOwnerProfileAction(formData: FormData) {

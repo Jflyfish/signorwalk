@@ -31,6 +31,7 @@ export default async function GetStartedPage({
         <p className="mt-6 text-[18px] leading-[28px] cu-muted">
           {CHECKOUT_STATUS === 'coming-soon' ? PILOT : 'Online checkout is not available on this site.'}
         </p>
+        <p className="mt-4 text-[14px] leading-[20px] text-[#555]">Self-serve checkout isn't on this preview. The pilot button emails us.</p>
         <a href={`mailto:${TALK_TO_US_EMAIL}`} className={`${button} mt-6`}>
           Email {TALK_TO_US_EMAIL}
         </a>

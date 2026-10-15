@@ -38,7 +38,7 @@ function noticeFor(query: { saved?: string; error?: string; removed?: string }):
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ cu?: string; section?: string; confirm?: string; saved?: string; error?: string; removed?: string }>;
+  searchParams: Promise<{ cu?: string; section?: string; confirm?: string; saved?: string; error?: string; removed?: string; need?: string }>;
 }) {
   const jar = await cookies();
   const session = verifySession(jar.get(CU_SESSION_COOKIE)?.value);
@@ -71,7 +71,7 @@ export default async function AdminPage({
         {selected && query.confirm === 'pause' ? (
           <OwnerEditor mode="pause" profile={(await getTenantProfile(selected.id))!} shortName="" primary="" secondary="" logoLight="" logoDark="" emailEnabled={false} notifyEmail="" notice={null} />
         ) : null}
-        {selected && query.confirm !== 'remove' && query.confirm !== 'pause' ? <EditTenant tenant={selected} notice={notice} /> : null}
+        {selected && query.confirm !== 'remove' && query.confirm !== 'pause' ? <EditTenant tenant={selected} notice={notice} askForSite={query.need === 'site'} /> : null}
         {!query.cu && usage ? <Usage tenants={tenants} /> : null}
         {!query.cu && !usage ? <Directory tenants={tenants} notice={notice} audit={await readAudit()} /> : null}
       </main>
@@ -82,9 +82,11 @@ export default async function AdminPage({
 async function EditTenant({
   tenant,
   notice,
+  askForSite,
 }: {
   tenant: ResolvedTenant;
   notice: { tone: 'ok' | 'err'; text: string } | null;
+  askForSite: boolean;
 }) {
   const profile = await getTenantProfile(tenant.id);
   if (!profile) return <p className="cu-err" role="alert">This credit union was not found.</p>;
@@ -104,6 +106,7 @@ async function EditTenant({
       emailEnabled={settings.emailEnabled}
       notifyEmail={settings.notifyEmail ?? ''}
       notice={notice}
+      askForSite={askForSite}
     />
   );
 }
@@ -128,7 +131,7 @@ function Directory({
       {audit.length > 0 ? (
         <section className="mt-10" aria-labelledby="audit-heading">
           <h2 id="audit-heading" className="text-[24px] font-bold leading-[30px]">Audit</h2>
-          <ul className="mt-4 max-w-full space-y-2 font-mono text-[14px] leading-[20px]">
+          <ul className="mt-4 max-w-full space-y-2 text-[14px] leading-[20px]">
             {audit.map(line => {
               const name = tenants.find(tenant => tenant.id === line.id)?.brand.shortName ?? line.id;
               return <li key={`${line.t}-${line.action}-${line.id}`}>{formatAuditLine(line, name)}</li>;

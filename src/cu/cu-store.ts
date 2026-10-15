@@ -278,13 +278,14 @@ const AUDIT_VERBS: Record<string, string> = {
 };
 const AUDIT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export function formatAuditLine(line: Pick<AuditLine, 't' | 'action'>, name: string): string {
+export function formatAuditLine(line: Pick<AuditLine, 't' | 'action' | 'who'>, name: string): string {
   const date = new Date(line.t);
   const when = Number.isNaN(date.getTime())
     ? line.t
     : `${AUDIT_MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}, ${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
   const verb = AUDIT_VERBS[line.action] ?? line.action;
-  return `${when} · ${verb} ${name}`;
+  const who = line.who === 'tenant' ? 'by tenant' : 'by owner';
+  return `${when} · ${verb} ${name} · ${who}`;
 }
 
 export async function appendAudit(action: string, id: string, who: 'owner' | 'tenant' = 'owner'): Promise<void> {

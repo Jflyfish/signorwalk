@@ -4,7 +4,7 @@ import test from 'node:test';
 import { NextRequest } from 'next/server';
 import { POST as analyze } from '../src/app/api/cu/[tenant]/analyze/route';
 import { POST as extract } from '../src/app/api/cu/[tenant]/extract/route';
-import { appendAudit, formatAuditLine, readAudit, resetCuStore } from '../src/cu/cu-store';
+import { appendAudit, formatAuditLine, readAudit, readFrameAncestorCache, resetCuStore, writeFrameAncestorCache } from '../src/cu/cu-store';
 import { getCuTenant } from '../src/cu/tenants';
 import {
   listCuTenants,
@@ -72,8 +72,12 @@ test('the owner can add and remove a credit union without dropping the seeds', a
   assert.equal(audit.every(line => line.id === 'north-pier-cu' && !line.t.includes('@')), true);
   assert.equal(JSON.stringify(audit).includes('example'), false);
   assert.equal(
-    formatAuditLine({ t: '2026-10-15T14:30:00.000Z', action: 'pause' }, 'Larkspur'),
-    'Oct 15, 14:30 · Paused Larkspur',
+    formatAuditLine({ t: '2026-10-15T14:30:00.000Z', action: 'pause', who: 'owner' }, 'Larkspur CU'),
+    'Oct 15, 14:30 · Paused Larkspur CU · by owner',
+  );
+  assert.equal(
+    formatAuditLine({ t: '2026-10-15T14:50:00.000Z', action: 'branding', who: 'tenant' }, 'Larkspur CU'),
+    'Oct 15, 14:50 · Branded Larkspur CU · by tenant',
   );
   assert.deepEqual(parseEmbedOrigins('https://www.northpiercu.example\n'), ['https://www.northpiercu.example']);
   assert.equal(parseEmbedOrigins('*'), null);
@@ -88,7 +92,9 @@ test('the owner can add and remove a credit union without dropping the seeds', a
 
 test('a paused credit union is unavailable on the page and returns 404 from the APIs', async () => {
   resetCuStore();
+  writeFrameAncestorCache('larkspur-cu', "'self' https://www.larkspurcu.example", Date.now() + 30_000);
   await setTenantStatus('larkspur-cu', 'paused');
+  assert.equal(readFrameAncestorCache('larkspur-cu', Date.now()), undefined);
   assert.equal((await loadCuTenant('larkspur-cu'))?.status, 'paused');
   const analyzeRes = await analyze(new NextRequest('https://signorwalk.com/api/cu/larkspur-cu/analyze', {
     method: 'POST',
@@ -116,6 +122,11 @@ test('a paused credit union is unavailable on the page and returns 404 from the 
   assert.match(editor, /confirmId/);
   assert.match(editor, /cu-danger/);
   assert.match(editor, /'Pause'/);
+  assert.match(editor, /Add at least one website that can show the tool\./);
+  assert.match(editor, /Add website/);
+  assert.match(editor, /Until launch, only Sign or Walk admins can sign in\. CU staff logins come later\./);
+  assert.match(readFileSync('src/app/cu/actions.ts', 'utf8'), /need=site#embed-allowlist/);
+  assert.equal(admin.includes('font-mono'), false);
   assert.match(readFileSync('src/cu/tenant-directory.ts', 'utf8'), /Paused\. Members see an unavailable page\./);
   assert.match(admin, /STATUS_PAUSED/);
   assert.match(admin, /'Paused'/);

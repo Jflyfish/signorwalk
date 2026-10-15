@@ -240,6 +240,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(page.includes(value), true);
   assert.match(page, /description: VALUE_LINE/);
   assert.match(page, /flex flex-wrap items-baseline gap-x-2/);
+  assert.match(page, /hidden md:inline">\{' · '\}/);
+  assert.match(page, /Self-serve checkout isn't on this preview\. The pilot button emails us\./);
+  assert.match(started, /Self-serve checkout isn't on this preview\. The pilot button emails us\./);
   assert.match(page, /Over \$5B\? Email us\./);
   assert.match(page, /\{' · '\}/);
   assert.match(page, /mailto:\$\{TALK_TO_US_EMAIL\}/);
