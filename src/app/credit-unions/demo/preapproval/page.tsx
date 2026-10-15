@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function DemoPreapprovalPage() {
-  return <DemoPage />;
+  return <DemoPage demo />;
 }

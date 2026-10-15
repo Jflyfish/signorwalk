@@ -2,7 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { track } from '@vercel/analytics';
-import { FILE_READ_ERROR, UPLOAD_DISCLOSURE } from '@/cu/copy';
+import { FILE_READ_ERROR } from '@/cu/copy';
+import { UploadDisclosure } from '@/cu/UploadDisclosure';
 import type { DerivedBrand } from '@/cu/contrast';
 import { ADD_APR_RECOMMENDATION, financeGradeIsProvisional, memberRecommendationLine } from '@/cu/recommendation-display';
 import { DEMO_FINANCE_SAMPLE, DEMO_GRADE_C, DEMO_GRADE_D } from '@/cu/demo-sample';
@@ -560,7 +561,7 @@ export function CheckForm({
               />
             </>
           )}
-          <p className={uploadError ? 'cu-err mt-2' : 'mt-2 text-[14px] leading-[20px] cu-muted'} role={uploadError ? 'alert' : 'status'}>{numbersOnly ? UPLOAD_DISCLOSURE : (uploadNote || UPLOAD_DISCLOSURE)}</p>
+          <p className={uploadError ? 'cu-err mt-2' : 'mt-2 text-[14px] leading-[20px] cu-muted'} role={uploadError ? 'alert' : 'status'}>{numbersOnly || !uploadNote ? <UploadDisclosure /> : uploadNote}</p>
           <p className="mt-2 text-[14px] leading-[20px]">
             <a href="/credit-unions/privacy" className={textLink}>Privacy</a>
           </p>

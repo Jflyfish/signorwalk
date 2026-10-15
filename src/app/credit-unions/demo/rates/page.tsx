@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function DemoRatesPage() {
-  return <DemoPage />;
+  return <DemoPage demo />;
 }

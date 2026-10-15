@@ -283,6 +283,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(copy, /sent to Anthropic for that request/);
   assert.match(copy, /A worksheet may include a name and VIN/);
   assert.match(copy, /due-diligence packet/);
+  assert.match(copy, /DUE_DILIGENCE_PACKET_HREF = '\/credit-unions\/packet'/);
   assert.equal(copy.toLowerCase().includes('zero data retention'), false);
   assert.equal(copy.toLowerCase().includes('zdr'), false);
   assert.equal(copy.includes('AI_FACTS.join'), false);
@@ -296,7 +297,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(readFileSync('src/app/credit-unions/terms/page.tsx', 'utf8'), /\{PILOT_MARK\}/);
   assert.match(readFileSync('src/app/credit-unions/[...slug]/page.tsx', 'utf8'), /creditUnionAlias/);
   assert.equal(started.includes('AiDisclosure'), false);
-  assert.match(started, /UPLOAD_DISCLOSURE/);
+  assert.match(started, /UploadDisclosure/);
   assert.match(started, /href="\/credit-unions\/privacy"/);
   assert.equal(dashboard.includes('Since pilot start'), false);
   assert.match(dashboard, /All time/);
@@ -361,7 +362,18 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(extract.includes('export const GET'), false);
   assert.match(extract, /export async function POST/);
   assert.match(form, /FILE_READ_ERROR/);
-  assert.match(form, /UPLOAD_DISCLOSURE/);
+  assert.match(form, /UploadDisclosure/);
+  assert.match(readFileSync('src/cu/UploadDisclosure.tsx', 'utf8'), /DUE_DILIGENCE_PACKET_HREF/);
+  const rateNote = readFileSync('docs/analyze-rate-limit.md', 'utf8');
+  assert.match(rateNote, /section 6\.5/);
+  assert.match(rateNote, /12 requests per 60 seconds/);
+  assert.match(rateNote, /have not been load-tested/);
+  assert.match(rateNote, /Open item: there is no shared limit across instances/);
+  assert.equal(rateNote.toLowerCase().includes('firewall rule is configured'), false);
+  assert.match(readFileSync('src/app/credit-unions/demo/preapproval/page.tsx', 'utf8'), /<DemoPage demo \/>/);
+  assert.match(readFileSync('src/app/credit-unions/demo/rates/page.tsx', 'utf8'), /<DemoPage demo \/>/);
+  assert.equal(readFileSync('src/app/credit-unions/demo/help/page.tsx', 'utf8').includes('<DemoPage demo'), false);
+  assert.equal(readFileSync('src/app/credit-unions/demo/privacy/page.tsx', 'utf8').includes('<DemoPage demo'), false);
   assert.match(form, /href="\/credit-unions\/privacy"/);
   assert.equal(form.includes('AI_FACTS'), false);
   assert.match(form, /numbersOnly/);

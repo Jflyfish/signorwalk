@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { UPLOAD_DISCLOSURE } from '@/cu/copy';
+import { UploadDisclosure } from '@/cu/UploadDisclosure';
 import { getPricedTier, resolveTierParam } from '../pricing';
 import { startTrialAction } from './actions';
 
@@ -73,7 +73,7 @@ export default async function GetStartedPage({
         </form>
         <p className="mt-4 text-[14px] leading-[20px] cu-muted">Check your email to confirm. Saving stays off until then.</p>
         <p className="mt-4 text-[14px] leading-[20px] cu-muted">
-          {UPLOAD_DISCLOSURE}{' '}
+          <UploadDisclosure />{' '}
           <Link href="/credit-unions/privacy" className="font-semibold cu-ink underline decoration-1 underline-offset-4 cu-linkline cu-ring">Privacy</Link>
         </p>
         <p className="mt-4">
