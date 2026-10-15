@@ -54,11 +54,9 @@ export default function CreditUnionsPage() {
           See it in action.{' '}
           <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
         </p>
-        <ul className="mt-10 max-w-[640px] list-disc space-y-2 pl-5 text-[14px] leading-[20px] cu-muted">
-          <li>Embed the check on your website.</li>
-          <li>Branding and usage are on your dashboard.</li>
-          <li>The trial requires an email confirmation before you can save.</li>
-        </ul>
+        <p className="mt-10 max-w-[640px] text-[14px] leading-[20px] cu-muted">
+          The trial requires an email confirmation before you can save.
+        </p>
       </div>
 
       <div className="mt-16 cu-band py-16 md:mt-24">

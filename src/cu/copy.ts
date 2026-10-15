@@ -10,6 +10,6 @@ export const AI_FACTS = [
   'This application does not store the worksheet or the numbers from it. The grade comes from rules in this application. A model does not write the sentences a member reads.',
 ] as const;
 
-export const UPLOAD_DISCLOSURE = AI_FACTS.join(' ');
+export const UPLOAD_DISCLOSURE = "Your worksheet is sent to Anthropic to read the numbers for this check. We don't store it.";
 
 export const FILE_READ_ERROR = "We couldn't read that file. Enter the numbers instead.";

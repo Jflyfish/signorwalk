@@ -426,10 +426,8 @@ export function CheckForm({
             </>
           )}
           <p className="mt-2 text-[14px] leading-[20px] cu-muted" role="status">{numbersOnly ? UPLOAD_DISCLOSURE : (uploadNote || UPLOAD_DISCLOSURE)}</p>
-          <p className="mt-4 text-[14px] leading-[20px]">
+          <p className="mt-2 text-[14px] leading-[20px]">
             <a href="/credit-unions/privacy" className={textLink}>Privacy</a>
-            {' · '}
-            <a href="/credit-unions/packet" className={textLink}>Due-diligence packet</a>
           </p>
         </div>
 

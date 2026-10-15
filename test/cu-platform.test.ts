@@ -245,8 +245,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(/\bfees?\b/i.test(page), false);
   assert.equal(/\bfees?\b/i.test(started), false);
   assert.match(page, /<AiDisclosure \/>/);
-  assert.match(page, /Embed the check on your website\./);
-  assert.match(page, /Branding and usage are on your dashboard\./);
+  assert.equal(page.includes('Embed the check on your website.'), false);
+  assert.equal(page.includes('Branding and usage are on your dashboard.'), false);
   assert.match(page, /The trial requires an email confirmation before you can save\./);
   assert.match(page, /href="\/credit-unions\/terms"/);
   assert.match(page, /\{VALUE_LINE\}/);
@@ -273,6 +273,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(copy, /sent to Anthropic for that request/);
   assert.match(copy, /This pilot does not use zero data retention\./);
   assert.match(copy, /A worksheet may include a member name and VIN\./);
+  assert.match(copy, /Your worksheet is sent to Anthropic to read the numbers for this check\. We don't store it\./);
+  assert.equal(copy.includes('AI_FACTS.join'), false);
   assert.equal(copy.includes('then discarded'), false);
   assert.match(privacy, /\{PILOT_MARK\}/);
   assert.match(privacy, /Pending counsel review/);
@@ -282,7 +284,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(readFileSync('src/app/credit-unions/terms/page.tsx', 'utf8'), /Pending counsel review/);
   assert.match(readFileSync('src/app/credit-unions/terms/page.tsx', 'utf8'), /\{PILOT_MARK\}/);
   assert.match(readFileSync('src/app/credit-unions/[...slug]/page.tsx', 'utf8'), /creditUnionAlias/);
-  assert.match(started, /<AiDisclosure \/>/);
+  assert.equal(started.includes('AiDisclosure'), false);
+  assert.match(started, /UPLOAD_DISCLOSURE/);
+  assert.match(started, /href="\/credit-unions\/privacy"/);
   assert.equal(dashboard.includes('Since pilot start'), false);
   assert.match(dashboard, /All time/);
   assert.match(dashboard, /href=\{shareUrl\}/);
@@ -335,7 +339,12 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(extract, /export async function POST/);
   assert.match(form, /FILE_READ_ERROR/);
   assert.match(form, /UPLOAD_DISCLOSURE/);
+  assert.match(form, /href="\/credit-unions\/privacy"/);
+  assert.equal(form.includes('AI_FACTS'), false);
   assert.match(form, /numbersOnly/);
+  assert.match(dashboard, /border cu-line bg-white/);
+  assert.match(dashboard, /Save links/);
+  assert.match(dashboard, /Save website/);
   assert.match(readFileSync('src/app/credit-unions/embed-demo/EmbedDemo.tsx', 'utf8'), /entry=numbers/);
   assert.match(readFileSync('src/app/cu/[tenant]/embed/page.tsx', 'utf8'), /numbersOnlyEmbed/);
   assert.equal(readFileSync('src/app/cu/actions.ts', 'utf8').includes('verified = true'), false);

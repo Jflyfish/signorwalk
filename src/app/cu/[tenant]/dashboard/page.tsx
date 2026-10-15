@@ -187,7 +187,7 @@ export default async function DashboardPage({
               <span className="mt-2 block font-normal cu-muted">Add at least one website that can show the tool.</span>
               <textarea id="embed-allowlist" name="embedOrigins" rows={3} className="cu-ring mt-2 block w-full rounded-lg border cu-line px-4 py-3 text-[16px] font-normal" />
             </label>
-            <button type="submit" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save website</button>
+            <button type="submit" className={`${section === 'usage' && tenant.loanLinksSet === false ? 'inline-flex h-12 w-full items-center justify-center rounded-lg border cu-line bg-white px-4 text-[15px] font-semibold cu-ink md:h-11 md:w-auto' : 'cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto'}`}>Save website</button>
           </form>
         ) : null}
         {saved ? <Alert tone="ok">{saved}</Alert> : null}
