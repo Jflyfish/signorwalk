@@ -147,6 +147,13 @@ export default async function DashboardPage({
           ))}
         </div>
       </nav>
+      {query.saved === 'confirmed' && tenant.loanLinksSet === false ? (
+        <div className="sticky top-0 z-20 border-b cu-line bg-white px-4 py-3">
+          <p className="mx-auto w-full max-w-[1120px] text-[15px] font-semibold leading-[24px]">
+            Set the pre-approval URL and the rates URL before you share the member link.
+          </p>
+        </div>
+      ) : null}
       <main className="mx-auto w-full max-w-[1120px] px-4 py-10">
         {!tenant.verified ? (
           <form action={resendConfirmAction} className="mb-6 max-w-[560px] rounded-lg border cu-line p-4">
@@ -171,13 +178,13 @@ export default async function DashboardPage({
             <h2 className="text-[24px] font-bold leading-[30px]">Pre-approval and rates</h2>
             <p className="text-[14px] leading-[20px] cu-muted">Add the credit union&apos;s own pages. These fields start empty.</p>
             <label className="text-[14px] font-semibold leading-[20px]">Pre-approval URL
-              <input name="preApprovalUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
+              <input name="preApprovalUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="cu-ring mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
             </label>
             <label className="text-[14px] font-semibold leading-[20px]">Rates URL
-              <input name="ratesUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
+              <input name="ratesUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="cu-ring mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
             </label>
             <input type="hidden" name="tenant" value={tenant.id} />
-            <button type="submit" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save links</button>
+            <button type="submit" className="cu-primary cu-ring inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save links</button>
           </form>
         ) : null}
         {tenant.verified && tenant.embedOrigins.length === 0 ? (
@@ -210,7 +217,11 @@ export default async function DashboardPage({
           {aggregates.checks === 0 ? (
             <div className="mt-10 max-w-[560px] text-left">
               <h2 className="text-[24px] font-bold leading-[30px]">No checks yet</h2>
-              <p className="mt-2 text-[14px] leading-[20px] cu-muted">Checks appear here after a member uses the link above.</p>
+              <p className="mt-2 text-[14px] leading-[20px] cu-muted">Checks appear here after a member uses this link.</p>
+              <p className="mt-4 break-all text-[15px] leading-[24px]">
+                <a href={shareUrl} className="underline underline-offset-4 cu-linkline">{shareUrl}</a>
+              </p>
+              <CopyLink url={shareUrl} />
             </div>
           ) : (
             <div className="mt-10">

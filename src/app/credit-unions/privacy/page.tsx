@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AI_FACTS, PILOT_MARK } from '@/cu/copy';
-import { OWNER_OPEN_ITEMS } from '@/cu/owner-open-items';
+import { OWNER_BLANK, OWNER_OPEN_ITEMS } from '@/cu/owner-open-items';
 import { TALK_TO_US_EMAIL } from '../pricing';
 
 export const metadata: Metadata = {
@@ -46,7 +46,7 @@ export default function CreditUnionPrivacyPage() {
 
       <h2 className="mt-10 text-[24px] font-bold leading-[30px]">The owner still has to supply</h2>
       <ul className="mt-4 list-disc space-y-2 pl-5 text-[18px] leading-[28px]">
-        {OWNER_OPEN_ITEMS.map(item => <li key={item}>{item}</li>)}
+        {OWNER_OPEN_ITEMS.map(item => <li key={item}>{item} — {OWNER_BLANK}</li>)}
       </ul>
 
       <p className="mt-10 text-[18px] leading-[28px]">

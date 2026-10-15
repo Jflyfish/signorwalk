@@ -1,5 +1,5 @@
 import { DOCUMENT_VERSION_LABEL, TALK_TO_US_EMAIL } from '../../app/credit-unions/pricing';
-import { OWNER_OPEN_ITEMS } from '../owner-open-items';
+import { OWNER_BLANK, OWNER_OPEN_ITEMS } from '../owner-open-items';
 
 export interface DueDiligenceDoc {
   slug: string;
@@ -15,7 +15,7 @@ const DRAFT_BANNER = `PILOT-ONLY, PENDING COUNSEL REVIEW.
 ${DOCUMENT_VERSION_LABEL.toUpperCase()}
 Status: draft of what this build does. Pending counsel review.
 This file is not an audit, not a certification, not a signed agreement, and not legal advice.
-Items marked [To be completed] have no answer yet. A blank is not a "no."
+Items marked ${OWNER_BLANK} have no answer yet. A blank is not a "no."
 Items marked [Draft design] describe behavior in this codebase. They are not a control attestation.
 Contact: ${TALK_TO_US_EMAIL}
 Date: 2026-10-15
@@ -28,7 +28,7 @@ function draftMarkdown(title: string, body: string): string {
 
 const dataFlowSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-labelledby="dfTitle dfDesc">
   <title id="dfTitle">Sign or Walk credit-union data-flow diagram, draft v0.9</title>
-  <desc id="dfDesc">A member enters dealer-quote numbers, or optionally uploads a worksheet image or PDF. The file, which may include a name or VIN, is sent to Anthropic for that request and is not stored by this application. The grade comes from rules here. There is no connection to the core, online banking, or loan origination, and no database of member quotes. This pilot does not use zero data retention.</desc>
+  <desc id="dfDesc">A member enters dealer-quote numbers, or optionally uploads a worksheet image or PDF. The file, which may include a name or VIN, is sent to Anthropic for that request and is not stored by this application. The grade comes from rules here. There is no connection to the core, online banking, or loan origination, and no database of member quotes. Anthropic DPA, region, and retention: ${OWNER_BLANK}.</desc>
   <rect width="960" height="520" fill="#f8fafc"/>
   <rect width="960" height="72" fill="#111827"/>
   <text x="36" y="44" fill="#ffffff" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700">Data-flow diagram</text>
@@ -76,7 +76,7 @@ Placeholder in the shape of a short vendor questionnaire. It is not a completed 
 ## 1. Organization
 
 1.1 Legal name
-Answer: [To be completed]
+Answer: ${OWNER_BLANK}
 
 1.2 Headquarters and year formed
 Answer: [To be completed]
@@ -85,13 +85,13 @@ Answer: [To be completed]
 Answer: [Draft design] ${TALK_TO_US_EMAIL}
 
 1.4 Insurance (cyber, technology E&amp;O)
-Answer: [To be completed] Do not read this draft as evidence of a policy or a limit.
+Answer: ${OWNER_BLANK}
 
 1.5 SOC 2, ISO 27001, or similar
-Answer: [To be completed] This draft does not claim a report. Hosting and AI vendors may have their own reports. Obtaining those reports, and any carve-out language, is still open.
+Answer: ${OWNER_BLANK} This draft does not claim a report.
 
 1.6 Independent penetration test or external scan
-Answer: [To be completed]
+Answer: ${OWNER_BLANK}
 
 ## 2. Service
 
@@ -104,7 +104,7 @@ Answer: [Draft design] A person using the credit union's branded page. The servi
 ## 3. Data
 
 3.1 Is member nonpublic personal information stored?
-Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, aggregate grade counts, and audit lines (time, action, id, who). Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — [To be completed — owner]
+Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, aggregate grade counts, and audit lines (time, action, id, who). Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — ${OWNER_BLANK}
 
 3.2 Are quote numbers stored?
 Answer: [Draft design] Quote figures are used to produce the result for that visit. They are not written to an application database as a member file. Aggregate counts record how many checks returned each grade. They do not record the quote.
@@ -132,10 +132,10 @@ Answer: [Draft design] Not used.
 ## 5. Subprocessors
 
 5.1 Hosting
-Answer: [Draft design] Vercel hosts the application. What appears in Vercel edge or platform logs, and how long it is kept, is [To be completed].
+Answer: [Draft design] Vercel hosts the application. What appears in Vercel edge or platform logs, and how long it is kept, is ${OWNER_BLANK}.
 
 5.2 AI vendor
-Answer: [Draft design] Anthropic is the processor for worksheet reading. Every upload sends the full worksheet image, which may include a name or VIN, to Anthropic. Sign or Walk does not store that file. The grade route does not call Anthropic. This pilot does not use zero data retention. Anthropic commercial terms, DPA, retention window, and region — [To be completed — owner]
+Answer: [Draft design] Anthropic is the processor for worksheet reading. Every upload sends the full worksheet image, which may include a name or VIN, to Anthropic. Sign or Walk does not store that file. The grade route does not call Anthropic. Anthropic DPA, region, and retention — ${OWNER_BLANK}
 
 5.3 Email delivery
 Answer: [Draft design] Resend, when configured, sends the trial confirmation to the staff email, a signup notice to the operator address, and an optional summary of aggregate counts. Resend does not receive the worksheet. Member results are not emailed.
@@ -155,7 +155,10 @@ Answer: [Draft design] The original plan was a subdomain only, with credit union
 Answer: [Draft design] The intended log line is operational: time, tenant, route, grade, flag identifiers, and latency. It is not intended to include the quote, a vehicle, an IP address, or a user agent. Confirming infrastructure logs is [To be completed].
 
 6.4 Retention of any incidental technical data
-Answer: [To be completed]
+Answer: ${OWNER_BLANK}
+
+6.5 Analyze API rate limit
+Answer: [Draft design] POST /api/cu/{tenant}/analyze allows 12 requests per 60 seconds per address. The count is kept in memory on each server instance and is not shared across instances. No shared firewall rule is configured. A worksheet read allows 6 requests per 60 seconds on the same kind of limit.
 
 ## 7. Security operations
 
@@ -169,7 +172,7 @@ Answer: [Draft design] The service is designed not to store member quotes. Any i
 Answer: [To be completed]
 
 7.4 Incident response
-Answer: [To be completed] Including how a credit union would be notified, and on what timeline.
+Answer: ${OWNER_BLANK}
 
 7.5 Business continuity
 Answer: [To be completed]
@@ -207,7 +210,7 @@ This is Sign or Walk's draft description of the AI terms the credit-union servic
 ## 1. Vendor
 
 Anthropic is called on extract when a worksheet image or PDF is uploaded and the API key is set. The analyze route does not call Anthropic. It grades with the rules engine and template pack tp-1.0.0.
-This pilot does not use zero data retention. Model snapshot, DPA, retention window, and region — [To be completed — owner]
+This file does not state Anthropic's DPA, region, or retention. Those items are ${OWNER_BLANK}. Model snapshot — ${OWNER_BLANK}
 The Harborlight page linked from the marketing demo hides upload. The Harborlight member page can still upload, with a cap of 2 extracts an hour.
 
 ## 2. What the model is allowed to do
@@ -220,7 +223,7 @@ The Harborlight page linked from the marketing demo hides upload. The Harborligh
 
 ## 4. Training and retention
 
-[Draft design] This pilot does not use zero data retention. Sign or Walk does not train its own model on worksheets. Whether Anthropic trains on a request, and the DPA, retention window, and region — [To be completed — owner]
+[Draft design] Sign or Walk does not train its own model on worksheets. Whether Anthropic trains on a request, and the DPA, retention window, and region — ${OWNER_BLANK}
 
 ## 5. Guard rails
 
@@ -232,7 +235,7 @@ The grade compares a quote with labeled benchmark ranges. It is not the credit u
 
 ## 7. Still open
 
-- Anthropic commercial terms and DPA, including the retention window and region — [To be completed — owner]
+- Anthropic commercial terms and DPA, including the retention window and region — ${OWNER_BLANK}
 - Name the exact model snapshot.
 - The grade already runs on rules. Extract calls Anthropic only when a worksheet is uploaded and the key is set.
 
@@ -298,7 +301,7 @@ NOT FOR EXECUTION.
 This is a plain-language sample for discussion with counsel. It is missing terms a real agreement needs (liability, indemnity, governing law, and others, each marked below). Do not sign it. Do not treat the prices as an offer that can be accepted by email unless a later, signed order form says so.
 
 Parties
-- Provider legal entity — [To be completed — owner]
+- Provider legal entity — ${OWNER_BLANK}
 - Customer: [credit union legal name to be completed]
 - Effective date: [To be completed]
 
@@ -349,7 +352,7 @@ Prices in section 4 are annual. There is no monthly price. There is no setup fee
 
 ## 6. 90-day free pilot
 
-The Customer may start a 90-day free pilot. There is no charge for 90 days. Whether the Customer can end that pilot early, and on what notice, is [To be completed].
+The Customer may start a 90-day free pilot. There is no charge for 90 days. Whether the Customer can end that pilot early, and on what notice, is ${OWNER_BLANK}.
 
 The annual prices in section 4 are the prices after the pilot, if the Customer continues. [Counsel to confirm how a later term is written, including what is charged after the 90 days.]
 
@@ -357,7 +360,7 @@ The pilot is not a promise of funded loans, member savings, or a later term. Con
 
 ## 7. Member data and core systems
 
-The member form does not ask for a name, email, account number, or member number. An uploaded worksheet may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. This pilot does not use zero data retention.
+The member form does not ask for a name, email, account number, or member number. An uploaded worksheet may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Anthropic DPA, region, and retention — ${OWNER_BLANK}.
 
 Staff records (credit union name, contact, work email, scrypt login hash) are stored for the trial. They are not a member file.
 
@@ -380,8 +383,8 @@ Effect of termination, including removal of the branded page: [To be completed].
 - Confidentiality
 - Warranties
 - Indemnity
-- Limitation of liability
-- Insurance covenants
+- Limitation of liability — ${OWNER_BLANK}
+- Insurance covenants — ${OWNER_BLANK}
 - Governing law and venue
 - Assignment
 - Publicity
@@ -405,7 +408,7 @@ This addendum describes the data this build handles. A worksheet may include a n
 ## 1. Parties
 
 - Controller / credit union: [To be completed]
-- Processor legal entity — [To be completed — owner]
+- Processor legal entity — ${OWNER_BLANK}
 - Related agreement: the sample contract, which is also an unsigned draft
 
 ## 2. Subject
@@ -424,7 +427,7 @@ An uploaded worksheet is different. It may contain a member name and VIN. See se
 
 ## 4. Data that may be processed
 
-[Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record. Also uploaded worksheet images or PDFs, sent to the AI vendor and not stored by us. Anthropic is the processor for that file. This pilot does not use zero data retention. DPA, retention window, and region — [To be completed — owner]
+[Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record. Also uploaded worksheet images or PDFs, sent to the AI vendor and not stored by us. Anthropic is the processor for that file. DPA, retention window, and region — ${OWNER_BLANK}
 
 Staff trial records (credit union name, contact name, work email, scrypt login hash), branding, settings, aggregate grade counts, and audit lines are stored. They are not a member worksheet.
 
@@ -439,7 +442,7 @@ Process the quote figures only to show the educational result and the credit uni
 | Subprocessor | Role | Status in this draft |
 | --- | --- | --- |
 | Vercel | Application hosting | Intended |
-| Anthropic | Reads an uploaded worksheet image or PDF for that request. This pilot does not use zero data retention. | In use on extract when the API key is set |
+| Anthropic | Reads an uploaded worksheet image or PDF for that request. DPA, region, and retention are ${OWNER_BLANK}. | In use on extract when the API key is set |
 | Resend | Trial confirmation, signup notice, and an optional count summary. Does not receive the worksheet. | In use when configured |
 | Stripe | Card checkout | Not implemented |
 
@@ -459,7 +462,7 @@ Because the design does not keep a member record, there should be nothing to ret
 
 ## 10. International transfers
 
-Host region and the region where Anthropic processes a worksheet — [To be completed — owner]
+Host region and the region where Anthropic processes a worksheet — ${OWNER_BLANK}
 
 ## 11. Audits
 
@@ -467,7 +470,7 @@ The credit union's right to review the due-diligence packet, and any on-site or 
 
 ## 12. GLBA
 
-Whether a worksheet that contains a name or VIN is nonpublic personal information, and how that sits in the credit union's program — [To be completed — owner]
+Whether a worksheet that contains a name or VIN is nonpublic personal information, and how that sits in the credit union's program — ${OWNER_BLANK}
 
 ## 13. Status
 

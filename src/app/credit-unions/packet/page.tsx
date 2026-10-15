@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PILOT_MARK } from '@/cu/copy';
-import { OWNER_OPEN_ITEMS } from '@/cu/owner-open-items';
+import { OWNER_BLANK, OWNER_OPEN_ITEMS } from '@/cu/owner-open-items';
 import { dueDiligenceDocs } from '@/cu/packet/documents';
 import { DOCUMENT_VERSION_LABEL } from '../pricing';
 
@@ -28,9 +28,13 @@ export default function CreditUnionPacketPage() {
       <ul className="mt-10 list-disc space-y-2 pl-5 text-[18px] leading-[28px]">
         {dueDiligenceDocs.map(doc => <li key={doc.slug}>{doc.title}</li>)}
       </ul>
+      <h2 className="mt-10 text-[24px] font-bold leading-[30px]">Analyze API rate limit</h2>
+      <p className="mt-4 text-[18px] leading-[28px]">
+        POST /api/cu/&#123;tenant&#125;/analyze allows 12 requests per 60 seconds per address. That count lives in memory on each server instance and is not shared across instances. No shared firewall rule is configured. A worksheet read allows 6 requests per 60 seconds on the same kind of limit.
+      </p>
       <h2 className="mt-10 text-[24px] font-bold leading-[30px]">The owner still has to supply</h2>
       <ul className="mt-4 list-disc space-y-2 pl-5 text-[18px] leading-[28px]">
-        {OWNER_OPEN_ITEMS.map(item => <li key={item}>{item} — [To be completed — owner]</li>)}
+        {OWNER_OPEN_ITEMS.map(item => <li key={item}>{item} — {OWNER_BLANK}</li>)}
       </ul>
       <p className="mt-10">
         <Link href="/credit-unions" className={link}>← Back to plans</Link>

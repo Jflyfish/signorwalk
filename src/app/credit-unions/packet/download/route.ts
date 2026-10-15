@@ -12,7 +12,7 @@ PILOT-ONLY, PENDING COUNSEL REVIEW.
 These files describe what this build does. They are not a signed contract, not an audit, and not a certification.
 The download is ungated. This site does not ask for an email to send it.
 
-A worksheet image or PDF is sent to Anthropic for that request. This pilot does not use zero data retention. Retention window and region — [To be completed — owner]. This application does not store the worksheet.
+A worksheet image or PDF may include a name and VIN. It is sent to Anthropic for that request. This application does not store the worksheet. Anthropic DPA, region, and retention — TO BE PROVIDED BY OWNER/COUNSEL.
 Grading is a rules engine and template pack tp-1.0.0. Quote numbers are not stored as a member file.
 `;
 

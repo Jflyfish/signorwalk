@@ -1,19 +1,12 @@
 import type { Metadata } from 'next';
 import { DemoPage } from '../DemoPage';
 
-const BODY = 'This sandbox stands in for a credit union pre-approval page so the demo link does not 404. No application is taken here.';
-
 export const metadata: Metadata = {
-  title: 'Demo only — pre-approval',
-  description: BODY,
+  title: 'Your pre-approval page goes here',
+  description: 'A live credit union sends members to its own pre-approval URL, which it sets in the dashboard.',
   robots: { index: false, follow: false },
 };
 
 export default function DemoPreapprovalPage() {
-  return (
-    <DemoPage
-      title="Demo only: pre-approval"
-      body={BODY}
-    />
-  );
+  return <DemoPage />;
 }

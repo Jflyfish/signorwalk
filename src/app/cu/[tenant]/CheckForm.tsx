@@ -4,9 +4,9 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { track } from '@vercel/analytics';
 import { FILE_READ_ERROR, UPLOAD_DISCLOSURE } from '@/cu/copy';
 import type { DerivedBrand } from '@/cu/contrast';
-import { DEMO_FINANCE_SAMPLE } from '@/cu/demo-sample';
-import { GRADE_FILL } from '@/cu/grades';
 import { ADD_APR_RECOMMENDATION, financeGradeIsProvisional, memberRecommendationLine } from '@/cu/recommendation-display';
+import { DEMO_FINANCE_SAMPLE, DEMO_GRADE_C, DEMO_GRADE_D } from '@/cu/demo-sample';
+import { GRADE_FILL } from '@/cu/grades';
 import type { TenantReport } from '@/cu/engine/types';
 import type { CuPublic } from '@/cu/tenants';
 import { memberLink } from '@/cu/utm';
@@ -39,11 +39,22 @@ const EMPTY = {
 type FieldKey = keyof typeof EMPTY;
 type DealType = 'lease' | 'finance';
 
+function sampleFields(sample: typeof DEMO_FINANCE_SAMPLE | typeof DEMO_GRADE_C | typeof DEMO_GRADE_D): typeof EMPTY {
+  return {
+    ...EMPTY,
+    sellingPrice: sample.sellingPrice,
+    msrp: sample.msrp,
+    apr: sample.apr,
+    docFee: sample.docFee,
+    ...('downPayment' in sample ? { downPayment: sample.downPayment, monthlyPayment: sample.monthlyPayment } : {}),
+  };
+}
+
 const inputClass =
-  'w-full h-12 px-4 rounded-lg border cu-line bg-white text-[18px] leading-[28px] cu-ink';
+  'cu-ring w-full h-12 px-4 rounded-lg border cu-line bg-white text-[18px] leading-[28px] cu-ink';
 
 const textLink =
-  'cu-link text-[15px] font-semibold hover:underline underline-offset-4';
+  'cu-link cu-ring text-[15px] font-semibold hover:underline underline-offset-4';
 
 const embedFile =
   'cu-ring mt-2 block w-full text-[14px] font-normal cu-muted file:mr-3 file:h-12 file:cursor-pointer file:rounded-lg file:border file:border-solid file:border-[#E5E5E5] file:bg-white file:px-4 file:text-[15px] file:font-semibold file:text-[#111] md:file:h-11';
@@ -109,10 +120,10 @@ function Primary({
   wide?: boolean;
 }) {
   const className = wide
-    ? 'cu-primary inline-flex items-center justify-center text-center min-h-12 w-full px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60'
-    : 'cu-primary inline-flex items-center justify-center text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60';
+    ? 'cu-primary cu-ring inline-flex items-center justify-center text-center min-h-12 w-full px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60'
+    : 'cu-primary cu-ring inline-flex items-center justify-center text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60';
   if (href) {
-    return <a href={href} className={className} onClick={onClick}>{children}</a>;
+    return <a href={href} target="_top" className={className} onClick={onClick}>{children}</a>;
   }
   return <button type={type} disabled={disabled} className={className} onClick={onClick}>{children}</button>;
 }
@@ -139,7 +150,7 @@ export function CheckForm({
   const [dealType, setDealType] = useState<DealType>('finance');
   const [term, setTerm] = useState('60');
   const [state, setState] = useState('');
-  const [fields, setFields] = useState(() => (demoSample ? { ...EMPTY, ...DEMO_FINANCE_SAMPLE } : EMPTY));
+  const [fields, setFields] = useState(() => (demoSample ? sampleFields(DEMO_FINANCE_SAMPLE) : EMPTY));
   const [showTrade, setShowTrade] = useState(false);
   const [showAddons, setShowAddons] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -161,9 +172,11 @@ export function CheckForm({
 
   const accent = brand.brandText;
   const [uploadNote, setUploadNote] = useState('');
+  const [uploadError, setUploadError] = useState(false);
 
   async function onUpload(file: File | null) {
     if (!file) return;
+    setUploadError(false);
     setUploadNote('Reading the worksheet.');
     const body = new FormData();
     body.set('file', file);
@@ -171,6 +184,7 @@ export function CheckForm({
       const res = await fetch(`/api/cu/${tenant.id}/extract`, { method: 'POST', body });
       const data = await res.json();
       if (!res.ok || !data.success || !data.fields || typeof data.fields !== 'object') {
+        setUploadError(true);
         setUploadNote(typeof data.error === 'string' ? data.error : FILE_READ_ERROR);
         return;
       }
@@ -183,8 +197,10 @@ export function CheckForm({
       setFields(prev => ({ ...prev, ...next }));
       if (next.tradeDealerOffer || next.tradePayoff) setShowTrade(true);
       if (next.extendedWarranty || next.gapInsurance || next.tireWheel || next.paintInterior) setShowAddons(true);
+      setUploadError(false);
       setUploadNote('Numbers filled from the worksheet. The file was not stored.');
     } catch {
+      setUploadError(true);
       setUploadNote(FILE_READ_ERROR);
     }
   }
@@ -193,26 +209,41 @@ export function CheckForm({
     setFields(prev => ({ ...prev, [key]: value }));
   }
 
-  function switchType(next: DealType) {
-    setDealType(next);
-    setTerm(next === 'lease' ? '36' : '60');
+  function applySample(kind: 'a' | 'c' | 'd') {
+    const sample = kind === 'c' ? DEMO_GRADE_C : kind === 'd' ? DEMO_GRADE_D : DEMO_FINANCE_SAMPLE;
+    setDealType('finance');
+    setTerm(sample.term);
+    setShowTrade(false);
+    setShowAddons(false);
+    const next = sampleFields(sample);
+    setFields(next);
+    setNeedsApr(false);
+    setReport(null);
+    if (kind !== 'a') {
+      void gradeSnapshot({ fields: next, term: sample.term, dealType: 'finance', showTrade: false, showAddons: false });
+    }
   }
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function gradeSnapshot(snapshot: {
+    fields: typeof EMPTY;
+    term: string;
+    dealType: DealType;
+    showTrade: boolean;
+    showAddons: boolean;
+  }) {
     setError('');
     const skip = new Set<FieldKey>();
-    if (!showTrade) {
+    if (!snapshot.showTrade) {
       skip.add('tradeDealerOffer');
       skip.add('tradePayoff');
     }
-    if (!showAddons) {
+    if (!snapshot.showAddons) {
       skip.add('extendedWarranty');
       skip.add('gapInsurance');
       skip.add('tireWheel');
       skip.add('paintInterior');
     }
-    if (dealType === 'finance') {
+    if (snapshot.dealType === 'finance') {
       skip.add('moneyFactor');
       skip.add('buyRateMoneyFactor');
       skip.add('residualPercent');
@@ -221,12 +252,12 @@ export function CheckForm({
       skip.add('apr');
       skip.add('amountFinanced');
     }
-    const payload: Record<string, string> = { dealType, termMonths: term };
+    const payload: Record<string, string> = { dealType: snapshot.dealType, termMonths: snapshot.term };
     if (state) payload.state = state;
     let any = false;
-    for (const key of Object.keys(fields) as FieldKey[]) {
+    for (const key of Object.keys(EMPTY) as FieldKey[]) {
       if (skip.has(key)) continue;
-      const raw = fields[key].trim();
+      const raw = snapshot.fields[key].trim();
       if (!raw) continue;
       if (!/^\d+(\.\d+)?$/.test(raw.replace(/[$,]/g, ''))) {
         setError('Use numbers only. Leave a line blank if you do not have it.');
@@ -235,7 +266,7 @@ export function CheckForm({
       payload[key] = raw.replace(/[$,]/g, '');
       any = true;
     }
-    if (dealType === 'finance' && !payload.apr) {
+    if (snapshot.dealType === 'finance' && !payload.apr) {
       if (!any) {
         setError('Enter at least one number from the worksheet.');
         return;
@@ -268,7 +299,7 @@ export function CheckForm({
       const archetype = String(data.analysis.archetype);
       if (/^[ABCDF]$/.test(grade)) onGrade?.(grade);
       if (['A', 'B', 'C', 'D', 'F'].includes(grade) && /^(LEASE|FIN)_[A-Z_]+$/.test(archetype)) {
-        trackSafe('analysis_completed', { tenant: tenant.id, grade, dealType, archetype });
+        trackSafe('analysis_completed', { tenant: tenant.id, grade, dealType: snapshot.dealType, archetype });
       }
       requestAnimationFrame(() => headingRef.current?.focus());
     } catch {
@@ -276,6 +307,16 @@ export function CheckForm({
     } finally {
       setBusy(false);
     }
+  }
+
+  function switchType(next: DealType) {
+    setDealType(next);
+    setTerm(next === 'lease' ? '36' : '60');
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await gradeSnapshot({ fields, term, dealType, showTrade, showAddons });
   }
 
   if (needsApr) {
@@ -290,18 +331,20 @@ export function CheckForm({
         <p className="mt-4 text-[18px] leading-[28px]">
           This finance offer has no APR from the worksheet, so there is no grade yet. A grade from this tool is a comparison, not a credit decision.
         </p>
+        <p className="mt-4 inline-flex rounded-full border cu-line px-3 py-1 text-[13px] font-semibold leading-[18px]">Partial grade — add APR</p>
         <p className="mt-4 text-[15px] font-semibold leading-[24px]">{ADD_APR_RECOMMENDATION}</p>
-        <div className="mt-10">
-          <Primary
+        <p className="mt-10">
+          <button
             type="button"
+            className={textLink}
             onClick={() => {
               returnToApr.current = true;
               setNeedsApr(false);
             }}
           >
-            Add the APR
-          </Primary>
-        </div>
+            Add APR and check again
+          </button>
+        </p>
       </div>
     );
   }
@@ -322,7 +365,7 @@ export function CheckForm({
     return (
       <div className={embedded
         ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
-        : 'mx-auto w-full max-w-[560px] px-4 pb-[120px] pt-16 md:pb-16 md:pt-24'}>
+        : 'mx-auto w-full max-w-[560px] px-4 pb-[calc(120px+env(safe-area-inset-bottom))] pt-16 md:pb-16 md:pt-24'}>
         <div className="flex flex-col md:flex-row md:items-center md:gap-4">
           <p className="text-[14px] leading-[20px] cu-muted md:hidden">Grade</p>
           <p
@@ -334,9 +377,12 @@ export function CheckForm({
           </p>
           <div className="mt-4 md:mt-0">
             <p className="hidden text-[14px] leading-[20px] cu-muted md:block">Grade</p>
-            <h1 ref={headingRef} tabIndex={-1} className="text-[18px] leading-[28px] md:mt-4">
+            <h1 ref={headingRef} tabIndex={-1} className="text-[24px] font-bold leading-[30px] outline-none md:mt-4">
               <span className="sr-only">{report.grade}. </span>{report.headline}
             </h1>
+            {aprBlank || report.limitedData ? (
+              <p className="mt-4 inline-flex rounded-full border cu-line px-3 py-1 text-[13px] font-semibold leading-[18px]">Partial grade — add APR</p>
+            ) : null}
             <p className="mt-4 text-[18px] leading-[28px]">{report.gradeExplanation}</p>
             {caption ? <p className="mt-4 text-[15px] font-semibold leading-[24px]">{caption}</p> : null}
           </div>
@@ -359,19 +405,18 @@ export function CheckForm({
         {tenant.preApprovalUrl ? (
           <div className={embedded
             ? 'static mt-10 w-full'
-            : 'fixed inset-x-0 bottom-0 border-t cu-line bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
+            : 'fixed inset-x-0 bottom-0 z-10 border-t cu-line bg-white px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
             <p className="mb-3 text-[14px] font-semibold leading-[20px]">Next step</p>
             <Primary
               wide={embedded}
               href={memberLink(tenant.preApprovalUrl)}
               onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
             >
-              {tenant.preApprovalUrl.includes('/credit-unions/demo/') ? 'Demo only: pre-approval' : (
-                <>
-                  <span className="md:hidden">Get pre-approved</span>
-                  <span className="hidden md:inline">Get pre-approved with {tenant.name}</span>
-                </>
-              )}
+              <span className="md:hidden">Get pre-approved</span>
+              <span className="hidden md:inline">Get pre-approved with {tenant.name}</span>
+              {tenant.preApprovalUrl.includes('/credit-unions/demo/') ? (
+                <span className="ml-2 inline-flex items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+              ) : null}
             </Primary>
           </div>
         ) : null}
@@ -448,10 +493,14 @@ export function CheckForm({
               <p className="mt-6">
                 <a
                   href={memberLink(tenant.ratesUrl)}
+                  target="_top"
                   className={textLink}
                   onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'rates' })}
                 >
-                  {tenant.ratesUrl.includes('/credit-unions/demo/') ? 'Demo only: auto rates' : tenant.ratesLabel}
+                  {tenant.ratesUrl.includes('/credit-unions/demo/') ? 'See auto rates' : tenant.ratesLabel}
+                  {tenant.ratesUrl.includes('/credit-unions/demo/') ? (
+                    <span className="ml-2 inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+                  ) : null}
                 </a>
               </p>
               ) : null}
@@ -470,18 +519,25 @@ export function CheckForm({
   const terms = dealType === 'lease' ? LEASE_TERMS : FINANCE_TERMS;
 
   return (
-    <div className="mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pb-24 md:pt-24">
+    <div className="mx-auto w-full max-w-[560px] px-4 pb-[max(4rem,env(safe-area-inset-bottom))] pt-16 md:pb-24 md:pt-24">
       <h1 className="text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px]">Check a dealer offer</h1>
       <p className="mt-6 text-[18px] leading-[28px] cu-muted">Enter the numbers from the dealer worksheet.</p>
       {demoSample ? (
-        <p className="mt-4 text-[15px] leading-[24px]">
-          Sample finance offer for this demo, with a {DEMO_FINANCE_SAMPLE.apr}% APR. Replace any number with the worksheet.
-        </p>
+        <>
+          <p className="mt-4 text-[15px] leading-[24px]">
+            Sample finance offer for this demo, with a {DEMO_FINANCE_SAMPLE.apr}% APR. Replace any number with the worksheet.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button type="button" className={`${textLink} cu-ring`} onClick={() => applySample('a')}>Try a sample deal</button>
+            <button type="button" className="cu-ring inline-flex h-8 items-center rounded-full border cu-line px-3 text-[14px] font-semibold" onClick={() => applySample('c')}>C</button>
+            <button type="button" className="cu-ring inline-flex h-8 items-center rounded-full border cu-line px-3 text-[14px] font-semibold" onClick={() => applySample('d')}>D</button>
+          </div>
+        </>
       ) : null}
 
       <form onSubmit={onSubmit} className="mt-10" aria-describedby={error ? `${formId}-error` : undefined}>
         <div role="status" aria-live="polite" className="sr-only">{busy ? 'Checking the numbers.' : ''}</div>
-        {error ? <p id={`${formId}-error`} role="alert" className="mb-6 text-[14px] font-semibold leading-[20px]">{error}</p> : null}
+        {error ? <p id={`${formId}-error`} role="alert" className="cu-err mb-6">{error}</p> : null}
 
         <div className="mb-6">
           {numbersOnly ? (
@@ -495,7 +551,7 @@ export function CheckForm({
                 id="worksheet"
                 type="file"
                 accept="image/jpeg,image/png,image/webp,application/pdf"
-                className={embedded ? embedFile : 'mt-2 block w-full text-[14px]'}
+                className={embedded ? embedFile : 'cu-ring mt-2 block w-full text-[14px]'}
                 onChange={event => {
                   const file = event.target.files?.[0] ?? null;
                   event.target.value = '';
@@ -504,7 +560,7 @@ export function CheckForm({
               />
             </>
           )}
-          <p className="mt-2 text-[14px] leading-[20px] cu-muted" role="status">{numbersOnly ? UPLOAD_DISCLOSURE : (uploadNote || UPLOAD_DISCLOSURE)}</p>
+          <p className={uploadError ? 'cu-err mt-2' : 'mt-2 text-[14px] leading-[20px] cu-muted'} role={uploadError ? 'alert' : 'status'}>{numbersOnly ? UPLOAD_DISCLOSURE : (uploadNote || UPLOAD_DISCLOSURE)}</p>
           <p className="mt-2 text-[14px] leading-[20px]">
             <a href="/credit-unions/privacy" className={textLink}>Privacy</a>
           </p>
@@ -531,6 +587,7 @@ export function CheckForm({
                     name="dealType"
                     value={option}
                     checked={selected}
+                    className="cu-ring"
                     onChange={() => switchType(option)}
                   />
                   {option === 'finance' ? 'Finance' : 'Lease'}

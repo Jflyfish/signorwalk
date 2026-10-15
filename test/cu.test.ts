@@ -17,7 +17,7 @@ import { getCuTenant, toCuPublic } from '../src/cu/tenants';
 import { memberLink } from '../src/cu/utm';
 import { config } from '../src/middleware';
 import { POST } from '../src/app/api/cu/[tenant]/analyze/route';
-import { DEMO_FINANCE_SAMPLE } from '../src/cu/demo-sample';
+import { DEMO_FINANCE_SAMPLE, DEMO_GRADE_C, DEMO_GRADE_D } from '../src/cu/demo-sample';
 import { gradePayload } from '../src/cu/engine/report';
 import { ADD_APR_RECOMMENDATION, financeGradeIsProvisional, memberRecommendationLine } from '../src/cu/recommendation-display';
 
@@ -148,7 +148,11 @@ test('due diligence packet is one zip containing every draft', () => {
   assert.match(packet, /source of truth/);
   assert.match(packet, /owner approval before merge/);
   assert.match(packet, /PILOT-ONLY, PENDING COUNSEL REVIEW/);
-  assert.match(packet, /does not use zero data retention/);
+  assert.match(packet, /TO BE PROVIDED BY OWNER\/COUNSEL/);
+  assert.match(packet, /No shared firewall rule is configured/);
+  assert.match(packet, /12 requests per 60 seconds/);
+  assert.equal(packet.toLowerCase().includes('zero data retention'), false);
+  assert.equal(packet.toLowerCase().includes('zdr'), false);
   assert.match(packet, /## 11\. Owner must supply/);
   assert.match(packet, /\[To be completed — owner\]/);
   assert.equal(packet.includes('Sign or Walk [legal entity'), false);
@@ -275,4 +279,9 @@ test('demo sample includes an APR and grades; a blank APR is still a B from the 
   });
   assert.equal(fullLine, graded.recommendationLabel);
   assert.equal(readFileSync('src/cu/engine/evaluate.ts', 'utf8').includes('function recommendationFor'), true);
+
+  const gradeC = gradePayload({ dealType: 'finance', ...DEMO_GRADE_C, termMonths: DEMO_GRADE_C.term }, 'Harborlight Credit Union');
+  assert.equal(gradeC.grade, 'C');
+  const gradeD = gradePayload({ dealType: 'finance', ...DEMO_GRADE_D, termMonths: DEMO_GRADE_D.term }, 'Harborlight Credit Union');
+  assert.equal(gradeD.grade, 'D');
 });
