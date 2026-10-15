@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { UPLOAD_DISCLOSURE } from '@/cu/copy';
-import { DemoFrame } from './DemoFrame';
 import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
@@ -51,13 +50,11 @@ export default function CreditUnionsPage() {
           {HEADLINE}
         </h1>
         <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] cu-muted">{VALUE_LINE}</p>
+        <p className="mt-6 text-[14px] leading-[20px] cu-muted">
+          See it in action.{' '}
+          <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
+        </p>
       </div>
-
-      <section className="mx-auto w-full max-w-[960px] px-4 pt-16" aria-labelledby="demo-heading">
-        <h2 id="demo-heading" className="text-[24px] font-bold leading-[30px]">See it in action</h2>
-        <p className="mt-2 max-w-[640px] text-[14px] leading-[20px] cu-muted">Demo. This is Harborlight Credit Union&apos;s check. Grades here are not your credit union&apos;s.</p>
-        <DemoFrame />
-      </section>
 
       <div className="mt-16 cu-band py-16 md:mt-24">
         <div className="mx-auto w-full max-w-[960px] px-4">
@@ -75,7 +72,7 @@ export default function CreditUnionsPage() {
                   <Link href={`/credit-unions/get-started?tier=${tier.id}`} className={`${marked ? solidButton : outlineButton} mt-4`}>
                     Start 90-day free trial
                   </Link>
-                  <p className="mt-4 text-[14px] leading-[20px] cu-muted">Free for 90 days. Cancel anytime.</p>
+                  <p className="mt-4 text-[14px] leading-[20px] cu-muted">Free for 90 days. No card.</p>
                 </li>
               );
             })}

@@ -92,10 +92,17 @@ test('signup is limited to five an hour and an ended trial is unavailable', () =
   assert.equal(tenantUnavailable({ status: 'active', trialEndsAt: '2026-01-01T00:00:00.000Z' }, Date.parse('2026-10-15T00:00:00.000Z')), true);
   assert.equal(tenantUnavailable({ status: 'active' }), false);
   assert.equal(tenantUnavailable({ status: 'paused' }), true);
+  assert.equal(tenantUnavailable({ status: 'active', verified: false }), true);
   const actions = readFileSync('src/app/cu/actions.ts', 'utf8');
   assert.match(actions, /staffLoginMatches/);
   assert.match(actions, /verified === false/);
   assert.match(actions, /notice=confirm/);
+  assert.equal(actions.includes('verified = true'), false);
+  assert.match(actions, /resendConfirmAction/);
+  assert.match(readFileSync('src/app/cu/[tenant]/confirm/route.ts', 'utf8'), /profile\.verified = true/);
+  assert.match(readFileSync('src/app/cu/[tenant]/dashboard/page.tsx', 'utf8'), /Check your email to confirm/);
+  assert.match(readFileSync('src/cu/rate-limit.ts', 'utf8'), /TODO: move this to a shared KV limit before production/);
+  assert.match(readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8'), /sendSignupNotice/);
   const middleware = readFileSync('src/middleware.ts', 'utf8');
   assert.equal(middleware.includes(`return "'self'"`), false);
 });

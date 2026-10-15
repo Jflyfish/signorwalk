@@ -1,11 +1,13 @@
 'use server';
 
+/** PAYMENTS ARE NOT BUILT. Signup starts a trial. Nothing here takes a card. */
+
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, signSession } from '@/cu/auth';
 import { appendAudit } from '@/cu/cu-store';
 import { requestOriginFrom } from '@/cu/embed';
-import { sendTrialConfirm } from '@/cu/notify';
+import { sendSignupNotice, sendTrialConfirm } from '@/cu/notify';
 import { clientAddress, takeSignupSlot } from '@/cu/rate-limit';
 import { createTrial } from '@/cu/trial';
 
@@ -60,6 +62,7 @@ export async function startTrialAction(formData: FormData) {
       `${origin}/cu/${result.id}/confirm?token=${result.confirmToken}`,
     );
   }
+  await sendSignupNotice(String(formData.get('name') ?? '').trim(), result.id);
   await appendAudit('create', result.id, 'tenant');
   redirect(`/cu/${result.id}/dashboard`);
 }

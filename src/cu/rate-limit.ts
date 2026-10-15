@@ -73,7 +73,11 @@ export function resetExtractRateLimit(): void {
   extractBuckets.clear();
 }
 
-/** Signup window. The map stores a hash of the address, not the address. */
+/**
+ * Signup window. The map stores a hash of the address, not the address.
+ * TODO: move this to a shared KV limit before production. Do not add a
+ * production Firewall rule for signup yet.
+ */
 export const SIGNUP_WINDOW_MS = 60 * 60 * 1000;
 export const SIGNUP_LIMIT = 5;
 const signupBuckets = new Map<string, number[]>();

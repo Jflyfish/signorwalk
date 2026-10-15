@@ -2,6 +2,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { isEmbedOrigin } from './embed';
 import { saveStaffLogin } from './staff-login';
 import {
+  getTenantProfile,
   loadCuTenant,
   normalizeProfile,
   saveTenantProfile,
@@ -84,4 +85,14 @@ export async function createTrial(input: {
   await saveTenantProfile(stored, { shortName: short, primary: '#111111' });
   await saveStaffLogin(id, email, input.secret);
   return { ok: true, id, confirmToken };
+}
+
+/** Replaces the confirm hash. Does not mark the trial verified. */
+export async function rotateConfirmToken(id: string): Promise<string | null> {
+  const profile = await getTenantProfile(id);
+  if (!profile || profile.verified !== false) return null;
+  const confirmToken = randomBytes(32).toString('hex');
+  profile.confirmHash = createHash('sha256').update(confirmToken).digest('hex');
+  await saveTenantProfile(profile);
+  return confirmToken;
 }

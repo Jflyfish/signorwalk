@@ -1,3 +1,4 @@
+import { TALK_TO_US_EMAIL } from '@/app/credit-unions/pricing';
 import { getAggregates, getSettings, type Aggregates } from './cu-store';
 import { loadCuTenant } from './tenant-directory';
 
@@ -14,6 +15,26 @@ export function summaryText(name: string, agg: Aggregates): string {
     `Grades: A ${agg.grades.A}, B ${agg.grades.B}, C ${agg.grades.C}, D ${agg.grades.D}, F ${agg.grades.F}`,
     'No member information is included.',
   ].join('\n');
+}
+
+/** Tells the team a trial started. Returns false when Resend is unset. Does not log addresses. */
+export async function sendSignupNotice(name: string, id: string): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM;
+  if (!apiKey || !from || !name || !id) return false;
+  try {
+    const { Resend } = await import('resend');
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from,
+      to: TALK_TO_US_EMAIL,
+      subject: `New Sign or Walk trial — ${name}`,
+      text: `${name} started a 90-day trial.\nSlug: ${id}\n`,
+    });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Optional trial note. Returns false when Resend is unset. Does not log the address. */

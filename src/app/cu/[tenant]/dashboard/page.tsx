@@ -6,7 +6,7 @@ import { resolveBrand } from '@/cu/brand';
 import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
 import { deepLink, iframeSnippet, requestOriginFrom } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
-import { confirmTrialAction, saveEmbedOriginsAction, saveSettingsAction, sendSummaryAction } from '../../actions';
+import { resendConfirmAction, saveEmbedOriginsAction, saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 import { StaffHeader } from '../../StaffHeader';
 import { BrandingForm } from './BrandingForm';
@@ -25,7 +25,8 @@ function sectionFrom(query: { section?: string; saved?: string; error?: string; 
   if (query.section === 'branding' || query.section === 'settings' || query.section === 'usage' || query.section === 'embed') return query.section;
   if (query.saved === 'branding' || query.error === 'branding') return 'branding';
   if (query.saved === 'origins' || query.error === 'origins') return 'embed';
-  if (query.saved === 'settings' || query.saved === 'email' || query.error === 'email' || (query.notice && query.notice !== 'confirm')) return 'settings';
+  const stay = query.notice === 'confirm' || query.notice === 'sent' || query.notice === 'mail';
+  if (query.saved === 'settings' || query.saved === 'email' || query.error === 'email' || (query.notice && !stay)) return 'settings';
   return 'usage';
 }
 
@@ -98,8 +99,10 @@ export default async function DashboardPage({
       : query.error === 'origins'
         ? 'Use one https origin per line.'
         : '';
-  const saved = query.saved ? NOTICES[query.saved] : '';
-  const caution = query.notice && query.notice !== 'confirm' ? NOTICES[query.notice] : '';
+  const saved = query.saved ? NOTICES[query.saved] : query.notice === 'sent' ? 'Confirmation email sent.' : '';
+  const caution = query.notice === 'mail'
+    ? 'Email is not configured on this server.'
+    : query.notice && query.notice !== 'confirm' && query.notice !== 'sent' ? NOTICES[query.notice] : '';
   const trialLine = tenant.trialEndsAt ? trialCopy(tenant.trialEndsAt) : '';
   const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
   const shareUrl = `https://signorwalk.com/cu/${tenant.id}`;
@@ -143,19 +146,19 @@ export default async function DashboardPage({
       </nav>
       <main className="mx-auto w-full max-w-[1120px] px-4 py-10">
         {!tenant.verified ? (
-          <form action={confirmTrialAction} className="mb-6 max-w-[560px] rounded-lg border cu-line p-4">
+          <form action={resendConfirmAction} className="mb-6 max-w-[560px] rounded-lg border cu-line p-4">
             <input type="hidden" name="tenant" value={tenant.id} />
-            <p className="text-[14px] leading-[20px]">Confirm this trial before saving changes.</p>
-            <button type="submit" className="cu-primary mt-4 inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Confirm trial</button>
+            <p className="text-[14px] leading-[20px]">Check your email to confirm</p>
+            <button type="submit" className="cu-link mt-4 text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline">Resend link</button>
           </form>
         ) : null}
         {trialLine ? <p className="mb-6 text-[14px] leading-[20px] cu-muted">{trialLine}</p> : null}
-        {tenant.embedOrigins.length === 0 ? (
+        {tenant.verified && tenant.embedOrigins.length === 0 ? (
           <form action={saveEmbedOriginsAction} className="mb-6 grid max-w-[560px] gap-4">
             <input type="hidden" name="tenant" value={tenant.id} />
             <label htmlFor="embed-allowlist" className="text-[14px] font-semibold leading-[20px]">Add website
               <span className="mt-2 block font-normal cu-muted">Add at least one website that can show the tool.</span>
-              <textarea id="embed-allowlist" name="embedOrigins" rows={3} className="mt-2 block w-full rounded-lg border cu-line px-4 py-3 text-[16px] font-normal" />
+              <textarea id="embed-allowlist" name="embedOrigins" rows={3} className="cu-ring mt-2 block w-full rounded-lg border cu-line px-4 py-3 text-[16px] font-normal" />
             </label>
             <button type="submit" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save website</button>
           </form>

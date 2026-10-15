@@ -4,9 +4,11 @@ import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { canOpenTenant, checkCredentials, CU_SESSION_COOKIE, demoTenantId, signSession, verifySession, type CuSession } from '@/cu/auth';
 import { appendAudit, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
-import { staffLoginMatches } from '@/cu/staff-login';
+import { requestOriginFrom } from '@/cu/embed';
 import { readLogoFile } from '@/cu/logo-file';
-import { sendAggregateSummary } from '@/cu/notify';
+import { sendAggregateSummary, sendTrialConfirm } from '@/cu/notify';
+import { readStaffEmail, staffLoginMatches } from '@/cu/staff-login';
+import { rotateConfirmToken } from '@/cu/trial';
 import {
   getTenantProfile,
   loadCuTenant,
@@ -103,16 +105,19 @@ function emailOk(value: string): boolean {
   return value.length <= 120 && (!value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
 }
 
-export async function confirmTrialAction(formData: FormData) {
+export async function resendConfirmAction(formData: FormData) {
   const tenant = String(formData.get('tenant') ?? '');
-  const session = await guard(tenant);
-  if (session.role !== 'cu') redirect(`/cu/${tenant}/dashboard`);
+  await guard(tenant);
   const profile = await getTenantProfile(tenant);
-  if (!profile) redirect(`/cu/${tenant}/dashboard`);
-  profile.verified = true;
-  delete profile.confirmHash;
-  await saveTenantProfile(profile);
-  redirect(`/cu/${tenant}/dashboard?saved=confirmed`);
+  if (!profile || profile.verified !== false) redirect(`/cu/${tenant}/dashboard`);
+  const email = await readStaffEmail(tenant);
+  const h = await headers();
+  const origin = requestOriginFrom(name => h.get(name));
+  if (!email || !origin) redirect(`/cu/${tenant}/dashboard?notice=mail`);
+  const token = await rotateConfirmToken(tenant);
+  if (!token) redirect(`/cu/${tenant}/dashboard?notice=mail`);
+  const sent = await sendTrialConfirm(email, profile.name, `${origin}/cu/${tenant}/confirm?token=${token}`);
+  redirect(`/cu/${tenant}/dashboard?notice=${sent ? 'sent' : 'mail'}`);
 }
 
 export async function saveSettingsAction(formData: FormData) {

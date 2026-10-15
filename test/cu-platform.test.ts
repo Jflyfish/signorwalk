@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { NextRequest } from 'next/server';
 import { ephemeralSecret, checkCredentials, signSession, verifySession } from '../src/cu/auth';
@@ -9,7 +9,6 @@ import { getAggregates, getBranding, recordCheck, resetCuStore, saveBranding, sa
 import { readLogoFile } from '../src/cu/logo-file';
 import { formatOcrLog, pickOcrFields } from '../src/cu/ocr';
 import { sendAggregateSummary, summaryText } from '../src/cu/notify';
-import { CHECKOUT_STATUS } from '../src/app/credit-unions/get-started/checkout-stubs';
 import { POST } from '../src/app/api/cu/[tenant]/extract/route';
 
 const ENV_KEYS = ['CU_DEMO_EMAIL', 'CU_DEMO_PASSWORD', 'CU_DEMO_TENANT', 'CU_ADMIN_EMAIL', 'CU_ADMIN_PASSWORD', 'CU_SESSION_SECRET', 'ANTHROPIC_API_KEY'] as const;
@@ -214,11 +213,12 @@ test('worksheet route does not read or log a file when OCR is not configured', a
 });
 
 test('stripe checkout stays unwired', () => {
-  assert.equal(CHECKOUT_STATUS, 'coming-soon');
-  const src = readFileSync('src/app/credit-unions/get-started/checkout-stubs.ts', 'utf8');
+  assert.equal(existsSync('src/app/credit-unions/get-started/checkout-stubs.ts'), false);
+  const src = readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8');
   assert.match(src, /PAYMENTS ARE NOT BUILT/);
   assert.equal(src.includes('sk_live'), false);
   assert.equal(src.includes('sk_test'), false);
+  assert.equal(src.toLowerCase().includes('stripe'), false);
 });
 
 test('growth copy and the worksheet route stay on the approved words', () => {
@@ -245,8 +245,12 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(started.includes("Self-serve checkout isn't on this preview"), false);
   assert.match(page, /Start 90-day free trial/);
   assert.match(page, /See it in action/);
-  assert.match(page, /Demo\. This is Harborlight Credit Union/);
-  assert.match(readFileSync('src/app/credit-unions/DemoFrame.tsx', 'utf8'), /\/cu\/harborlight-cu\/embed/);
+  assert.match(page, /Open live demo/);
+  assert.match(page, /\/credit-unions\/embed-demo/);
+  assert.match(page, /Free for 90 days\. No card\./);
+  assert.equal(page.includes('Cancel anytime'), false);
+  assert.equal(page.includes('DemoFrame'), false);
+  assert.equal(page.includes('/cu/harborlight-cu/embed'), false);
   assert.match(page, /Over \$5B\? Email us\./);
   assert.match(page, /\{' · '\}/);
   assert.match(page, /mailto:\$\{TALK_TO_US_EMAIL\}/);
@@ -288,6 +292,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(started, /name="company"/);
   assert.match(started, /name="website"/);
   assert.match(started, /No credit card/);
+  assert.match(started, /At least 12 characters\./);
+  assert.match(started, /cu-ring/);
   assert.equal(started.toLowerCase().includes('stripe'), false);
   assert.equal(started.includes('card number'), false);
   const signup = readFileSync('src/app/credit-unions/get-started/actions.ts', 'utf8');

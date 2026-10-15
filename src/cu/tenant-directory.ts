@@ -43,8 +43,8 @@ export interface ResolvedTenant extends CuTenant {
 
 export const TENANT_UNAVAILABLE = 'This check is unavailable.';
 
-export function tenantUnavailable(tenant: { status: 'active' | 'paused'; trialEndsAt?: string }, now = Date.now()): boolean {
-  if (tenant.status === 'paused') return true;
+export function tenantUnavailable(tenant: { status: 'active' | 'paused'; trialEndsAt?: string; verified?: boolean }, now = Date.now()): boolean {
+  if (tenant.status === 'paused' || tenant.verified === false) return true;
   if (!tenant.trialEndsAt) return false;
   const ends = Date.parse(tenant.trialEndsAt);
   return Number.isFinite(ends) && ends <= now;

@@ -13,13 +13,13 @@ export const metadata: Metadata = {
 const button =
   'inline-flex items-center justify-center h-12 w-full md:h-11 md:w-auto px-4 rounded-lg cu-solid text-[15px] font-semibold cu-ring';
 
-const field = 'mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal';
+const field = 'cu-ring mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal';
 
 const ERRORS: Record<string, string> = {
   name: 'Enter the credit union name.',
   contact: 'Enter a contact name.',
   email: 'Enter a work email.',
-  secret: 'Use at least 12 characters.',
+  secret: 'At least 12 characters.',
   website: 'Enter a website like https://www.example.com, or leave it blank.',
   taken: 'That name is already in use. Try another.',
   rate: 'Too many signups from this network. Try again later.',
@@ -62,6 +62,7 @@ export default async function GetStartedPage({
           </label>
           <label className="text-[14px] font-semibold leading-[20px]">Password
             <input name="password" type="password" required minLength={12} autoComplete="new-password" className={field} />
+            <span className="mt-2 block text-[14px] font-normal leading-[20px] cu-muted">At least 12 characters.</span>
           </label>
           <label className="text-[14px] font-semibold leading-[20px]">Website
             <input name="website" autoComplete="url" placeholder="https://www.example.com" className={field} />
@@ -69,7 +70,7 @@ export default async function GetStartedPage({
           <p className="text-[14px] leading-[20px] cu-muted">Optional. Used as a website that can show the tool.</p>
           <button type="submit" className={button}>Start 90-day free trial</button>
         </form>
-        <p className="mt-4 text-[14px] leading-[20px] cu-muted">Confirm the trial on the dashboard before saving changes.</p>
+        <p className="mt-4 text-[14px] leading-[20px] cu-muted">Check your email to confirm. Saving stays off until then.</p>
         <p className="mt-4">
           <Link
             href="/credit-unions"
