@@ -12,7 +12,10 @@ export function creditUnionAlias(slug: string[]): string | null {
   ) return '/credit-unions/terms';
   if (path.includes('privacy')) return '/credit-unions/privacy';
   if (
-    path.includes('packet')
+    path === 'dd'
+    || path.startsWith('dd.')
+    || path.endsWith('/dd')
+    || path.includes('packet')
     || path.includes('due-diligence')
     || path.includes('due_diligence')
     || path.endsWith('.pdf')

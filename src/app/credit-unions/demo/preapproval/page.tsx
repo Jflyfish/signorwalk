@@ -10,7 +10,7 @@ export default function DemoPreapprovalPage() {
   return (
     <DemoPage
       title="Demo only: pre-approval"
-      body="This sandbox stands in for a credit union pre-approval page so the Harborlight demo link does not 404. No application is taken here."
+      body="This sandbox stands in for a credit union pre-approval page so the demo link does not 404. No application is taken here."
     />
   );
 }

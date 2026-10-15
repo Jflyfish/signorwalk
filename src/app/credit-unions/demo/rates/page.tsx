@@ -10,7 +10,7 @@ export default function DemoRatesPage() {
   return (
     <DemoPage
       title="Demo only: auto rates"
-      body="This sandbox stands in for a credit union rates page so the Harborlight demo link does not 404. No rate is published here."
+      body="This sandbox stands in for a credit union rates page so the demo link does not 404. No rate is published here."
     />
   );
 }

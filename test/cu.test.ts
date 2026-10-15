@@ -35,22 +35,31 @@ test('slug resolves the demo tenants and nothing else', () => {
 });
 
 test('public links carry aggregate UTM parameters', () => {
-  const pub = toCuPublic(getCuTenant('harborlight-cu')!);
-  const pre = new URL(pub.preApprovalUrl);
+  const harbor = getCuTenant('harborlight-cu')!;
+  assert.equal(harbor.preApprovalUrl, '/credit-unions/demo/preapproval');
+  assert.equal(harbor.ratesUrl, '/credit-unions/demo/rates');
+  assert.equal(harbor.supportUrl, '/credit-unions/demo/help');
+  assert.equal(harbor.privacyUrl, '/credit-unions/demo/privacy');
+  assert.equal(harbor.preApprovalUrl.includes('signorwalk.com'), false);
+  const pub = toCuPublic(harbor);
+  const pre = new URL(pub.preApprovalUrl, 'http://preview.local');
   assert.equal(pre.searchParams.get('utm_source'), 'signorwalk');
   assert.equal(pre.searchParams.get('utm_medium'), 'referral');
   assert.equal(pre.searchParams.get('utm_campaign'), 'harborlight-cu');
   assert.equal(pre.searchParams.get('utm_content'), 'preapproval');
-  const rates = new URL(pub.ratesUrl);
+  const rates = new URL(pub.ratesUrl, 'http://preview.local');
   assert.equal(rates.searchParams.get('utm_content'), 'rates');
   assert.equal(rates.searchParams.get('utm_campaign'), 'harborlight-cu');
-  assert.equal(pre.hostname, 'signorwalk.com');
-  assert.equal(pre.pathname, '/credit-unions/demo/preapproval');
-  assert.equal(rates.pathname, '/credit-unions/demo/rates');
-  assert.equal(memberLink(pub.preApprovalUrl), `${pre.pathname}${pre.search}`);
-  assert.equal(memberLink(pub.ratesUrl).startsWith('/credit-unions/demo/rates?'), true);
+  assert.equal(pub.preApprovalUrl.startsWith('/credit-unions/demo/preapproval?'), true);
+  assert.equal(pub.preApprovalUrl.includes('signorwalk.com'), false);
+  assert.equal(memberLink(pub.preApprovalUrl), pub.preApprovalUrl);
+  assert.equal(
+    memberLink('https://signorwalk.com/credit-unions/demo/preapproval?utm_content=preapproval'),
+    '/credit-unions/demo/preapproval?utm_content=preapproval',
+  );
   const summit = toCuPublic(getCuTenant('summit-ridge-fcu')!);
-  assert.equal(new URL(summit.preApprovalUrl).hostname.endsWith('.example'), true);
+  assert.equal(summit.preApprovalUrl.startsWith('/credit-unions/demo/preapproval?'), true);
+  assert.equal(new URL(summit.preApprovalUrl, 'http://preview.local').searchParams.get('utm_campaign'), 'summit-ridge-fcu');
   assert.equal(memberLink(summit.preApprovalUrl), summit.preApprovalUrl);
 });
 
@@ -137,12 +146,15 @@ test('due diligence packet is one zip containing every draft', () => {
   assert.match(packet, /PILOT-ONLY, PENDING COUNSEL REVIEW/);
   assert.match(packet, /does not use zero data retention/);
   assert.match(packet, /## 11\. Owner must supply/);
+  assert.match(packet, /\[To be completed — owner\]/);
+  assert.equal(packet.includes('Sign or Walk [legal entity'), false);
   assert.equal(packet.toLowerCase().includes('cancel anytime'), false);
   assert.equal(packet.toLowerCase().includes('zero-retention'), false);
 });
 
 test('guessed packet, privacy, and terms paths alias to real pages', () => {
   assert.equal(creditUnionAlias(['packet.pdf']), '/credit-unions/packet');
+  assert.equal(creditUnionAlias(['dd']), '/credit-unions/packet');
   assert.equal(creditUnionAlias(['due-diligence']), '/credit-unions/packet');
   assert.equal(creditUnionAlias(['due_diligence']), '/credit-unions/packet');
   assert.equal(creditUnionAlias(['terms.pdf']), '/credit-unions/terms');

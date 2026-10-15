@@ -24,8 +24,10 @@ test('demo tenants seed the store and stay in config', async () => {
   const rows = await listCuTenants();
   assert.deepEqual(rows.map(row => row.id), ['harborlight-cu', 'summit-ridge-fcu', 'larkspur-cu']);
   assert.equal(rows.every(row => row.status === 'active'), true);
-  assert.equal(new URL(rows[0].preApprovalUrl).pathname, '/credit-unions/demo/preapproval');
-  assert.equal(new URL(rows.find(row => row.id === 'summit-ridge-fcu')!.preApprovalUrl).hostname.endsWith('.example'), true);
+  assert.equal(rows[0].preApprovalUrl, '/credit-unions/demo/preapproval');
+  assert.equal(rows[0].preApprovalUrl.includes('signorwalk.com'), false);
+  assert.equal(rows.find(row => row.id === 'summit-ridge-fcu')!.ratesUrl, '/credit-unions/demo/rates');
+  assert.equal(rows[0].supportUrl, '/credit-unions/demo/help');
   assert.equal(getCuTenant('harborlight-cu')?.name, 'Harborlight Credit Union');
   const profile = normalizeProfile({
     id: 'harborlight-cu',
@@ -40,8 +42,26 @@ test('demo tenants seed the store and stay in config', async () => {
   await saveTenantProfile(profile);
   const overlaid = await loadCuTenant('harborlight-cu');
   assert.equal(overlaid?.name, 'Harbor Light Credit Union');
-  assert.equal(new URL(overlaid!.preApprovalUrl).pathname, '/credit-unions/demo/preapproval');
-  assert.equal(new URL(overlaid!.ratesUrl).pathname, '/credit-unions/demo/rates');
+  assert.equal(overlaid!.preApprovalUrl, '/credit-unions/demo/preapproval');
+  assert.equal(overlaid!.ratesUrl, '/credit-unions/demo/rates');
+  assert.equal(overlaid!.supportUrl, '/credit-unions/demo/help');
+  const absolute = normalizeProfile({
+    id: 'harborlight-cu',
+    name: 'Harbor Light Credit Union',
+    preApprovalUrl: 'https://signorwalk.com/credit-unions/demo/preapproval',
+    ratesUrl: 'https://signorwalk.com/credit-unions/demo/rates',
+    supportUrl: 'https://www.harborlightcu.example/help',
+    privacyUrl: 'https://www.harborlightcu.example/privacy',
+    embedOrigins: ['https://www.harborlightcu.example'],
+    status: 'active',
+    shortName: 'Harbor Light',
+  });
+  assert.ok(absolute);
+  await saveTenantProfile(absolute);
+  const rewritten = await loadCuTenant('harborlight-cu');
+  assert.equal(rewritten?.preApprovalUrl, '/credit-unions/demo/preapproval');
+  assert.equal(rewritten?.ratesUrl, '/credit-unions/demo/rates');
+  assert.equal(rewritten?.privacyUrl, '/credit-unions/demo/privacy');
   assert.equal(overlaid!.embedOrigins.includes('https://www.harborlightcu.example'), true);
   const real = normalizeProfile({
     id: 'harborlight-cu',

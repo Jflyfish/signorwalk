@@ -104,7 +104,7 @@ Answer: [Draft design] A person using the credit union's branded page. The servi
 ## 3. Data
 
 3.1 Is member nonpublic personal information stored?
-Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, aggregate grade counts, and audit lines (time, action, id, who). Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program is [To be completed] by the owner.
+Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, aggregate grade counts, and audit lines (time, action, id, who). Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — [To be completed — owner]
 
 3.2 Are quote numbers stored?
 Answer: [Draft design] Quote figures are used to produce the result for that visit. They are not written to an application database as a member file. Aggregate counts record how many checks returned each grade. They do not record the quote.
@@ -135,7 +135,7 @@ Answer: [Draft design] Not used.
 Answer: [Draft design] Vercel hosts the application. What appears in Vercel edge or platform logs, and how long it is kept, is [To be completed].
 
 5.2 AI vendor
-Answer: [Draft design] Anthropic is the processor for worksheet reading. Every upload sends the full worksheet image, which may include a name or VIN, to Anthropic. Sign or Walk does not store that file. The grade route does not call Anthropic. This pilot does not use zero data retention. How long Anthropic keeps the request, and in which region, follows Anthropic's current terms. Those terms are [To be completed] by the owner. This draft does not restate them.
+Answer: [Draft design] Anthropic is the processor for worksheet reading. Every upload sends the full worksheet image, which may include a name or VIN, to Anthropic. Sign or Walk does not store that file. The grade route does not call Anthropic. This pilot does not use zero data retention. Anthropic commercial terms, DPA, retention window, and region — [To be completed — owner]
 
 5.3 Email delivery
 Answer: [Draft design] Resend, when configured, sends the trial confirmation to the staff email, a signup notice to the operator address, and an optional summary of aggregate counts. Resend does not receive the worksheet. Member results are not emailed.
@@ -195,7 +195,7 @@ No one has signed this questionnaire. It is draft ${DOCUMENT_VERSION_LABEL}.
 
 These titles have no answer in this draft. A blank is not a no.
 
-${OWNER_OPEN_ITEMS.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+${OWNER_OPEN_ITEMS.map(item => `- ${item} — [To be completed — owner]`).join('\n')}
 `.replaceAll('&amp;', '&'),
 );
 
@@ -207,7 +207,7 @@ This is Sign or Walk's draft description of the AI terms the credit-union servic
 ## 1. Vendor
 
 Anthropic is called on extract when a worksheet image or PDF is uploaded and the API key is set. The analyze route does not call Anthropic. It grades with the rules engine and template pack tp-1.0.0.
-This pilot does not use zero data retention. The model snapshot, region, and retention window are [To be completed] from Anthropic's current terms. This draft does not restate them.
+This pilot does not use zero data retention. Model snapshot, DPA, retention window, and region — [To be completed — owner]
 The Harborlight page linked from the marketing demo hides upload. The Harborlight member page can still upload, with a cap of 2 extracts an hour.
 
 ## 2. What the model is allowed to do
@@ -220,7 +220,7 @@ The Harborlight page linked from the marketing demo hides upload. The Harborligh
 
 ## 4. Training and retention
 
-[Draft design] This pilot does not use zero data retention. Retention and region follow Anthropic's current terms. Sign or Walk does not train its own model on worksheets. Whether Anthropic trains on a request is in those terms. The owner must attach the terms. This draft does not claim a training prohibition.
+[Draft design] This pilot does not use zero data retention. Sign or Walk does not train its own model on worksheets. Whether Anthropic trains on a request, and the DPA, retention window, and region — [To be completed — owner]
 
 ## 5. Guard rails
 
@@ -232,7 +232,7 @@ The grade compares a quote with labeled benchmark ranges. It is not the credit u
 
 ## 7. Still open
 
-- Attach Anthropic's current commercial terms and DPA, including the retention window and region.
+- Anthropic commercial terms and DPA, including the retention window and region — [To be completed — owner]
 - Name the exact model snapshot.
 - The grade already runs on rules. Extract calls Anthropic only when a worksheet is uploaded and the key is set.
 
@@ -298,7 +298,7 @@ NOT FOR EXECUTION.
 This is a plain-language sample for discussion with counsel. It is missing terms a real agreement needs (liability, indemnity, governing law, and others, each marked below). Do not sign it. Do not treat the prices as an offer that can be accepted by email unless a later, signed order form says so.
 
 Parties
-- Provider: Sign or Walk [legal entity name to be completed]
+- Provider legal entity — [To be completed — owner]
 - Customer: [credit union legal name to be completed]
 - Effective date: [To be completed]
 
@@ -405,7 +405,7 @@ This addendum describes the data this build handles. A worksheet may include a n
 ## 1. Parties
 
 - Controller / credit union: [To be completed]
-- Processor / provider: Sign or Walk [legal entity to be completed]
+- Processor legal entity — [To be completed — owner]
 - Related agreement: the sample contract, which is also an unsigned draft
 
 ## 2. Subject
@@ -424,7 +424,7 @@ An uploaded worksheet is different. It may contain a member name and VIN. See se
 
 ## 4. Data that may be processed
 
-[Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record. Also uploaded worksheet images or PDFs, sent to the AI vendor and not stored by us. Anthropic is the processor for that file. This pilot does not use zero data retention. Retention and region follow Anthropic's current terms and are not restated here.
+[Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record. Also uploaded worksheet images or PDFs, sent to the AI vendor and not stored by us. Anthropic is the processor for that file. This pilot does not use zero data retention. DPA, retention window, and region — [To be completed — owner]
 
 Staff trial records (credit union name, contact name, work email, scrypt login hash), branding, settings, aggregate grade counts, and audit lines are stored. They are not a member worksheet.
 
@@ -459,7 +459,7 @@ Because the design does not keep a member record, there should be nothing to ret
 
 ## 10. International transfers
 
-[To be completed] Host and model regions are not fixed in this draft.
+Host region and the region where Anthropic processes a worksheet — [To be completed — owner]
 
 ## 11. Audits
 
@@ -467,7 +467,7 @@ The credit union's right to review the due-diligence packet, and any on-site or 
 
 ## 12. GLBA
 
-The parties intend the branded page not to create a file of member nonpublic personal information. Whether that intent matches the credit union's own Safeguards program is for the credit union and its counsel. This draft is not that opinion.
+Whether a worksheet that contains a name or VIN is nonpublic personal information, and how that sits in the credit union's program — [To be completed — owner]
 
 ## 13. Status
 

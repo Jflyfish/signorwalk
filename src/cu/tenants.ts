@@ -26,9 +26,13 @@ export interface CuTenant {
 }
 
 /**
- * Fictional pilots. Harborlight pre-approval and rates open sandbox pages on this site.
- * Summit and Larkspur still use the reserved .example TLD. Embed origins stay .example.
+ * Fictional pilots. Loan, help, and privacy links are paths on this host.
+ * Embed origins stay on the reserved .example TLD. Do not store a production origin here.
  */
+const DEMO_PREAPPROVAL = '/credit-unions/demo/preapproval';
+const DEMO_RATES = '/credit-unions/demo/rates';
+const DEMO_HELP = '/credit-unions/demo/help';
+const DEMO_PRIVACY = '/credit-unions/demo/privacy';
 export const CU_TENANTS: readonly CuTenant[] = [
   {
     id: 'harborlight-cu',
@@ -44,10 +48,10 @@ export const CU_TENANTS: readonly CuTenant[] = [
       logoLight: '/cu-brand/harborlight.svg',
       logoAspect: 1,
     },
-    supportUrl: 'https://www.harborlightcu.example/help',
-    privacyUrl: 'https://www.harborlightcu.example/privacy',
-    preApprovalUrl: 'https://signorwalk.com/credit-unions/demo/preapproval',
-    ratesUrl: 'https://signorwalk.com/credit-unions/demo/rates',
+    supportUrl: DEMO_HELP,
+    privacyUrl: DEMO_PRIVACY,
+    preApprovalUrl: DEMO_PREAPPROVAL,
+    ratesUrl: DEMO_RATES,
     preApprovalLabel: 'Demo only: pre-approval',
     ratesLabel: 'Demo only: auto rates',
     embedOrigins: ['https://www.harborlightcu.example'],
@@ -66,12 +70,12 @@ export const CU_TENANTS: readonly CuTenant[] = [
       logoLight: '/cu-brand/summit.svg',
       logoAspect: 1,
     },
-    supportUrl: 'https://www.summitridgefcu.example/support',
-    privacyUrl: 'https://www.summitridgefcu.example/privacy',
-    preApprovalUrl: 'https://www.summitridgefcu.example/loans/preapproval',
-    ratesUrl: 'https://www.summitridgefcu.example/loans/auto-rates',
-    preApprovalLabel: 'Get pre-approved at Summit Ridge',
-    ratesLabel: 'See Summit Ridge auto rates',
+    supportUrl: DEMO_HELP,
+    privacyUrl: DEMO_PRIVACY,
+    preApprovalUrl: DEMO_PREAPPROVAL,
+    ratesUrl: DEMO_RATES,
+    preApprovalLabel: 'Demo only: pre-approval',
+    ratesLabel: 'Demo only: auto rates',
     embedOrigins: ['https://www.summitridgefcu.example'],
   },
   {
@@ -88,12 +92,12 @@ export const CU_TENANTS: readonly CuTenant[] = [
       logoLight: '/cu-brand/larkspur.svg',
       logoAspect: 1,
     },
-    supportUrl: 'https://www.larkspurcu.example/help',
-    privacyUrl: 'https://www.larkspurcu.example/privacy',
-    preApprovalUrl: 'https://www.larkspurcu.example/auto/preapproval',
-    ratesUrl: 'https://www.larkspurcu.example/rates/auto',
-    preApprovalLabel: 'Get pre-approved at Larkspur',
-    ratesLabel: 'See Larkspur auto rates',
+    supportUrl: DEMO_HELP,
+    privacyUrl: DEMO_PRIVACY,
+    preApprovalUrl: DEMO_PREAPPROVAL,
+    ratesUrl: DEMO_RATES,
+    preApprovalLabel: 'Demo only: pre-approval',
+    ratesLabel: 'Demo only: auto rates',
     embedOrigins: ['https://www.larkspurcu.example'],
   },
 ];

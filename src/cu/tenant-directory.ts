@@ -234,15 +234,19 @@ function channels(hex: string): string {
   return `${rgb[0]} ${rgb[1]} ${rgb[2]}`;
 }
 
-/** A store seeded before the sandbox pages existed still points Harborlight at .example. */
-function sandboxLink(profileUrl: string, seedUrl: string | undefined): string {
-  if (!seedUrl) return profileUrl;
+/** A store seeded earlier may still hold .example or an absolute production demo URL. */
+function placeholderHost(url: string): boolean {
   try {
-    if (new URL(profileUrl).hostname.endsWith('.example')) return seedUrl;
+    const host = new URL(url).hostname;
+    return host === 'signorwalk.com' || host.endsWith('.signorwalk.com') || host === 'example' || host.endsWith('.example');
   } catch {
-    return profileUrl;
+    return false;
   }
-  return profileUrl;
+}
+
+function sandboxLink(profileUrl: string, seedUrl: string | undefined): string {
+  if (!seedUrl || !placeholderHost(profileUrl)) return profileUrl;
+  return seedUrl;
 }
 
 function materialize(profile: StoredTenantProfile, branding: StoredBranding | null, seed?: CuTenant): ResolvedTenant {
@@ -279,10 +283,10 @@ function materialize(profile: StoredTenantProfile, branding: StoredBranding | nu
       accent: channels(derived.brandText),
     },
     brand,
-    supportUrl: profile.supportUrl,
-    privacyUrl: profile.privacyUrl,
-    preApprovalUrl: profile.id === 'harborlight-cu' ? sandboxLink(profile.preApprovalUrl, seed?.preApprovalUrl) : profile.preApprovalUrl,
-    ratesUrl: profile.id === 'harborlight-cu' ? sandboxLink(profile.ratesUrl, seed?.ratesUrl) : profile.ratesUrl,
+    supportUrl: seed ? sandboxLink(profile.supportUrl, seed.supportUrl) : profile.supportUrl,
+    privacyUrl: seed ? sandboxLink(profile.privacyUrl, seed.privacyUrl) : profile.privacyUrl,
+    preApprovalUrl: seed ? sandboxLink(profile.preApprovalUrl, seed.preApprovalUrl) : profile.preApprovalUrl,
+    ratesUrl: seed ? sandboxLink(profile.ratesUrl, seed.ratesUrl) : profile.ratesUrl,
     preApprovalLabel: profile.preApprovalLabel,
     ratesLabel: profile.ratesLabel,
     embedOrigins: profile.embedOrigins,
