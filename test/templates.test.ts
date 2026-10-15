@@ -101,7 +101,7 @@ test('credit-union UI says Sign or Walk only in the header line', () => {
     const hits = text.match(/Sign or Walk/g) ?? [];
     const withLine = text.match(/with Sign or Walk/g) ?? [];
     const powered = text.match(/Powered by Sign or Walk/g) ?? [];
-    const wordmark = file.endsWith('not-found.tsx') || file.endsWith('admin/page.tsx') || file.endsWith('Unavailable.tsx')
+    const wordmark = file.endsWith('not-found.tsx') || file.endsWith('admin/page.tsx') || file.endsWith('Unavailable.tsx') || file.endsWith('MissingTenant.tsx')
       ? (text.match(/>Sign or Walk</g) ?? [])
       : [];
     const staff = file.endsWith('admin/OwnerEditor.tsx') ? (text.match(/Sign or Walk admins/g) ?? []) : [];

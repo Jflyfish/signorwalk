@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { UPLOAD_DISCLOSURE } from '@/cu/copy';
+import { DemoFrame } from './DemoFrame';
 import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
@@ -52,6 +53,12 @@ export default function CreditUnionsPage() {
         <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] cu-muted">{VALUE_LINE}</p>
       </div>
 
+      <section className="mx-auto w-full max-w-[960px] px-4 pt-16" aria-labelledby="demo-heading">
+        <h2 id="demo-heading" className="text-[24px] font-bold leading-[30px]">See it in action</h2>
+        <p className="mt-2 max-w-[640px] text-[14px] leading-[20px] cu-muted">Demo. This is Harborlight Credit Union&apos;s check. Grades here are not your credit union&apos;s.</p>
+        <DemoFrame />
+      </section>
+
       <div className="mt-16 cu-band py-16 md:mt-24">
         <div className="mx-auto w-full max-w-[960px] px-4">
           <ul className="grid gap-4 md:grid-cols-3">
@@ -66,7 +73,7 @@ export default function CreditUnionsPage() {
                   <p className="mt-4 text-[14px] leading-[20px] cu-muted">{ASSETS[tier.id]}</p>
                   <p className="mt-4 text-[32px] font-bold leading-[32px] tabular-nums">{formatUsd(tier.annualUsd)}/yr</p>
                   <Link href={`/credit-unions/get-started?tier=${tier.id}`} className={`${marked ? solidButton : outlineButton} mt-4`}>
-                    Start 90-day free pilot
+                    Start 90-day free trial
                   </Link>
                   <p className="mt-4 text-[14px] leading-[20px] cu-muted">Free for 90 days. Cancel anytime.</p>
                 </li>
@@ -74,7 +81,6 @@ export default function CreditUnionsPage() {
             })}
           </ul>
 
-          <p className="mt-4 text-[14px] leading-[20px] text-[#555]">Self-serve checkout isn't on this preview. The pilot button emails us.</p>
           <p className="mt-10 text-[14px] leading-[20px] cu-muted">{UPLOAD_DISCLOSURE}</p>
           <p className="mt-4 flex flex-wrap items-baseline gap-x-2 text-[14px] leading-[20px]">
             <a href={`mailto:${TALK_TO_US_EMAIL}`} className={textLink}>Over $5B? Email us.</a>

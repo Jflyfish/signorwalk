@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { EMBED_COMPLETED, EMBED_RESIZE } from '@/cu/embed';
+import { EMBED_COMPLETED, EMBED_RESIZE } from '@/cu/embed-client';
 
 export function EmbedDemo() {
   const [height, setHeight] = useState<number | null>(null);

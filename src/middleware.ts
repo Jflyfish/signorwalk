@@ -27,11 +27,11 @@ async function ancestorsFromNode(req: NextRequest): Promise<string | null> {
       headers: { [FRAME_ANCESTORS_HEADER]: frameAncestorsToken() },
       signal: AbortSignal.timeout(1500),
     });
-    if (!res.ok) return "'self'";
+    if (!res.ok) return "'none'";
     const data = await res.json() as { ancestors?: unknown };
-    return acceptAncestors(data.ancestors) ?? "'self'";
+    return acceptAncestors(data.ancestors) ?? "'none'";
   } catch {
-    return "'self'";
+    return "'none'";
   }
 }
 

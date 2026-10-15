@@ -9,6 +9,7 @@ import {
   writeStoreJson,
   type StoredBranding,
 } from './cu-store';
+import { deleteStaffLogin } from './staff-login';
 import { isEmbedOrigin } from './embed';
 import { CU_TENANTS, getCuTenant, type CuTenant } from './tenants';
 
@@ -26,13 +27,52 @@ export interface StoredTenantProfile {
   ratesLabel: string;
   embedOrigins: string[];
   status: 'active' | 'paused';
+  contactName?: string;
+  trialEndsAt?: string;
+  /** False until the trial confirmation step. Missing means a seeded or owner-created credit union. */
+  verified?: boolean;
+  confirmHash?: string;
 }
 
 export interface ResolvedTenant extends CuTenant {
   status: 'active' | 'paused';
+  contactName?: string;
+  trialEndsAt?: string;
+  verified: boolean;
 }
 
 export const TENANT_UNAVAILABLE = 'This check is unavailable.';
+
+export function tenantUnavailable(tenant: { status: 'active' | 'paused'; trialEndsAt?: string }, now = Date.now()): boolean {
+  if (tenant.status === 'paused') return true;
+  if (!tenant.trialEndsAt) return false;
+  const ends = Date.parse(tenant.trialEndsAt);
+  return Number.isFinite(ends) && ends <= now;
+}
+
+export function slugFromName(name: string): string | null {
+  const slug = name
+    .trim()
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48)
+    .replace(/-+$/g, '');
+  if (!slug || !SLUG.test(slug) || RESERVED.has(slug)) return null;
+  return slug;
+}
+
+export async function uniqueSlug(base: string): Promise<string | null> {
+  await ensureTenantDirectory();
+  const index = (await readIndex()) ?? [];
+  if (!index.includes(base)) return base;
+  for (let n = 2; n <= 20; n += 1) {
+    const next = `${base.slice(0, 44).replace(/-+$/g, '')}-${n}`;
+    if (SLUG.test(next) && !RESERVED.has(next) && !index.includes(next)) return next;
+  }
+  return null;
+}
 export const STATUS_PAUSED = 'Paused. Members see an unavailable page.';
 export const STATUS_ACTIVE = 'Active. Members can use the check.';
 
@@ -96,6 +136,10 @@ export function normalizeProfile(input: {
   embedOrigins: string[];
   status: 'active' | 'paused';
   shortName?: string;
+  contactName?: string;
+  trialEndsAt?: string;
+  verified?: boolean;
+  confirmHash?: string;
 }): StoredTenantProfile | null {
   const id = input.id.trim().toLowerCase();
   if (!SLUG.test(id) || id.length > 48 || RESERVED.has(id)) return null;
@@ -127,6 +171,10 @@ export function normalizeProfile(input: {
     ratesLabel,
     embedOrigins: input.embedOrigins,
     status: input.status,
+    contactName: input.contactName?.trim() ? clip(input.contactName, 80) : undefined,
+    trialEndsAt: input.trialEndsAt && Number.isFinite(Date.parse(input.trialEndsAt)) ? input.trialEndsAt : undefined,
+    verified: input.verified,
+    confirmHash: input.confirmHash,
   };
 }
 
@@ -217,6 +265,9 @@ function materialize(profile: StoredTenantProfile, branding: StoredBranding | nu
     preApprovalLabel: profile.preApprovalLabel,
     ratesLabel: profile.ratesLabel,
     embedOrigins: profile.embedOrigins,
+    contactName: profile.contactName,
+    trialEndsAt: profile.trialEndsAt,
+    verified: profile.verified !== false,
   };
 }
 
@@ -292,5 +343,6 @@ export async function removeTenant(id: string): Promise<void> {
   const index = (await readIndex()) ?? [];
   await writeIndex(index.filter(item => item !== id));
   await deleteTenantData(id);
+  await deleteStaffLogin(id);
   clearFrameAncestorCache(id);
 }

@@ -5,7 +5,7 @@ import { formatOcrLog, OCR_PROMPT, pickOcrFields, type OcrOutcome } from '@/cu/o
 import { recordUpload } from '@/cu/cu-store';
 import { missingTenantResponse } from '@/cu/missing-page';
 import { clientAddress, takeExtractSlot } from '@/cu/rate-limit';
-import { loadCuTenant, TENANT_UNAVAILABLE } from '@/cu/tenant-directory';
+import { loadCuTenant, TENANT_UNAVAILABLE, tenantUnavailable } from '@/cu/tenant-directory';
 
 const MAX_FILE = 5 * 1024 * 1024;
 const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
   const pathname = `/api/cu/${slug}/extract`;
   const tenant = await loadCuTenant(slug);
   if (!tenant) return missingTenantResponse(pathname);
-  if (tenant.status === 'paused') {
+  if (tenantUnavailable(tenant)) {
     return json(pathname, { success: false, error: TENANT_UNAVAILABLE }, 404);
   }
   if (req.method !== 'POST') {

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import type { DerivedBrand } from '@/cu/contrast';
-import { completedMessage, isEmbedOrigin, resizeMessage } from '@/cu/embed';
+import { completedMessage, isEmbedOrigin, resizeMessage } from '@/cu/embed-client';
 import type { CuPublic } from '@/cu/tenants';
 import { CheckForm } from '../CheckForm';
 

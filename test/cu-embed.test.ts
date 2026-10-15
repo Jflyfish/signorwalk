@@ -195,7 +195,8 @@ test('embed CSP fails closed and does not fall back to the config seeds', async 
   assert.match(middleware, /AbortSignal\.timeout\(1500\)/);
   assert.match(middleware, /FRAME_ANCESTORS_HEADER/);
   assert.equal(FRAME_ANCESTORS_HEADER, 'x-cu-frame-ancestors');
-  assert.match(middleware, /return "'self'"/);
+  assert.match(middleware, /return "'none'"/);
+  assert.equal(middleware.includes(`return "'self'"`), false);
 
   const path = '/cu/harborlight-cu/embed';
   const thrown = await resolveFrameAncestors(path, async () => {

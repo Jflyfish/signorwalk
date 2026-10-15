@@ -39,14 +39,8 @@ export default async function CuLayout({
 }) {
   const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) {
-    return (
-      <div className="cu-missing min-h-screen bg-white cu-ink">
-        <style>{`
-          .cu-missing :focus-visible { outline: 2px solid var(--cu-ink); outline-offset: 2px; }
-        `}</style>
-        {children}
-      </div>
-    );
+    const { MissingTenant } = await import('../MissingTenant');
+    return <MissingTenant />;
   }
   const brand = await resolveBrand(tenant);
   return (

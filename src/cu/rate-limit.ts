@@ -72,3 +72,25 @@ export function takeExtractSlot(ip: string, now = Date.now()): { allowed: boolea
 export function resetExtractRateLimit(): void {
   extractBuckets.clear();
 }
+
+/** Signup window. The map stores a hash of the address, not the address. */
+export const SIGNUP_WINDOW_MS = 60 * 60 * 1000;
+export const SIGNUP_LIMIT = 5;
+const signupBuckets = new Map<string, number[]>();
+
+export function takeSignupSlot(ip: string, now = Date.now()): { allowed: boolean; retryAfterSec: number } {
+  const key = bucketKey(`signup:${ip}`);
+  const recent = (signupBuckets.get(key) ?? []).filter(ts => now - ts < SIGNUP_WINDOW_MS);
+  if (recent.length >= SIGNUP_LIMIT) {
+    const retryAfterSec = Math.max(1, Math.ceil((SIGNUP_WINDOW_MS - (now - recent[0])) / 1000));
+    signupBuckets.set(key, recent);
+    return { allowed: false, retryAfterSec };
+  }
+  recent.push(now);
+  signupBuckets.set(key, recent);
+  return { allowed: true, retryAfterSec: 0 };
+}
+
+export function resetSignupRateLimit(): void {
+  signupBuckets.clear();
+}

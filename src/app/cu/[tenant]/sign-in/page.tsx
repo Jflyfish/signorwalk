@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { resolveBrand } from '@/cu/brand';
 import { loadCuTenant } from '@/cu/tenant-directory';
 import { TALK_TO_US_EMAIL } from '@/app/credit-unions/pricing';
@@ -26,7 +25,7 @@ export default async function SignInPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const tenant = await loadCuTenant((await params).tenant);
-  if (!tenant) notFound();
+  if (!tenant) return null;
   const brand = await resolveBrand(tenant);
   const error = ERRORS[(await searchParams).error ?? ''];
   return (

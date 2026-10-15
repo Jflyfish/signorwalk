@@ -114,8 +114,8 @@ test('a paused credit union is unavailable on the page and returns 404 from the 
   const embed = readFileSync('src/app/cu/[tenant]/embed/page.tsx', 'utf8');
   const editor = readFileSync('src/app/cu/admin/OwnerEditor.tsx', 'utf8');
   const admin = readFileSync('src/app/cu/admin/page.tsx', 'utf8');
-  assert.match(page, /status === 'paused'/);
-  assert.match(embed, /status === 'paused'/);
+  assert.match(page, /tenantUnavailable/);
+  assert.match(embed, /tenantUnavailable/);
   assert.match(editor, /BrandingForm/);
   assert.match(editor, /confirm=remove/);
   assert.match(editor, /confirm=pause/);
@@ -124,7 +124,7 @@ test('a paused credit union is unavailable on the page and returns 404 from the 
   assert.match(editor, /'Pause'/);
   assert.match(editor, /Add at least one website that can show the tool\./);
   assert.match(editor, /Add website/);
-  assert.match(editor, /Until launch, only Sign or Walk admins can sign in\. CU staff logins come later\./);
+  assert.match(editor, /Staff who start a trial sign in with the email and password from signup\./);
   assert.match(readFileSync('src/app/cu/actions.ts', 'utf8'), /need=site#embed-allowlist/);
   assert.equal(admin.includes('font-mono'), false);
   assert.match(readFileSync('src/cu/tenant-directory.ts', 'utf8'), /Paused\. Members see an unavailable page\./);

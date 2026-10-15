@@ -4,6 +4,7 @@ import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { canOpenTenant, checkCredentials, CU_SESSION_COOKIE, demoTenantId, signSession, verifySession, type CuSession } from '@/cu/auth';
 import { appendAudit, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
+import { staffLoginMatches } from '@/cu/staff-login';
 import { readLogoFile } from '@/cu/logo-file';
 import { sendAggregateSummary } from '@/cu/notify';
 import {
@@ -39,10 +40,15 @@ export async function signIn(formData: FormData) {
   const email = String(formData.get('email') ?? '');
   const password = String(formData.get('password') ?? '');
   const result = checkCredentials(tenant, email, password);
-  if (result.status !== 'ok') {
-    redirect(`/cu/${tenant}/sign-in?error=${result.status === 'unconfigured' ? 'unconfigured' : 'denied'}`);
+  const staff = result.status === 'ok' ? false : await staffLoginMatches(tenant, email, password);
+  if (result.status !== 'ok' && !staff) {
+    const missingSecret = !process.env.CU_SESSION_SECRET;
+    redirect(`/cu/${tenant}/sign-in?error=${result.status === 'unconfigured' || missingSecret ? 'unconfigured' : 'denied'}`);
   }
-  const token = signSession(result.session);
+  const session = result.status === 'ok'
+    ? result.session
+    : { role: 'cu' as const, tenantId: tenant, exp: Date.now() + 60 * 60 * 12 * 1000 };
+  const token = signSession(session);
   if (!token) redirect(`/cu/${tenant}/sign-in?error=unconfigured`);
   const jar = await cookies();
   jar.set(CU_SESSION_COOKIE, token, {
@@ -52,7 +58,7 @@ export async function signIn(formData: FormData) {
     secure: await secureCookie(),
     maxAge: 60 * 60 * 12,
   });
-  if (result.session.role === 'admin') redirect('/cu/admin');
+  if (session.role === 'admin') redirect('/cu/admin');
   redirect(`/cu/${tenant}/dashboard`);
 }
 
@@ -79,6 +85,14 @@ async function guard(tenant: string): Promise<CuSession> {
   return session;
 }
 
+async function guardMutable(tenant: string): Promise<CuSession> {
+  const session = await guard(tenant);
+  if (session.role === 'admin') return session;
+  const profile = await getTenantProfile(tenant);
+  if (profile?.verified === false) redirect(`/cu/${tenant}/dashboard?notice=confirm`);
+  return session;
+}
+
 async function ownerOnly(): Promise<void> {
   const session = await currentSession();
   if (!session) redirect(`/cu/${demoTenantId()}/sign-in`);
@@ -89,9 +103,21 @@ function emailOk(value: string): boolean {
   return value.length <= 120 && (!value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
 }
 
+export async function confirmTrialAction(formData: FormData) {
+  const tenant = String(formData.get('tenant') ?? '');
+  const session = await guard(tenant);
+  if (session.role !== 'cu') redirect(`/cu/${tenant}/dashboard`);
+  const profile = await getTenantProfile(tenant);
+  if (!profile) redirect(`/cu/${tenant}/dashboard`);
+  profile.verified = true;
+  delete profile.confirmHash;
+  await saveTenantProfile(profile);
+  redirect(`/cu/${tenant}/dashboard?saved=confirmed`);
+}
+
 export async function saveSettingsAction(formData: FormData) {
   const tenant = String(formData.get('tenant') ?? '');
-  await guard(tenant);
+  await guardMutable(tenant);
   const notifyEmail = String(formData.get('notifyEmail') ?? '').trim();
   if (notifyEmail.length > 120 || (notifyEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail))) {
     redirect(`/cu/${tenant}/dashboard?section=settings&error=email`);
@@ -100,9 +126,22 @@ export async function saveSettingsAction(formData: FormData) {
   redirect(`/cu/${tenant}/dashboard?section=settings&saved=settings`);
 }
 
+export async function saveEmbedOriginsAction(formData: FormData) {
+  const tenant = String(formData.get('tenant') ?? '');
+  await guardMutable(tenant);
+  const origins = parseEmbedOrigins(String(formData.get('embedOrigins') ?? ''));
+  if (!origins) redirect(`/cu/${tenant}/dashboard?section=embed&error=origins`);
+  try {
+    await replaceEmbedOrigins(tenant, origins);
+  } catch {
+    redirect(`/cu/${tenant}/dashboard?section=embed&error=origins`);
+  }
+  redirect(`/cu/${tenant}/dashboard?section=embed&saved=origins`);
+}
+
 export async function saveBrandingAction(formData: FormData) {
   const tenant = String(formData.get('tenant') ?? '');
-  const session = await guard(tenant);
+  const session = await guardMutable(tenant);
   const owner = session.role === 'admin' && formData.get('returnTo') === 'owner';
   const shortName = String(formData.get('shortName') ?? '').trim().replace(/\s+/g, ' ');
   const primary = String(formData.get('primary') ?? '').trim();
@@ -143,7 +182,7 @@ async function logoFromForm(entry: FormDataEntryValue | null) {
 
 export async function sendSummaryAction(formData: FormData) {
   const tenant = String(formData.get('tenant') ?? '');
-  await guard(tenant);
+  await guardMutable(tenant);
   try {
     const result = await sendAggregateSummary(tenant);
     if (!result.sent) redirect(`/cu/${tenant}/dashboard?section=settings&notice=${result.reason}`);

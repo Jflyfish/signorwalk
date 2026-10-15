@@ -16,6 +16,26 @@ export function summaryText(name: string, agg: Aggregates): string {
   ].join('\n');
 }
 
+/** Optional trial note. Returns false when Resend is unset. Does not log the address. */
+export async function sendTrialConfirm(to: string, name: string, url: string): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM;
+  if (!apiKey || !from || !to) return false;
+  try {
+    const { Resend } = await import('resend');
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from,
+      to,
+      subject: `Confirm your Sign or Walk trial — ${name}`,
+      text: `Confirm the 90-day free trial for ${name}.\n${url}\n`,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function sendAggregateSummary(
   tenantId: string,
 ): Promise<{ sent: false; reason: 'disabled' | 'not-configured' | 'missing-tenant' } | { sent: true }> {

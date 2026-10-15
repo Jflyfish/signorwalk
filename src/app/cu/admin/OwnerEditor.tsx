@@ -183,7 +183,7 @@ export function OwnerEditor({
 
           <section aria-labelledby="staff-heading">
             <h2 id="staff-heading" className="text-[24px] font-bold leading-[30px]">Staff access</h2>
-            <p className="mt-2 text-[14px] leading-[20px] text-[#555]">Until launch, only Sign or Walk admins can sign in. CU staff logins come later.</p>
+            <p className="mt-2 text-[14px] leading-[20px] cu-muted">Staff who start a trial sign in with the email and password from signup.</p>
           </section>
 
           <section aria-labelledby="status-heading">
