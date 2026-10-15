@@ -52,6 +52,7 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signOut(formData: FormData) {
+  const session = await currentSession();
   const tenant = String(formData.get('tenant') ?? '');
   const dest = getCuTenant(tenant)?.id ?? demoTenantId();
   const jar = await cookies();
@@ -62,6 +63,7 @@ export async function signOut(formData: FormData) {
     secure: await secureCookie(),
     maxAge: 0,
   });
+  if (session?.role === 'admin') redirect('/credit-unions');
   redirect(`/cu/${dest}/sign-in`);
 }
 

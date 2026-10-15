@@ -133,7 +133,7 @@ Answer: [Draft design] Not used.
 Answer: [Draft design] Vercel hosts the application. What appears in Vercel edge or platform logs, and how long it is kept, is [To be completed].
 
 5.2 AI vendor
-Answer: [Draft design] Anthropic is the intended model vendor, and only if a credit union's configuration turns the classifier on. The intended call does not include a member's name or account number. Commercial terms (training, retention, region) are [To be completed] and are described as intent in the AI vendor terms draft, which is not the vendor's contract.
+Answer: [Draft design] Anthropic is the model vendor. Every upload sends the full worksheet image, which may include a name or VIN, to Anthropic. Sign or Walk does not store that file. Commercial terms (training, retention, region) are [To be completed] and are described as intent in the AI vendor terms draft, which is not the vendor's contract.
 
 5.3 Email delivery
 Answer: [Draft design] The credit-union service does not send member email. Resend is used on the separate consumer site and is not part of this service in this draft.
@@ -326,7 +326,7 @@ The Customer is responsible for the accuracy of those URLs and for the rates and
 
 ## 4. Prices
 
-List prices, in United States dollars, billed annually. Every priced tier is the same product. The tier follows total assets. There is no monthly price.
+List prices, in United States dollars, billed annually. Every priced tier is the same product. The tier follows total assets. There is no monthly price. There is no setup fee.
 
 | Tier | Total assets | Annual |
 | --- | --- | --- |
@@ -340,7 +340,7 @@ The public website's consumer footer says the consumer grader is free. That sent
 
 ## 5. Billing
 
-Prices in section 4 are annual. There is no monthly price. Online checkout is not built. This sample does not authorize Provider to charge a card. An invoice process for a term after the pilot is [To be completed].
+Prices in section 4 are annual. There is no monthly price. There is no setup fee. Online checkout is not built. This sample does not authorize Provider to charge a card. An invoice process for a term after the pilot is [To be completed].
 
 ## 6. 90-day free pilot
 
@@ -416,7 +416,7 @@ If a person types that kind of data into a numeric field, the field should rejec
 
 ## 4. Data that may be processed
 
-[Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record.
+[Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record. Also uploaded worksheet images or PDFs, sent to the AI vendor and not stored by us.
 
 [To be completed] Incidental technical data in host or edge logs (which may include IP address). The application log is intended to exclude quote inputs, IP address, and user agent. Retention of any platform log is not answered in this draft.
 

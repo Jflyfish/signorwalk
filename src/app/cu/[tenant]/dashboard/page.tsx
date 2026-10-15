@@ -126,7 +126,7 @@ export default async function DashboardPage({
 
         {section === 'usage' ? <section aria-labelledby="usage-heading">
           <h1 id="usage-heading" className="text-[32px] font-bold leading-[38px]">Usage</h1>
-          <p className="mt-4 text-[14px] leading-[20px] cu-muted">Since pilot start</p>
+          <p className="mt-4 text-[14px] leading-[20px] cu-muted">All time</p>
           <div className="mt-8 grid grid-cols-2 gap-6">
             <p>
               <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{aggregates.checks}</span>
@@ -140,7 +140,9 @@ export default async function DashboardPage({
           {aggregates.checks === 0 ? (
             <div className="mx-auto mt-10 w-full max-w-[560px] text-center">
               <h2 className="text-[24px] font-bold leading-[30px]">No checks yet</h2>
-              <p className="mt-2 text-[14px] leading-[20px] cu-muted">Share your link: {shareUrl}</p>
+              <p className="mt-2 text-[14px] leading-[20px] cu-muted">
+                Share your link: <a href={shareUrl} className="underline underline-offset-4 cu-linkline">{shareUrl}</a>
+              </p>
             </div>
           ) : (
             <div className="mt-10">

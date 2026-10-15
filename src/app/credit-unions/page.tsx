@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { UPLOAD_DISCLOSURE } from '@/cu/copy';
 import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
 const HEADLINE = 'Help your members spot a bad car deal before they sign.';
+const VALUE_LINE = 'Members enter a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
 
 const ASSETS: Record<PricedTierId, string> = {
   starter: 'Under $250M in assets',
@@ -14,11 +14,11 @@ const ASSETS: Record<PricedTierId, string> = {
 
 export const metadata: Metadata = {
   title: 'Credit unions — Sign or Walk',
-  description: UPLOAD_DISCLOSURE,
+  description: VALUE_LINE,
   alternates: { canonical: PAGE_URL },
   openGraph: {
     title: HEADLINE,
-    description: UPLOAD_DISCLOSURE,
+    description: VALUE_LINE,
     url: PAGE_URL,
     type: 'website',
     siteName: 'Sign or Walk',
@@ -48,7 +48,7 @@ export default function CreditUnionsPage() {
         <h1 className="mt-4 max-w-[640px] text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px]">
           {HEADLINE}
         </h1>
-        <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] cu-muted">{UPLOAD_DISCLOSURE}</p>
+        <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] cu-muted">{VALUE_LINE}</p>
       </div>
 
       <div className="mt-16 cu-band py-16 md:mt-24">
@@ -75,8 +75,7 @@ export default function CreditUnionsPage() {
 
           <p className="mt-10">
             <a href={`mailto:${TALK_TO_US_EMAIL}`} className={textLink}>Over $5B? Email us.</a>
-          </p>
-          <p className="mt-4">
+            {' · '}
             <a href="/credit-unions/packet" className={textLink}>Download due-diligence packet ({DOCUMENT_VERSION_LABEL})</a>
           </p>
         </div>
@@ -88,7 +87,7 @@ export default function CreditUnionsPage() {
           {' · '}
           <Link href="/credit-unions/privacy" className="hover:underline underline-offset-4 cu-ring">Privacy</Link>
           {' · '}
-          <Link href="/contact" className="hover:underline underline-offset-4 cu-ring">Contact</Link>
+          <a href={`mailto:${TALK_TO_US_EMAIL}`} className="hover:underline underline-offset-4 cu-ring">Contact</a>
         </p>
       </footer>
     </div>

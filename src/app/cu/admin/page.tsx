@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, demoTenantId, verifySession } from '@/cu/auth';
-import { getAggregates, getSettings, staffDirectory } from '@/cu/cu-store';
+import { getAggregates, getSettings } from '@/cu/cu-store';
 import { CU_TENANTS } from '@/cu/tenants';
 import { StaffHeader } from '../StaffHeader';
 
@@ -45,7 +45,7 @@ export default async function AdminPage() {
           </p>
           <p>
             <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{rows.length}</span>
-            <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Tenants</span>
+            <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Credit unions</span>
           </p>
         </div>
         <div className="mt-10 overflow-x-auto">
@@ -72,25 +72,6 @@ export default async function AdminPage() {
             </tbody>
           </table>
         </div>
-        <h2 className="mt-10 text-[24px] font-bold leading-[30px]">Accounts</h2>
-        <table className="mt-4 w-full border-collapse text-left">
-          <thead>
-            <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
-              <th className="py-3 pr-4 font-semibold">Account</th>
-              <th className="py-3 pr-4 font-semibold">Role</th>
-              <th className="py-3 font-semibold">Tenant</th>
-            </tr>
-          </thead>
-          <tbody>
-            {staffDirectory().map(staff => (
-              <tr key={staff.role} className="border-b cu-line text-[15px]">
-                <td className="py-3 pr-4">{staff.label}</td>
-                <td className="py-3 pr-4">{staff.role === 'admin' ? 'Admin' : 'Credit union'}</td>
-                <td className="py-3">{staff.role === 'admin' ? 'All' : staff.tenantId}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </main>
     </>
   );

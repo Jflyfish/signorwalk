@@ -115,7 +115,11 @@ test('due diligence packet is one zip containing every draft', () => {
   assert.equal(inflated.equals(Buffer.from(first.body)), true);
   for (const tier of pricedTiers) assert.equal(tier.setupUsd, 0, tier.id);
   const packet = dueDiligenceDocs.map(doc => `${doc.title}\n${doc.description}\n${doc.body}`).join('\n');
-  assert.equal(/\bfees?\b/i.test(packet), false);
+  assert.match(packet, /Every upload sends the full worksheet image, which may include a name or VIN, to Anthropic\./);
+  assert.match(packet, /uploaded worksheet images or PDFs, sent to the AI vendor and not stored by us/);
+  const fees = packet.match(/\bfees?\b/gi) ?? [];
+  assert.deepEqual(fees, ['fee', 'fee']);
+  assert.equal(packet.split('There is no setup fee.').length - 1, 2);
 });
 
 test('credit-union headers deny framing and payment, and member pages skip third-party fonts', () => {
