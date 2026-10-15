@@ -23,9 +23,10 @@ test('middleware matches only credit-union paths', () => {
   assert.equal(joined.includes('tenant='), false);
 });
 
-test('slug resolves the two demo tenants and nothing else', () => {
+test('slug resolves the demo tenants and nothing else', () => {
   assert.equal(getCuTenant('harborlight-cu')?.name, 'Harborlight Credit Union');
   assert.equal(getCuTenant('SUMMIT-RIDGE-FCU')?.id, 'summit-ridge-fcu');
+  assert.equal(getCuTenant('larkspur-cu')?.name, 'Larkspur Credit Union');
   assert.equal(getCuTenant('sow'), undefined);
   assert.equal(getCuTenant('harborlight.signorwalk.app'), undefined);
   assert.equal(getCuTenant('../harborlight-cu'), undefined);

@@ -2,14 +2,14 @@ import { type BrandTokens, contrastRatio, deriveBrand, parseRgbChannels } from '
 import { withUtm } from './utm';
 
 /** Closed set of demo credit unions. The URL slug is the tenant. There is no cookie override. */
-export type CuTenantId = 'harborlight-cu' | 'summit-ridge-fcu';
+export type CuTenantId = 'harborlight-cu' | 'summit-ridge-fcu' | 'larkspur-cu';
 
 export interface CuTenant {
   id: CuTenantId;
   name: string;
   legalName: string;
   tagline: string;
-  logo: 'harborlight' | 'summit';
+  logo: 'harborlight' | 'summit' | 'larkspur';
   /** Space-separated RGB channels, for example "11 58 91". */
   colors: { primary: string; primaryFg: string; accent: string };
   brand: BrandTokens;
@@ -66,6 +66,27 @@ export const CU_TENANTS: readonly CuTenant[] = [
     ratesUrl: 'https://www.summitridgefcu.example/loans/auto-rates',
     preApprovalLabel: 'Get pre-approved at Summit Ridge',
     ratesLabel: 'See Summit Ridge auto rates',
+  },
+  {
+    id: 'larkspur-cu',
+    name: 'Larkspur Credit Union',
+    legalName: 'Larkspur Credit Union',
+    tagline: 'Check a vehicle offer',
+    logo: 'larkspur',
+    colors: { primary: '253 230 138', primaryFg: '17 17 17', accent: '138 116 3' },
+    brand: {
+      name: 'Larkspur Credit Union',
+      shortName: 'Larkspur CU',
+      primary: '#FDE68A',
+      logoLight: '/cu-brand/larkspur.svg',
+      logoAspect: 1,
+    },
+    supportUrl: 'https://www.larkspurcu.example/help',
+    privacyUrl: 'https://www.larkspurcu.example/privacy',
+    preApprovalUrl: 'https://www.larkspurcu.example/auto/preapproval',
+    ratesUrl: 'https://www.larkspurcu.example/rates/auto',
+    preApprovalLabel: 'Get pre-approved at Larkspur',
+    ratesLabel: 'See Larkspur auto rates',
   },
 ];
 

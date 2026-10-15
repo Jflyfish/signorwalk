@@ -29,7 +29,7 @@ export default async function AdminPage() {
 
   return (
     <>
-      <StaffHeader tenant={demoTenantId()} accountLabel="Admin">
+      <StaffHeader tenant={demoTenantId()}>
         <p className="text-[15px] font-semibold leading-[20px]">Sign or Walk</p>
       </StaffHeader>
       <main className="mx-auto w-full max-w-[1120px] px-4 py-10">

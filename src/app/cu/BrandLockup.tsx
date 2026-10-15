@@ -11,7 +11,7 @@ export function BrandLockup({
   name: string;
   shortName: string;
   color: string;
-  mark?: 'harborlight' | 'summit';
+  mark?: 'harborlight' | 'summit' | 'larkspur';
   logoLight?: string;
   logoAspect?: number;
   beside?: boolean;
@@ -35,9 +35,14 @@ export function BrandLockup({
               <path d="M16 6v14M10 20h12" stroke={color} strokeWidth="2" strokeLinecap="round" />
               <path d="M16 10l8 4" stroke={color} strokeWidth="2" strokeLinecap="round" />
             </svg>
-          ) : (
+          ) : mark === 'summit' ? (
             <svg viewBox="0 0 32 32" className="h-full w-full" role="img" aria-label={name}>
               <path d="M6 24l10-14 10 14" fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <svg viewBox="3 3 26 26" className="h-full w-full" role="img" aria-label={name}>
+              <circle cx="16" cy="16" r="5" fill="none" stroke={color} strokeWidth="2" />
+              <path d="M16 4v4M16 24v4M4 16h4M24 16h4" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" />
             </svg>
           )}
         </span>

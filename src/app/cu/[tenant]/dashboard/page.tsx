@@ -95,7 +95,7 @@ export default async function DashboardPage({
 
   return (
     <>
-      <StaffHeader tenant={tenant.id} accountLabel={brand.shortName}>
+      <StaffHeader tenant={tenant.id}>
         <BrandLockup
           name={tenant.name}
           shortName={brand.shortName}

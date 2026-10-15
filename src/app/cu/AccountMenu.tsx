@@ -11,7 +11,7 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
-export function AccountMenu({ tenant, label }: { tenant: string; label: string }) {
+export function AccountMenu({ tenant }: { tenant: string }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -41,8 +41,7 @@ export function AccountMenu({ tenant, label }: { tenant: string; label: string }
         aria-controls={menuId}
         onClick={() => setOpen(value => !value)}
       >
-        <span className="md:hidden">Account</span>
-        <span className="hidden md:inline">{label}</span>
+        Account
         <Chevron open={open} />
       </button>
       {open ? (

@@ -4,6 +4,7 @@ import test from 'node:test';
 import { NextRequest } from 'next/server';
 import { ephemeralSecret, checkCredentials, signSession, verifySession } from '../src/cu/auth';
 import { capChroma, contrastRatio, deriveBrand, parseHex, rgbToOklch } from '../src/cu/contrast';
+import { getCuTenant } from '../src/cu/tenants';
 import { getAggregates, getBranding, recordCheck, resetCuStore, saveBranding, saveSettings } from '../src/cu/cu-store';
 import { readLogoFile } from '../src/cu/logo-file';
 import { formatOcrLog, pickOcrFields } from '../src/cu/ocr';
@@ -39,6 +40,28 @@ test('chroma above 0.25 is capped at 0.18 and brand colors stay readable', () =>
   assert.ok(contrastRatio(white, rgb(brand.brandFill)) >= 4.5);
   assert.equal(brand.focus, brand.brandText);
   assert.match(brand.tint, /\/ 0\.08\)$/);
+});
+
+test('a pale yellow primary is darkened until text and buttons clear 4.5:1', () => {
+  const tenant = getCuTenant('larkspur-cu');
+  assert.ok(tenant);
+  assert.equal(tenant.brand.primary, '#FDE68A');
+  const logs: string[] = [];
+  const brand = deriveBrand(tenant.id, tenant.brand, line => logs.push(line));
+  assert.equal(brand.fallback, false);
+  assert.equal(logs.length, 0);
+  const source = parseHex(tenant.brand.primary);
+  const text = parseHex(brand.brandText);
+  const fill = parseHex(brand.brandFill);
+  assert.ok(source && text && fill);
+  const white: [number, number, number] = [255, 255, 255];
+  assert.ok(rgbToOklch(source)[0] > 0.9);
+  assert.ok(rgbToOklch(text)[0] < rgbToOklch(source)[0]);
+  assert.ok(rgbToOklch(fill)[0] < rgbToOklch(source)[0]);
+  assert.ok(contrastRatio(text, white) >= 4.5);
+  assert.ok(contrastRatio(white, fill) >= 4.5);
+  assert.equal(brand.onBrand, '#ffffff');
+  assert.match(brand.tint, /253 230 138/);
 });
 
 test('an unusable primary falls back to #111 and logs the tenant only', () => {
@@ -218,7 +241,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(dashboard.includes('text-center'), false);
   assert.match(dashboard, /CopyLink/);
   assert.match(readFileSync('src/app/cu/[tenant]/dashboard/CopyLink.tsx', 'utf8'), /Copy link/);
-  assert.match(readFileSync('src/app/cu/AccountMenu.tsx', 'utf8'), /md:hidden">Account/);
+  const account = readFileSync('src/app/cu/AccountMenu.tsx', 'utf8');
+  assert.match(account, />\s*Account\s*</);
+  assert.equal(account.includes('md:hidden'), false);
   assert.match(form, /pb-\[120px\]/);
   assert.match(admin, /hidden py-3 pr-4 font-semibold md:table-cell">Email/);
   assert.match(admin, /text-right font-semibold">Checks/);
