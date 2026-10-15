@@ -30,7 +30,7 @@ const PAGE = `<!DOCTYPE html>
 </html>
 `;
 
-/** Full document, so the root layout’s consumer chrome is not rendered. */
+/** Full document. Credit-union routes are outside the consumer layout, and this response does not use it. */
 export async function missingTenantResponse(pathname: string): Promise<NextResponse> {
   const res = new NextResponse(PAGE, {
     status: 404,
