@@ -9,6 +9,7 @@ import { saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 import { StaffHeader } from '../../StaffHeader';
 import { BrandingForm } from './BrandingForm';
+import { CopyLink } from './CopyLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -138,11 +139,12 @@ export default async function DashboardPage({
             </p>
           </div>
           {aggregates.checks === 0 ? (
-            <div className="mx-auto mt-10 w-full max-w-[560px] text-center">
+            <div className="mt-10 max-w-[560px] text-left">
               <h2 className="text-[24px] font-bold leading-[30px]">No checks yet</h2>
               <p className="mt-2 text-[14px] leading-[20px] cu-muted">
                 Share your link: <a href={shareUrl} className="underline underline-offset-4 cu-linkline">{shareUrl}</a>
               </p>
+              <CopyLink url={shareUrl} />
             </div>
           ) : (
             <div className="mt-10">

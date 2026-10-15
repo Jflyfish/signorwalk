@@ -20,7 +20,8 @@ function Swatch({ label, color }: { label: string; color: string }) {
   return (
     <div>
       <span className="block h-6 w-6" style={{ backgroundColor: color }} aria-hidden="true" />
-      <span className="mt-2 block text-[14px] leading-[20px] cu-muted">{label}</span>
+      <span className="mt-2 block font-mono text-[14px] leading-[20px] tabular-nums cu-muted">{color}</span>
+      <span className="block text-[14px] leading-[20px] cu-muted">{label}</span>
     </div>
   );
 }
@@ -28,11 +29,17 @@ function Swatch({ label, color }: { label: string; color: string }) {
 function LogoStage({ src, dark }: { src: string; dark?: boolean }) {
   if (!src) return null;
   return (
-    <div className={`mt-2 inline-flex items-center ${dark ? 'cu-solid px-3 py-2' : 'bg-white'}`}>
+    <div
+      className="mt-2 inline-flex items-center rounded-lg px-3 py-2"
+      style={{ backgroundColor: dark ? '#111111' : '#ffffff', border: '1px solid #E5E5E5' }}
+    >
       <img src={src} alt="" className="h-8 w-auto max-w-[160px] object-contain" />
     </div>
   );
 }
+
+const fileInput =
+  'cu-ring mt-2 block w-full text-[14px] font-normal cu-muted file:mr-3 file:h-12 file:cursor-pointer file:rounded-lg file:border file:border-solid file:border-[#E5E5E5] file:bg-white file:px-4 file:text-[15px] file:font-semibold file:text-[#111] md:file:h-11';
 
 export function BrandingForm({
   tenantId,
@@ -108,7 +115,7 @@ export function BrandingForm({
             type="file"
             accept="image/png,image/jpeg,image/webp,image/svg+xml"
             onChange={event => stage(event.target.files?.[0], setLightSrc)}
-            className="mt-2 block w-full text-[15px] font-normal"
+            className={fileInput}
           />
         </label>
         <LogoStage src={lightSrc} />
@@ -120,7 +127,7 @@ export function BrandingForm({
             type="file"
             accept="image/png,image/jpeg,image/webp,image/svg+xml"
             onChange={event => stage(event.target.files?.[0], setDarkSrc)}
-            className="mt-2 block w-full text-[15px] font-normal"
+            className={fileInput}
           />
         </label>
         {darkSrc ? <LogoStage src={darkSrc} dark /> : null}

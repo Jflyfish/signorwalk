@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { UPLOAD_DISCLOSURE } from '@/cu/copy';
 import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
@@ -73,7 +74,8 @@ export default function CreditUnionsPage() {
             })}
           </ul>
 
-          <p className="mt-10">
+          <p className="mt-10 text-[14px] leading-[20px] cu-muted">{UPLOAD_DISCLOSURE}</p>
+          <p className="mt-4">
             <a href={`mailto:${TALK_TO_US_EMAIL}`} className={textLink}>Over $5B? Email us.</a>
             {' · '}
             <a href="/credit-unions/packet" className={textLink}>Download due-diligence packet ({DOCUMENT_VERSION_LABEL})</a>

@@ -234,7 +234,7 @@ export function CheckForm({ tenant, brand }: { tenant: CuPublic; brand: DerivedB
     const rest = report.itemsToReview.slice(3);
     const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
     return (
-      <div className="mx-auto w-full max-w-[560px] px-4 pb-24 pt-16 md:pb-16 md:pt-24">
+      <div className="mx-auto w-full max-w-[560px] px-4 pb-[120px] pt-16 md:pb-16 md:pt-24">
         <div className="flex flex-col md:flex-row md:items-center md:gap-4">
           <p className="text-[14px] leading-[20px] cu-muted md:hidden">Grade</p>
           <p

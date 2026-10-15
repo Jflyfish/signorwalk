@@ -41,7 +41,8 @@ export function AccountMenu({ tenant, label }: { tenant: string; label: string }
         aria-controls={menuId}
         onClick={() => setOpen(value => !value)}
       >
-        {label}
+        <span className="md:hidden">Account</span>
+        <span className="hidden md:inline">{label}</span>
         <Chevron open={open} />
       </button>
       {open ? (

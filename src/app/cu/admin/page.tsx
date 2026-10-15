@@ -53,9 +53,9 @@ export default async function AdminPage() {
             <thead>
               <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
                 <th className="py-3 pr-4 font-semibold">Credit union</th>
-                <th className="py-3 pr-4 font-semibold">Checks</th>
-                <th className="py-3 pr-4 font-semibold">Uploads</th>
-                <th className="py-3 pr-4 font-semibold">Email</th>
+                <th className="py-3 pr-4 text-right font-semibold">Checks</th>
+                <th className="py-3 pr-4 text-right font-semibold">Uploads</th>
+                <th className="hidden py-3 pr-4 font-semibold md:table-cell">Email</th>
                 <th className="py-3 font-semibold">Dashboard</th>
               </tr>
             </thead>
@@ -63,9 +63,9 @@ export default async function AdminPage() {
               {rows.map(row => (
                 <tr key={row.tenant.id} className="border-b cu-line text-[15px] leading-[20px]">
                   <td className="py-3 pr-4">{row.tenant.name}</td>
-                  <td className="py-3 pr-4 tabular-nums">{row.aggregates.checks}</td>
-                  <td className="py-3 pr-4 tabular-nums">{row.aggregates.uploads}</td>
-                  <td className="py-3 pr-4">{row.settings.emailEnabled ? 'On' : 'Off'}</td>
+                  <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.checks}</td>
+                  <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.uploads}</td>
+                  <td className="hidden py-3 pr-4 md:table-cell">{row.settings.emailEnabled ? 'On' : 'Off'}</td>
                   <td className="py-3"><a className="font-semibold underline underline-offset-4 cu-linkline" href={`/cu/${row.tenant.id}/dashboard`}>{row.tenant.brand.shortName}</a></td>
                 </tr>
               ))}
