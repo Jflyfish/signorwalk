@@ -266,6 +266,10 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(page.includes('Cancel anytime'), false);
   assert.equal(page.includes('DemoFrame'), false);
   assert.match(page, /\/cu\/harborlight-cu\/embed\?entry=numbers/);
+  const iframe = page.match(/<iframe[\s\S]*?\/>/);
+  assert.ok(iframe);
+  assert.equal(iframe[0].includes('hidden'), false);
+  assert.equal(iframe[0].includes('md:hidden'), false);
   assert.match(page, /Recommended/);
   assert.equal(page.includes('Most chosen'), false);
   assert.match(page, /Over \$5B\? Email us\./);

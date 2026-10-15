@@ -50,13 +50,13 @@ export default function CreditUnionsPage() {
           {HEADLINE}
         </h1>
         <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] cu-muted">{VALUE_LINE}</p>
-        <p className="mt-6 hidden text-[14px] leading-[20px] cu-muted md:block">
+      </div>
+
+      <div className="mx-auto mt-10 w-full max-w-[960px] px-4">
+        <p className="hidden text-[14px] leading-[20px] cu-muted md:block">
           See it in action.{' '}
           <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
         </p>
-      </div>
-
-      <div className="mx-auto mt-10 w-full max-w-[960px] px-4 md:hidden">
         <p className="mt-10 text-[14px] leading-[20px] cu-muted md:hidden">
           See it in action.{' '}
           <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
