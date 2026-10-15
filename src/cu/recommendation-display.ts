@@ -26,6 +26,8 @@ export function memberRecommendationLine(input: {
   if (input.recommendation === 'sign' && (input.aprBlank || input.provisional)) {
     return ADD_APR_RECOMMENDATION;
   }
-  if (input.grade === 'A' || input.recommendation !== 'sign') return input.recommendationLabel;
+  // The A headline already says the offer compares favorably. A second line repeats it.
+  if (input.grade === 'A' && input.recommendation === 'sign') return '';
+  if (input.recommendation !== 'sign') return input.recommendationLabel;
   return '';
 }

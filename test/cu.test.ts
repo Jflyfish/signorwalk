@@ -277,7 +277,9 @@ test('demo sample includes an APR and grades; a blank APR is still a B from the 
     aprBlank: false,
     provisional: financeGradeIsProvisional(graded, false),
   });
-  assert.equal(fullLine, graded.recommendationLabel);
+  assert.equal(fullLine, '');
+  assert.match(graded.recommendationLabel, /Compares favorably/);
+  assert.match(graded.headline, /compare favorably/);
   assert.equal(readFileSync('src/cu/engine/evaluate.ts', 'utf8').includes('function recommendationFor'), true);
 
   const gradeC = gradePayload({ dealType: 'finance', ...DEMO_GRADE_C, termMonths: DEMO_GRADE_C.term }, 'Harborlight Credit Union');

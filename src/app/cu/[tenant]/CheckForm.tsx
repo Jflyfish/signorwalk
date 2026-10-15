@@ -121,8 +121,8 @@ function Primary({
   wide?: boolean;
 }) {
   const className = wide
-    ? 'cu-primary cu-ring inline-flex items-center justify-center text-center min-h-12 w-full px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60'
-    : 'cu-primary cu-ring inline-flex items-center justify-center text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60';
+    ? 'cu-primary cu-ring inline-flex items-center justify-center gap-2 text-center min-h-12 w-full px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60'
+    : 'cu-primary cu-ring inline-flex items-center justify-center gap-2 text-center min-h-12 w-full md:h-11 md:min-h-11 md:w-auto px-4 rounded-lg text-[15px] font-semibold leading-[20px] disabled:opacity-60';
   if (href) {
     return <a href={href} target="_top" className={className} onClick={onClick}>{children}</a>;
   }
@@ -363,10 +363,13 @@ export function CheckForm({
       provisional: dealType === 'finance' && financeGradeIsProvisional(report, aprBlank),
     });
     const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
+    const showRatesWithGrade = report.grade === 'A' && Boolean(tenant.ratesUrl);
+    const demoRates = tenant.ratesUrl.includes('/credit-unions/demo/');
+    const demoPreapproval = tenant.preApprovalUrl.includes('/credit-unions/demo/');
     return (
       <div className={embedded
         ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
-        : 'mx-auto w-full max-w-[560px] px-4 pb-[calc(120px+env(safe-area-inset-bottom))] pt-16 md:pb-16 md:pt-24'}>
+        : `mx-auto w-full max-w-[560px] px-4 ${showRatesWithGrade ? 'pb-[calc(200px+env(safe-area-inset-bottom))]' : 'pb-[calc(120px+env(safe-area-inset-bottom))]'} pt-16 md:pb-16 md:pt-24`}>
         <div className="flex flex-col md:flex-row md:items-center md:gap-4">
           <p className="text-[14px] leading-[20px] cu-muted md:hidden">Grade</p>
           <p
@@ -408,17 +411,31 @@ export function CheckForm({
             ? 'static mt-10 w-full'
             : 'fixed inset-x-0 bottom-0 z-10 border-t cu-line bg-white px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
             <p className="mb-3 text-[14px] font-semibold leading-[20px]">Next step</p>
-            <Primary
-              wide={embedded}
-              href={memberLink(tenant.preApprovalUrl)}
-              onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
-            >
-              <span className="md:hidden">Get pre-approved</span>
-              <span className="hidden md:inline">Get pre-approved with {tenant.name}</span>
-              {tenant.preApprovalUrl.includes('/credit-unions/demo/') ? (
-                <span className="ml-2 inline-flex items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+            <div className="flex flex-col items-start gap-3">
+              <Primary
+                wide={embedded}
+                href={memberLink(tenant.preApprovalUrl)}
+                onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
+              >
+                <span>Get pre-approved</span>
+                {demoPreapproval ? (
+                  <span className="inline-flex items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+                ) : null}
+              </Primary>
+              {showRatesWithGrade ? (
+                <a
+                  href={memberLink(tenant.ratesUrl)}
+                  target="_top"
+                  className={`${textLink} inline-flex items-center gap-2`}
+                  onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'rates' })}
+                >
+                  <span>{demoRates ? 'See auto rates' : tenant.ratesLabel}</span>
+                  {demoRates ? (
+                    <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+                  ) : null}
+                </a>
               ) : null}
-            </Primary>
+            </div>
           </div>
         ) : null}
 
@@ -490,17 +507,17 @@ export function CheckForm({
                 {report.disclaimers.map(line => <li key={line}>{line}</li>)}
               </ul>
 
-              {tenant.ratesUrl ? (
+              {tenant.ratesUrl && !showRatesWithGrade ? (
               <p className="mt-6">
                 <a
                   href={memberLink(tenant.ratesUrl)}
                   target="_top"
-                  className={textLink}
+                  className={`${textLink} inline-flex items-center gap-2`}
                   onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'rates' })}
                 >
-                  {tenant.ratesUrl.includes('/credit-unions/demo/') ? 'See auto rates' : tenant.ratesLabel}
-                  {tenant.ratesUrl.includes('/credit-unions/demo/') ? (
-                    <span className="ml-2 inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+                  <span>{demoRates ? 'See auto rates' : tenant.ratesLabel}</span>
+                  {demoRates ? (
+                    <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
                   ) : null}
                 </a>
               </p>

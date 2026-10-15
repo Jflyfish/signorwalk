@@ -329,6 +329,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(form, /cu-err/);
   assert.match(form, /cu-ring/);
   assert.match(form, /Get pre-approved/);
+  assert.equal(form.includes('Get pre-approved with'), false);
+  assert.match(form, /inline-flex items-center gap-2/);
+  assert.match(form, /showRatesWithGrade/);
   assert.match(form, /target="_top"/);
   assert.match(dashboard, /Set the pre-approval URL and the rates URL before you share the member link/);
   assert.match(dashboard, /No checks yet/);
