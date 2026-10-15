@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, demoTenantId, verifySession } from '@/cu/auth';
 import { getAggregates, getSettings, staffDirectory } from '@/cu/cu-store';
 import { CU_TENANTS } from '@/cu/tenants';
-import { AccountMenu } from '../AccountMenu';
+import { StaffHeader } from '../StaffHeader';
 
 export const metadata: Metadata = {
   title: 'Credit unions — admin',
@@ -29,12 +29,9 @@ export default async function AdminPage() {
 
   return (
     <>
-      <header className="border-b cu-line">
-        <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-4">
-          <p className="text-[15px] font-semibold leading-[20px]">Sign or Walk</p>
-          <AccountMenu tenant={demoTenantId()} linkClassName="cu-ink text-[15px] font-semibold underline underline-offset-4 cu-linkline" />
-        </div>
-      </header>
+      <StaffHeader tenant={demoTenantId()} accountLabel="Admin">
+        <p className="text-[15px] font-semibold leading-[20px]">Sign or Walk</p>
+      </StaffHeader>
       <main className="mx-auto w-full max-w-[1120px] px-4 py-10">
         <h1 className="text-[32px] font-bold leading-[38px]">Credit unions</h1>
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">

@@ -13,8 +13,21 @@ export function ChromeStyle() {
       .cu-line { border-color: var(--cu-line); }
       .cu-band { background-color: var(--cu-band); }
       .cu-solid { background-color: var(--cu-ink); color: #fff; }
-      .cu-ok { background-color: #f0fdf4; color: #14532d; }
-      .cu-err { background-color: #fef2f2; color: #7f1d1d; }
+      .cu-ok, .cu-err {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        border-radius: 8px;
+        border-width: 1px;
+        border-style: solid;
+        padding: 12px 16px;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 600;
+      }
+      .cu-ok { border-color: #15803d; background: rgb(21 128 61 / 0.06); color: #15803d; }
+      .cu-err { border-color: #b91c1c; background: rgb(185 28 28 / 0.06); color: #b91c1c; }
+      .cu-ok svg, .cu-err svg { flex: none; margin-top: 2px; }
       .cu-linkline { text-decoration-color: var(--cu-muted); }
       .cu-linkline:hover { text-decoration-color: var(--cu-ink); }
       .cu-ring:focus-visible { outline: 2px solid var(--cu-ink); outline-offset: 2px; }

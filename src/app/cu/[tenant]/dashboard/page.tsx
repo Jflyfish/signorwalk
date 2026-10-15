@@ -5,9 +5,9 @@ import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
 import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
 import { getCuTenant } from '@/cu/tenants';
-import { AccountMenu } from '../../AccountMenu';
 import { saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
+import { StaffHeader } from '../../StaffHeader';
 import { BrandingForm } from './BrandingForm';
 
 export const dynamic = 'force-dynamic';
@@ -24,6 +24,30 @@ function sectionFrom(query: { section?: string; saved?: string; error?: string; 
   if (query.saved === 'branding' || query.error === 'branding') return 'branding';
   if (query.saved === 'settings' || query.saved === 'email' || query.error === 'email' || query.notice) return 'settings';
   return 'usage';
+}
+
+function AlertIcon({ tone }: { tone: 'ok' | 'err' }) {
+  return tone === 'ok' ? (
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M5 8.2l2 2 4-4.2" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+      <circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M8 4.8v4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="8" cy="11.2" r="0.8" fill="currentColor" />
+    </svg>
+  );
+}
+
+function Alert({ tone, children }: { tone: 'ok' | 'err'; children: string }) {
+  return (
+    <p className={`${tone === 'ok' ? 'cu-ok' : 'cu-err'} mb-6`} role={tone === 'ok' ? 'status' : 'alert'}>
+      <AlertIcon tone={tone} />
+      <span>{children}</span>
+    </p>
+  );
 }
 
 const NOTICES: Record<string, string> = {
@@ -70,20 +94,17 @@ export default async function DashboardPage({
 
   return (
     <>
-      <header className="border-b cu-line">
-        <div className="mx-auto flex min-h-16 w-full max-w-[1120px] items-center justify-between gap-4 px-4">
-          <BrandLockup
-            name={tenant.name}
-            shortName={brand.shortName}
-            color={brand.brandText}
-            mark={tenant.logo}
-            logoLight={brand.logoLight}
-            logoAspect={brand.logoAspect}
-            fullNameOnPhone
-          />
-          <AccountMenu tenant={tenant.id} linkClassName="cu-link text-[15px] font-semibold underline underline-offset-4 cu-linkline" />
-        </div>
-      </header>
+      <StaffHeader tenant={tenant.id} accountLabel={brand.shortName}>
+        <BrandLockup
+          name={tenant.name}
+          shortName={brand.shortName}
+          color={brand.brandText}
+          mark={tenant.logo}
+          logoLight={brand.logoLight}
+          logoAspect={brand.logoAspect}
+          fullNameOnPhone
+        />
+      </StaffHeader>
       <nav className="border-b cu-line">
         <div className="mx-auto flex w-full max-w-[1120px] gap-6 px-4">
           {tabs.map(tab => (
@@ -99,9 +120,9 @@ export default async function DashboardPage({
         </div>
       </nav>
       <main className="mx-auto w-full max-w-[1120px] px-4 py-10">
-        {saved ? <p className="cu-ok mb-6 rounded-lg px-4 py-3 text-[14px] font-semibold leading-[20px]" role="status">{saved}</p> : null}
-        {caution ? <p className="cu-err mb-6 rounded-lg px-4 py-3 text-[14px] font-semibold leading-[20px]" role="status">{caution}</p> : null}
-        {error ? <p className="cu-err mb-6 rounded-lg px-4 py-3 text-[14px] font-semibold leading-[20px]" role="alert">{error}</p> : null}
+        {saved ? <Alert tone="ok">{saved}</Alert> : null}
+        {caution ? <Alert tone="err">{caution}</Alert> : null}
+        {error ? <Alert tone="err">{error}</Alert> : null}
 
         {section === 'usage' ? <section aria-labelledby="usage-heading">
           <h1 id="usage-heading" className="text-[32px] font-bold leading-[38px]">Usage</h1>
@@ -117,9 +138,10 @@ export default async function DashboardPage({
             </p>
           </div>
           {aggregates.checks === 0 ? (
-            <p className="mt-10 max-w-[560px] text-[15px] leading-[24px]">
-              No checks yet. Share your link: <a href={shareUrl} className="cu-link underline underline-offset-4 cu-linkline">{shareUrl}</a>
-            </p>
+            <div className="mx-auto mt-10 w-full max-w-[560px] text-center">
+              <h2 className="text-[24px] font-bold leading-[30px]">No checks yet</h2>
+              <p className="mt-2 text-[14px] leading-[20px] cu-muted">Share your link: {shareUrl}</p>
+            </div>
           ) : (
             <div className="mt-10">
               <table className="w-full max-w-[560px] border-collapse text-left">

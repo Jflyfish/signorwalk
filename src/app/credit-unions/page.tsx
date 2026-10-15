@@ -82,13 +82,13 @@ export default function CreditUnionsPage() {
         </div>
       </div>
 
-      <footer className="mx-auto mt-16 w-full max-w-[960px] px-4 pb-16 md:mt-24 md:pb-24">
+      <footer className="mx-auto w-full max-w-[960px] px-4 py-10">
         <p className="whitespace-nowrap text-[14px] leading-[20px] cu-muted">
           © 2026
           {' · '}
-          <Link href="/credit-unions/privacy" className="cu-ink underline decoration-1 underline-offset-4 cu-linkline cu-ring">Privacy</Link>
+          <Link href="/credit-unions/privacy" className="hover:underline underline-offset-4 cu-ring">Privacy</Link>
           {' · '}
-          <Link href="/contact" className="cu-ink underline decoration-1 underline-offset-4 cu-linkline cu-ring">Contact</Link>
+          <Link href="/contact" className="hover:underline underline-offset-4 cu-ring">Contact</Link>
         </p>
       </footer>
     </div>
