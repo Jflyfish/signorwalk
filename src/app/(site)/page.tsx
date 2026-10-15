@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { siteOpenGraph } from './site-open-graph';
 
 export const metadata: Metadata = {
   title: 'Sign or Walk — Know Before You Sign',
   description: 'Free AI car deal grader. Paste in your numbers and get an honest grade, every red flag, and a word-for-word negotiation script.',
   alternates: { canonical: 'https://signorwalk.com' },
+  openGraph: siteOpenGraph,
 };
 
 const jsonLd = {

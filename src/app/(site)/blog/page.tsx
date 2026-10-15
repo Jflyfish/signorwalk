@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { blogPosts } from '@/lib/blogPosts';
+import { siteOpenGraph } from '../site-open-graph';
 
 export const metadata: Metadata = {
   title: 'Blog — Sign or Walk',
   description: 'Car buying tips, deal breakdowns, and negotiation tactics from the Sign or Walk team.',
   alternates: { canonical: 'https://signorwalk.com/blog' },
+  openGraph: siteOpenGraph,
 };
 
 export default function BlogPage() {

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { siteOpenGraphImages } from '../site-open-graph';
 
 export const metadata: Metadata = {
   title: 'Negotiation Support — Sign or Walk',
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
     description: 'Get a word-for-word negotiation script built from your car deal.',
     url: 'https://signorwalk.com/negotiation-support',
     type: 'website',
+    images: siteOpenGraphImages,
   },
 };
 

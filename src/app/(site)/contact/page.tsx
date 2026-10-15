@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
+import { siteOpenGraph } from '../site-open-graph';
 
 export const metadata: Metadata = {
   title: 'Contact — Sign or Walk',
   description: 'Get in touch with the Sign or Walk team.',
   alternates: { canonical: 'https://signorwalk.com/contact' },
+  openGraph: siteOpenGraph,
 };
 
 export default function ContactPage() {

@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { siteOpenGraph } from '../site-open-graph';
 
 export const metadata: Metadata = {
   title: 'About — Sign or Walk',
   description: 'Sign or Walk is a free AI car deal grader built to protect everyday buyers from bad lease and finance deals.',
   alternates: { canonical: 'https://signorwalk.com/about' },
+  openGraph: siteOpenGraph,
 };
 
 export default function AboutPage() {

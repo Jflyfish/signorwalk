@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { siteOpenGraph } from '../site-open-graph';
 
 export const metadata: Metadata = {
   title: 'Ask a Pro — Sign or Walk',
   description: 'A former dealership insider reviews your car deal and tells you exactly what to say to negotiate. Save $250+ or your money back. Unsigned deals only.',
   alternates: { canonical: 'https://signorwalk.com/ask-a-pro' },
+  openGraph: siteOpenGraph,
 };
 
 function CheckIcon() {

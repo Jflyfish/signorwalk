@@ -24,6 +24,13 @@ export const metadata: Metadata = {
     url: PAGE_URL,
     type: 'website',
     siteName: 'Sign or Walk',
+    images: [{
+      alt: 'Help your members spot a bad car deal before they sign.',
+      type: 'image/png',
+      url: '/credit-unions/opengraph-image',
+      width: 1200,
+      height: 630,
+    }],
   },
 };
 

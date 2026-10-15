@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { siteOpenGraphImages } from '../site-open-graph';
 
 export const metadata: Metadata = {
   title: 'Grade My Car Deal — Free AI Deal Grader | Sign or Walk',
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
     description: 'Upload your lease or finance quote and get an A–F grade in 30 seconds.',
     url: 'https://signorwalk.com/analyze',
     type: 'website',
+    images: siteOpenGraphImages,
   },
 };
 
