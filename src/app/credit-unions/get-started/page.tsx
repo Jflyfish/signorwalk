@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { AiDisclosure } from '../AiDisclosure';
 import { getPricedTier, resolveTierParam } from '../pricing';
 import { startTrialAction } from './actions';
 
@@ -71,6 +72,7 @@ export default async function GetStartedPage({
           <button type="submit" className={button}>Start 90-day free trial</button>
         </form>
         <p className="mt-4 text-[14px] leading-[20px] cu-muted">Check your email to confirm. Saving stays off until then.</p>
+        <AiDisclosure />
         <p className="mt-4">
           <Link
             href="/credit-unions"

@@ -234,6 +234,17 @@ function channels(hex: string): string {
   return `${rgb[0]} ${rgb[1]} ${rgb[2]}`;
 }
 
+/** A store seeded before the sandbox pages existed still points Harborlight at .example. */
+function sandboxLink(profileUrl: string, seedUrl: string | undefined): string {
+  if (!seedUrl) return profileUrl;
+  try {
+    if (new URL(profileUrl).hostname.endsWith('.example')) return seedUrl;
+  } catch {
+    return profileUrl;
+  }
+  return profileUrl;
+}
+
 function materialize(profile: StoredTenantProfile, branding: StoredBranding | null, seed?: CuTenant): ResolvedTenant {
   const base = seed?.brand ?? {
     name: profile.name,
@@ -270,8 +281,8 @@ function materialize(profile: StoredTenantProfile, branding: StoredBranding | nu
     brand,
     supportUrl: profile.supportUrl,
     privacyUrl: profile.privacyUrl,
-    preApprovalUrl: profile.preApprovalUrl,
-    ratesUrl: profile.ratesUrl,
+    preApprovalUrl: profile.id === 'harborlight-cu' ? sandboxLink(profile.preApprovalUrl, seed?.preApprovalUrl) : profile.preApprovalUrl,
+    ratesUrl: profile.id === 'harborlight-cu' ? sandboxLink(profile.ratesUrl, seed?.ratesUrl) : profile.ratesUrl,
     preApprovalLabel: profile.preApprovalLabel,
     ratesLabel: profile.ratesLabel,
     embedOrigins: profile.embedOrigins,

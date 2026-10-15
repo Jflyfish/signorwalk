@@ -26,7 +26,8 @@ export interface CuTenant {
 }
 
 /**
- * Fictional pilots. Pre-approval and rate targets use the reserved .example TLD.
+ * Fictional pilots. Harborlight pre-approval and rates open sandbox pages on this site.
+ * Summit and Larkspur still use the reserved .example TLD. Embed origins stay .example.
  */
 export const CU_TENANTS: readonly CuTenant[] = [
   {
@@ -45,10 +46,10 @@ export const CU_TENANTS: readonly CuTenant[] = [
     },
     supportUrl: 'https://www.harborlightcu.example/help',
     privacyUrl: 'https://www.harborlightcu.example/privacy',
-    preApprovalUrl: 'https://www.harborlightcu.example/borrow/auto/preapproval',
-    ratesUrl: 'https://www.harborlightcu.example/rates/auto',
-    preApprovalLabel: 'Get pre-approved at Harborlight',
-    ratesLabel: 'See Harborlight auto rates',
+    preApprovalUrl: 'https://signorwalk.com/credit-unions/demo/preapproval',
+    ratesUrl: 'https://signorwalk.com/credit-unions/demo/rates',
+    preApprovalLabel: 'Demo only: pre-approval',
+    ratesLabel: 'Demo only: auto rates',
     embedOrigins: ['https://www.harborlightcu.example'],
   },
   {

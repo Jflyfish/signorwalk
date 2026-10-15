@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { UPLOAD_DISCLOSURE } from '@/cu/copy';
+import { AiDisclosure } from './AiDisclosure';
 import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
@@ -54,6 +54,11 @@ export default function CreditUnionsPage() {
           See it in action.{' '}
           <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
         </p>
+        <ul className="mt-10 max-w-[640px] list-disc space-y-2 pl-5 text-[14px] leading-[20px] cu-muted">
+          <li>Embed the check on your website.</li>
+          <li>Branding and usage are on your dashboard.</li>
+          <li>The trial requires an email confirmation before you can save.</li>
+        </ul>
       </div>
 
       <div className="mt-16 cu-band py-16 md:mt-24">
@@ -83,7 +88,7 @@ export default function CreditUnionsPage() {
             <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
           </p>
 
-          <p className="mt-10 text-[14px] leading-[20px] cu-muted">{UPLOAD_DISCLOSURE}</p>
+          <AiDisclosure />
           <p className="mt-4 flex flex-wrap items-baseline gap-x-2 text-[14px] leading-[20px]">
             <a href={`mailto:${TALK_TO_US_EMAIL}`} className={textLink}>Over $5B? Email us.</a>
             <span className="hidden md:inline">{' · '}</span>
@@ -93,11 +98,13 @@ export default function CreditUnionsPage() {
       </div>
 
       <footer className="mx-auto w-full max-w-[960px] px-4 py-10">
-        <p className="whitespace-nowrap text-[14px] leading-[20px] cu-muted">
-          © 2026
-          {' · '}
+        <p className="flex flex-wrap gap-x-2 text-[14px] leading-[20px] cu-muted">
+          <span>© 2026</span>
+          <span aria-hidden="true">·</span>
           <Link href="/credit-unions/privacy" className="hover:underline underline-offset-4 cu-ring">Privacy</Link>
-          {' · '}
+          <span aria-hidden="true">·</span>
+          <Link href="/credit-unions/terms" className="hover:underline underline-offset-4 cu-ring">Terms</Link>
+          <span aria-hidden="true">·</span>
           <a href={`mailto:${TALK_TO_US_EMAIL}`} className="hover:underline underline-offset-4 cu-ring">Contact</a>
         </p>
       </footer>

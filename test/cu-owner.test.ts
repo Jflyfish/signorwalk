@@ -24,6 +24,8 @@ test('demo tenants seed the store and stay in config', async () => {
   const rows = await listCuTenants();
   assert.deepEqual(rows.map(row => row.id), ['harborlight-cu', 'summit-ridge-fcu', 'larkspur-cu']);
   assert.equal(rows.every(row => row.status === 'active'), true);
+  assert.equal(new URL(rows[0].preApprovalUrl).pathname, '/credit-unions/demo/preapproval');
+  assert.equal(new URL(rows.find(row => row.id === 'summit-ridge-fcu')!.preApprovalUrl).hostname.endsWith('.example'), true);
   assert.equal(getCuTenant('harborlight-cu')?.name, 'Harborlight Credit Union');
   const profile = normalizeProfile({
     id: 'harborlight-cu',
@@ -36,7 +38,25 @@ test('demo tenants seed the store and stay in config', async () => {
   });
   assert.ok(profile);
   await saveTenantProfile(profile);
-  assert.equal((await loadCuTenant('harborlight-cu'))?.name, 'Harbor Light Credit Union');
+  const overlaid = await loadCuTenant('harborlight-cu');
+  assert.equal(overlaid?.name, 'Harbor Light Credit Union');
+  assert.equal(new URL(overlaid!.preApprovalUrl).pathname, '/credit-unions/demo/preapproval');
+  assert.equal(new URL(overlaid!.ratesUrl).pathname, '/credit-unions/demo/rates');
+  assert.equal(overlaid!.embedOrigins.includes('https://www.harborlightcu.example'), true);
+  const real = normalizeProfile({
+    id: 'harborlight-cu',
+    name: 'Harbor Light Credit Union',
+    preApprovalUrl: 'https://borrow.harborlightcu.org/auto',
+    ratesUrl: 'https://borrow.harborlightcu.org/rates',
+    embedOrigins: ['https://www.harborlightcu.example'],
+    status: 'active',
+    shortName: 'Harbor Light',
+  });
+  assert.ok(real);
+  await saveTenantProfile(real);
+  const kept = await loadCuTenant('harborlight-cu');
+  assert.equal(kept?.preApprovalUrl, 'https://borrow.harborlightcu.org/auto');
+  assert.equal(kept?.ratesUrl, 'https://borrow.harborlightcu.org/rates');
   assert.equal(getCuTenant('harborlight-cu')?.name, 'Harborlight Credit Union');
   resetCuStore();
 });

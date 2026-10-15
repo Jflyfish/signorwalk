@@ -11,7 +11,9 @@ import { buildZip } from '../src/cu/packet/zip';
 import { ANALYZE_LIMIT, resetAnalyzeRateLimit, takeAnalyzeSlot } from '../src/cu/rate-limit';
 import { clearDealStorage, DEAL_STORAGE_KEYS } from '../src/cu/storage';
 import { contrastRatio, parseRgbChannels } from '../src/cu/contrast';
+import { creditUnionAlias } from '../src/app/credit-unions/aliases';
 import { getCuTenant, toCuPublic } from '../src/cu/tenants';
+import { memberLink } from '../src/cu/utm';
 import { config } from '../src/middleware';
 import { POST } from '../src/app/api/cu/[tenant]/analyze/route';
 
@@ -42,6 +44,14 @@ test('public links carry aggregate UTM parameters', () => {
   const rates = new URL(pub.ratesUrl);
   assert.equal(rates.searchParams.get('utm_content'), 'rates');
   assert.equal(rates.searchParams.get('utm_campaign'), 'harborlight-cu');
+  assert.equal(pre.hostname, 'signorwalk.com');
+  assert.equal(pre.pathname, '/credit-unions/demo/preapproval');
+  assert.equal(rates.pathname, '/credit-unions/demo/rates');
+  assert.equal(memberLink(pub.preApprovalUrl), `${pre.pathname}${pre.search}`);
+  assert.equal(memberLink(pub.ratesUrl).startsWith('/credit-unions/demo/rates?'), true);
+  const summit = toCuPublic(getCuTenant('summit-ridge-fcu')!);
+  assert.equal(new URL(summit.preApprovalUrl).hostname.endsWith('.example'), true);
+  assert.equal(memberLink(summit.preApprovalUrl), summit.preApprovalUrl);
 });
 
 test('brand and grade colors meet WCAG AA for text', () => {
@@ -124,6 +134,23 @@ test('due diligence packet is one zip containing every draft', () => {
   assert.match(packet, /subdomain only/);
   assert.match(packet, /source of truth/);
   assert.match(packet, /owner approval before merge/);
+  assert.match(packet, /PILOT-ONLY, PENDING COUNSEL REVIEW/);
+  assert.match(packet, /does not use zero data retention/);
+  assert.match(packet, /## 11\. Owner must supply/);
+  assert.equal(packet.toLowerCase().includes('cancel anytime'), false);
+  assert.equal(packet.toLowerCase().includes('zero-retention'), false);
+});
+
+test('guessed packet, privacy, and terms paths alias to real pages', () => {
+  assert.equal(creditUnionAlias(['packet.pdf']), '/credit-unions/packet');
+  assert.equal(creditUnionAlias(['due-diligence']), '/credit-unions/packet');
+  assert.equal(creditUnionAlias(['due_diligence']), '/credit-unions/packet');
+  assert.equal(creditUnionAlias(['terms.pdf']), '/credit-unions/terms');
+  assert.equal(creditUnionAlias(['terms-of-service']), '/credit-unions/terms');
+  assert.equal(creditUnionAlias(['privacy']), '/credit-unions/privacy');
+  assert.equal(creditUnionAlias(['privacy.pdf']), '/credit-unions/privacy');
+  assert.equal(creditUnionAlias(['nope']), null);
+  assert.equal(creditUnionAlias(['..', 'packet']), null);
 });
 
 test('credit-union headers deny framing and payment, and member pages skip third-party fonts', async () => {

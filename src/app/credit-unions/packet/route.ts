@@ -6,14 +6,14 @@ import { DOCUMENT_VERSION_LABEL } from '../pricing';
 const FILENAME = `sign-or-walk-cu-due-diligence-${DOCUMENT_VERSION_LABEL.replace(/ /g, '-')}.zip`;
 
 const README = `Sign or Walk credit-union due diligence packet
-${DOCUMENT_VERSION_LABEL.replace(/^draft/, 'Draft')} — 2026-10-14
+${DOCUMENT_VERSION_LABEL.replace(/^draft/, 'Draft')} — 2026-10-15
 
-These files are placeholders for counsel and vendor risk.
-They are not a signed contract, not an audit, and not a certification.
+PILOT-ONLY, PENDING COUNSEL REVIEW.
+These files describe what this build does. They are not a signed contract, not an audit, and not a certification.
 The download is ungated. This site does not ask for an email to send it.
 
-The member experience lives at /cu/{slug} on signorwalk.com.
-Grading is a rules engine and an approved template pack. Quote numbers are not stored.
+A worksheet image or PDF is sent to Anthropic for that request. This pilot does not use zero data retention. Retention and region follow Anthropic's current terms. This application does not store the worksheet.
+Grading is a rules engine and template pack tp-1.0.0. Quote numbers are not stored as a member file.
 `;
 
 function packetBytes(): Uint8Array {

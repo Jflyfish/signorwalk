@@ -7,6 +7,7 @@ import type { DerivedBrand } from '@/cu/contrast';
 import { GRADE_FILL } from '@/cu/grades';
 import type { TenantReport } from '@/cu/engine/types';
 import type { CuPublic } from '@/cu/tenants';
+import { memberLink } from '@/cu/utm';
 import { US_STATES } from '@/lib/states';
 
 const FINANCE_TERMS = ['24', '36', '48', '60', '72', '84'];
@@ -288,11 +289,15 @@ export function CheckForm({
             : 'fixed inset-x-0 bottom-0 border-t cu-line bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
             <Primary
               wide={embedded}
-              href={tenant.preApprovalUrl}
+              href={memberLink(tenant.preApprovalUrl)}
               onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
             >
-              <span className="md:hidden">Get pre-approved</span>
-              <span className="hidden md:inline">Get pre-approved with {tenant.name}</span>
+              {tenant.preApprovalUrl.includes('/credit-unions/demo/') ? 'Demo only: pre-approval' : (
+                <>
+                  <span className="md:hidden">Get pre-approved</span>
+                  <span className="hidden md:inline">Get pre-approved with {tenant.name}</span>
+                </>
+              )}
             </Primary>
           </div>
         ) : null}
@@ -368,11 +373,11 @@ export function CheckForm({
               {tenant.ratesUrl ? (
               <p className="mt-6">
                 <a
-                  href={tenant.ratesUrl}
+                  href={memberLink(tenant.ratesUrl)}
                   className={textLink}
                   onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'rates' })}
                 >
-                  {tenant.ratesLabel}
+                  {tenant.ratesUrl.includes('/credit-unions/demo/') ? 'Demo only: auto rates' : tenant.ratesLabel}
                 </a>
               </p>
               ) : null}
@@ -399,25 +404,34 @@ export function CheckForm({
         <div role="status" aria-live="polite" className="sr-only">{busy ? 'Checking the numbers.' : ''}</div>
         {error ? <p id={`${formId}-error`} role="alert" className="mb-6 text-[14px] font-semibold leading-[20px]">{error}</p> : null}
 
-        {numbersOnly ? null : (
-          <div className="mb-6">
-            <label htmlFor="worksheet" className={`${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
-              Upload a dealer worksheet
-            </label>
-            <input
-              id="worksheet"
-              type="file"
-              accept="image/jpeg,image/png,image/webp,application/pdf"
-              className={embedded ? embedFile : 'mt-2 block w-full text-[14px]'}
-              onChange={event => {
-                const file = event.target.files?.[0] ?? null;
-                event.target.value = '';
-                void onUpload(file);
-              }}
-            />
-            <p className="mt-2 text-[14px] leading-[20px] cu-muted" role="status">{uploadNote || UPLOAD_DISCLOSURE}</p>
-          </div>
-        )}
+        <div className="mb-6">
+          {numbersOnly ? (
+            <p className="text-[14px] leading-[20px] cu-muted">Upload is off on this demo.</p>
+          ) : (
+            <>
+              <label htmlFor="worksheet" className={`${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
+                Upload a dealer worksheet
+              </label>
+              <input
+                id="worksheet"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,application/pdf"
+                className={embedded ? embedFile : 'mt-2 block w-full text-[14px]'}
+                onChange={event => {
+                  const file = event.target.files?.[0] ?? null;
+                  event.target.value = '';
+                  void onUpload(file);
+                }}
+              />
+            </>
+          )}
+          <p className="mt-2 text-[14px] leading-[20px] cu-muted" role="status">{numbersOnly ? UPLOAD_DISCLOSURE : (uploadNote || UPLOAD_DISCLOSURE)}</p>
+          <p className="mt-4 text-[14px] leading-[20px]">
+            <a href="/credit-unions/privacy" className={textLink}>Privacy</a>
+            {' · '}
+            <a href="/credit-unions/packet" className={textLink}>Due-diligence packet</a>
+          </p>
+        </div>
 
         <fieldset>
           <legend className="mb-4 text-[14px] font-semibold leading-[20px]">Offer type</legend>
