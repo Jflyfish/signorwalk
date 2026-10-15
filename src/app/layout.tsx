@@ -1,6 +1,38 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Sign or Walk',
+    url: 'https://signorwalk.com',
+    logo: 'https://signorwalk.com/icon',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Sign or Walk',
+    url: 'https://signorwalk.com',
+    description: 'Free AI-powered car deal grader. Get an honest grade on your lease or finance deal — every red flag, every number, word-for-word negotiation script.',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Any',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  },
+];
+
+function isCreditUnionPath(pathname: string): boolean {
+  return pathname === '/cu' || pathname.startsWith('/cu/') || pathname === '/credit-unions' || pathname.startsWith('/credit-unions/');
+}
+
+function isCuTenantPage(pathname: string): boolean {
+  const match = /^\/cu\/([^/]+)/.exec(pathname);
+  if (!match) return false;
+  const segment = match[1].toLowerCase();
+  return segment !== 'admin' && segment !== 'icon' && segment !== 'apple-icon' && segment !== 'opengraph-image' && segment !== 'twitter-image';
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://signorwalk.com'),
@@ -22,9 +54,29 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = (await headers()).get('x-pathname') ?? '';
+  const creditUnion = isCreditUnionPath(pathname);
   return (
     <html lang="en">
+      <head>
+        {!creditUnion && (
+          // @ts-expect-error -- Impact.com uses non-standard value attribute
+          <meta name='impact-site-verification' value='e7de6a6f-016b-4648-9f9c-158540f33c60' />
+        )}
+        {!creditUnion && (
+          <script type="text/javascript" dangerouslySetInnerHTML={{ __html: `(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7326631-016a-4fce-96e4-0cd9e935d1861.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');` }} />
+        )}
+        {!creditUnion && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          />
+        )}
+        {isCuTenantPage(pathname) && (
+          <link rel="icon" href="/cu/icon" type="image/png" sizes="32x32" />
+        )}
+      </head>
       <body className="min-h-screen bg-slate-50">
         {children}
         <Analytics />

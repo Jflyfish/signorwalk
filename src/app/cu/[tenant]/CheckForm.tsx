@@ -5,7 +5,7 @@ import { track } from '@vercel/analytics';
 import { FILE_READ_ERROR } from '@/cu/copy';
 import { UploadDisclosure } from '@/cu/UploadDisclosure';
 import type { DerivedBrand } from '@/cu/contrast';
-import { ADD_APR_RECOMMENDATION, financeGradeIsProvisional, memberRecommendationLine } from '@/cu/recommendation-display';
+import { financeGradeIsProvisional, memberRecommendationLine } from '@/cu/recommendation-display';
 import { DEMO_FINANCE_SAMPLE, DEMO_GRADE_C, DEMO_GRADE_D } from '@/cu/demo-sample';
 import { GRADE_FILL } from '@/cu/grades';
 import type { TenantReport } from '@/cu/engine/types';
@@ -330,15 +330,12 @@ export function CheckForm({
       <div className={embedded
         ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
         : 'mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pt-24'}>
-        <p className="text-[14px] leading-[20px] cu-muted">Incomplete</p>
-        <h1 ref={headingRef} tabIndex={-1} className="mt-4 text-[24px] font-bold leading-[30px] outline-none">
+        <h1 ref={headingRef} tabIndex={-1} className="text-[24px] font-bold leading-[30px] outline-none">
           Incomplete: add your APR for a full grade.
         </h1>
         <p className="mt-4 text-[18px] leading-[28px]">
           This finance offer has no APR from the worksheet, so there is no grade yet. A grade from this tool is a comparison, not a credit decision.
         </p>
-        <p className="mt-4 inline-flex rounded-full border cu-line px-3 py-1 text-[13px] font-semibold leading-[18px]">Partial grade — add APR</p>
-        <p className="mt-4 text-[15px] font-semibold leading-[24px]">{ADD_APR_RECOMMENDATION}</p>
         <p className="mt-10">
           <button
             type="button"

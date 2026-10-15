@@ -381,8 +381,12 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(form, /Partial grade — add more figures/);
   assert.match(form, /Sample C/);
   assert.match(form, /errorRef/);
-  assert.equal(readFileSync('src/app/layout.tsx', 'utf8').includes('impactcdn'), false);
-  assert.match(readFileSync('src/app/(site)/layout.tsx', 'utf8'), /<head>/);
+  const rootLayout = readFileSync('src/app/layout.tsx', 'utf8');
+  assert.match(rootLayout, /impactcdn/);
+  assert.match(rootLayout, /x-pathname/);
+  assert.match(rootLayout, /href="\/cu\/icon"/);
+  assert.equal(readFileSync('src/app/(site)/layout.tsx', 'utf8').includes('<head>'), false);
+  assert.match(readFileSync('src/middleware.ts', 'utf8'), /x-pathname/);
   assert.equal(existsSync('src/app/favicon.ico'), false);
   assert.match(form, /href="\/credit-unions\/privacy"/);
   assert.equal(form.includes('AI_FACTS'), false);
@@ -390,7 +394,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(form, /demoSample/);
   assert.match(form, /Incomplete: add your APR for a full grade\./);
   assert.match(form, /A blank APR stays incomplete and does not show a letter\./);
-  assert.match(form, /ADD_APR_RECOMMENDATION/);
+  assert.equal(form.includes('ADD_APR_RECOMMENDATION'), false);
+  assert.match(form, /Partial grade — add APR/);
   assert.equal(form.includes("from '@/cu/engine/evaluate"), false);
   assert.equal(form.includes("from '@/cu/engine/report"), false);
   assert.equal(form.includes('/api/analyze'), false);
