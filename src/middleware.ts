@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { readFrameAncestorCache } from '@/cu/cu-store';
-import { FRAME_ANCESTORS_HEADER, acceptAncestors, embedTenantId, frameAncestorsToken } from '@/cu/embed';
+import { FRAME_ANCESTORS_HEADER, embedTenantId, frameAncestorsForPath, frameAncestorsToken } from '@/cu/embed';
 import { securityHeaderList } from '@/cu/headers';
 import { missingTenantResponse } from '@/cu/missing-page';
 import { cuPathDisposition } from '@/cu/not-found-path';
@@ -9,32 +8,15 @@ import { cuPathDisposition } from '@/cu/not-found-path';
 /**
  * Runs only for the credit-union marketing page and /cu/[tenant].
  * Consumer routes are not matched, so they stay as they are on main.
- * Node runtime shares the process store with pages. The embed route is still
- * asked for the allowlist, because a separate bundle cannot see that store.
+ * Embed frame-ancestors are read here from the tenant allowlist. A protected
+ * Preview rejects an internal HTTP hop, and treating that failure as 'none'
+ * blocks same-origin iframes.
  */
 export const runtime = 'nodejs';
 
-async function ancestorsFromNode(req: NextRequest): Promise<string | null> {
-  const pathname = req.nextUrl.pathname;
-  const id = embedTenantId(pathname);
-  if (!id) return null;
-  const cached = readFrameAncestorCache(id, Date.now());
-  if (cached) return cached;
-  try {
-    const url = req.nextUrl.clone();
-    url.pathname = '/api/cu/frame-ancestors';
-    url.search = `?path=${encodeURIComponent(pathname)}`;
-    const res = await fetch(url, {
-      cache: 'no-store',
-      headers: { [FRAME_ANCESTORS_HEADER]: frameAncestorsToken() },
-      signal: AbortSignal.timeout(1500),
-    });
-    if (!res.ok) return "'none'";
-    const data = await res.json() as { ancestors?: unknown };
-    return acceptAncestors(data.ancestors) ?? "'none'";
-  } catch {
-    return "'none'";
-  }
+async function ancestorsForEmbed(pathname: string): Promise<string | null> {
+  if (!embedTenantId(pathname)) return null;
+  return frameAncestorsForPath(pathname);
 }
 
 /** 404 HTML for a missing credit union, or null when the page should render. */
@@ -73,7 +55,7 @@ export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const [blocked, stored] = await Promise.all([
     missingCreditUnionResponse(pathname, id => tenantIsPresent(req, id)),
-    ancestorsFromNode(req),
+    ancestorsForEmbed(pathname),
   ]);
   if (blocked) return blocked;
   const res = NextResponse.next();

@@ -54,9 +54,18 @@ export default function CreditUnionsPage() {
           See it in action.{' '}
           <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
         </p>
-        <p className="mt-10 max-w-[640px] text-[14px] leading-[20px] cu-muted">
-          The trial requires an email confirmation before you can save.
+      </div>
+
+      <div className="mx-auto mt-10 w-full max-w-[960px] px-4 md:hidden">
+        <p className="mt-10 text-[14px] leading-[20px] cu-muted md:hidden">
+          See it in action.{' '}
+          <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
         </p>
+        <iframe
+          title="Check a dealer offer"
+          src="/cu/harborlight-cu/embed?entry=numbers"
+          className="mt-4 h-[720px] w-full border cu-line"
+        />
       </div>
 
       <div className="mt-16 cu-band py-16 md:mt-24">
@@ -69,7 +78,8 @@ export default function CreditUnionsPage() {
                   key={tier.id}
                   className={`cu-card flex flex-col rounded-[12px] bg-white p-6 ${marked ? 'cu-card-marked' : ''}`}
                 >
-                  <h2 className="text-[24px] font-bold leading-[30px]">{tier.name}</h2>
+                  {tier.id === 'growth' ? <p className="text-[14px] font-semibold leading-[20px]">Recommended</p> : null}
+                  <h2 className={`text-[24px] font-bold leading-[30px] ${tier.id === 'growth' ? 'mt-2' : ''}`}>{tier.name}</h2>
                   <p className="mt-4 text-[14px] leading-[20px] cu-muted">{ASSETS[tier.id]}</p>
                   <p className="mt-4 text-[32px] font-bold leading-[32px] tabular-nums">{formatUsd(tier.annualUsd)}/yr</p>
                   <Link href={`/credit-unions/get-started?tier=${tier.id}`} className={`${marked ? solidButton : outlineButton} mt-4`}>
@@ -81,9 +91,8 @@ export default function CreditUnionsPage() {
             })}
           </ul>
 
-          <p className="mt-10 text-[14px] leading-[20px] cu-muted md:hidden">
-            See it in action.{' '}
-            <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
+          <p className="mt-10 max-w-[640px] text-[14px] leading-[20px] cu-muted">
+            The trial requires an email confirmation before you can save.
           </p>
 
           <AiDisclosure />

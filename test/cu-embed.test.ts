@@ -195,9 +195,22 @@ test('embed CSP fails closed and does not fall back to the config seeds', async 
   assert.match(middleware, /AbortSignal\.timeout\(1500\)/);
   assert.match(middleware, /FRAME_ANCESTORS_HEADER/);
   assert.equal(FRAME_ANCESTORS_HEADER, 'x-cu-frame-ancestors');
-  assert.match(middleware, /return "'none'"/);
+  assert.match(middleware, /frameAncestorsForPath/);
+  assert.equal(middleware.includes('/api/cu/frame-ancestors'), false);
+  assert.equal(middleware.includes(`return "'none'"`), false);
   assert.equal(middleware.includes(`return "'self'"`), false);
 
+  resetCuStore();
+  const permitted = await frameAncestorsForPath('/cu/harborlight-cu/embed');
+  assert.notEqual(permitted, "'none'");
+  assert.match(permitted, /'self'/);
+  assert.match(permitted, /https:\/\/www\.harborlightcu\.example/);
+  const framed = await securityHeaderList('/cu/harborlight-cu/embed', permitted);
+  const framedCsp = framed.find(header => header.key === 'Content-Security-Policy')!.value;
+  assert.equal(framedCsp.includes("frame-ancestors 'none'"), false);
+  assert.equal(framed.find(header => header.key === 'X-Frame-Options'), undefined);
+
+  resetCuStore();
   const path = '/cu/harborlight-cu/embed';
   const thrown = await resolveFrameAncestors(path, async () => {
     throw new Error('lookup-failed');

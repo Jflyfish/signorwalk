@@ -42,7 +42,8 @@ export default async function GetStartedPage({
   return (
     <div className="flex min-h-screen items-center px-4">
       <div className="mx-auto w-full max-w-[480px] py-16 md:py-24">
-        <h1 className="text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px]">{heading}</h1>
+        {tier?.id === 'growth' ? <p className="text-[14px] font-semibold leading-[20px]">Recommended</p> : null}
+        <h1 className={`text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px] ${tier?.id === 'growth' ? 'mt-2' : ''}`}>{heading}</h1>
         <p className="mt-6 text-[18px] leading-[28px] cu-muted">No credit card. The trial runs for 90 days.</p>
         {error ? <p className="mt-4 text-[14px] font-semibold leading-[20px]" role="alert">{error}</p> : null}
         <form action={startTrialAction} className="mt-6 grid gap-4">

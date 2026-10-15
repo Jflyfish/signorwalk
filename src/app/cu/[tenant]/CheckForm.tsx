@@ -271,6 +271,8 @@ export function CheckForm({
             <h1 ref={headingRef} tabIndex={-1} className="text-[18px] leading-[28px] md:mt-4">
               <span className="sr-only">{report.grade}. </span>{report.headline}
             </h1>
+            <p className="mt-4 text-[18px] leading-[28px]">{report.gradeExplanation}</p>
+            <p className="mt-4 text-[15px] font-semibold leading-[24px]">{report.recommendationLabel}</p>
           </div>
         </div>
 
@@ -287,6 +289,7 @@ export function CheckForm({
           <div className={embedded
             ? 'static mt-10 w-full'
             : 'fixed inset-x-0 bottom-0 border-t cu-line bg-white p-4 md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
+            <p className="mb-3 text-[14px] font-semibold leading-[20px]">Next step</p>
             <Primary
               wide={embedded}
               href={memberLink(tenant.preApprovalUrl)}

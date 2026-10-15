@@ -26,17 +26,20 @@ export function EmbedDemo() {
   }, []);
 
   return (
-    <main className="mx-auto w-full max-w-[800px] px-4 py-10">
-      <p className="text-[14px] leading-[20px] cu-muted">Host page</p>
-      <h1 className="mt-2 text-[32px] font-bold leading-[38px]">Harborlight embed</h1>
-      <p id="sow-embed-events" className="mt-4 text-[15px] leading-[24px]">
+    <main className="mx-auto w-full max-w-[800px] px-4 py-10 md:py-16">
+      <p className="text-[14px] font-semibold leading-[20px] cu-muted">Demo only</p>
+      <h1 className="mt-4 text-[32px] font-extrabold leading-[38px]">See the member check</h1>
+      <p className="mt-6 text-[18px] leading-[28px]">
+        This is the check a member would use, framed the way it sits on a credit union site. Harborlight Credit Union is fictional. Enter numbers from a worksheet. No application is taken, and this is not a rate or an offer of credit.
+      </p>
+      <p id="sow-embed-events" className="sr-only">
         Resize height: {height ?? '—'} · Completed grade: {grade ?? '—'}
       </p>
       <iframe
         id="sow-cu"
         title="Check a dealer offer"
         src="/cu/harborlight-cu/embed?entry=numbers"
-        className="mt-6 w-full border cu-line"
+        className="mt-8 w-full border cu-line"
         style={{ height: height ?? 720 }}
       />
     </main>

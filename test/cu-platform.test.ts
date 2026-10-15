@@ -265,7 +265,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(page, /Free for 90 days\. No card\./);
   assert.equal(page.includes('Cancel anytime'), false);
   assert.equal(page.includes('DemoFrame'), false);
-  assert.equal(page.includes('/cu/harborlight-cu/embed'), false);
+  assert.match(page, /\/cu\/harborlight-cu\/embed\?entry=numbers/);
+  assert.match(page, /Recommended/);
+  assert.equal(page.includes('Most chosen'), false);
   assert.match(page, /Over \$5B\? Email us\./);
   assert.match(page, /\{' · '\}/);
   assert.match(page, /mailto:\$\{TALK_TO_US_EMAIL\}/);
