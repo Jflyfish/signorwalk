@@ -45,9 +45,40 @@ export interface StaffLabel {
 
 const EMPTY_GRADES: GradeCounts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
 
-const globalStore = globalThis as typeof globalThis & { __sowCuStore?: Map<string, string> };
+const globalStore = globalThis as typeof globalThis & {
+  __sowCuStore?: Map<string, string>;
+  __sowFrameAncestors?: Map<string, { value: string; exp: number }>;
+};
 const memory = globalStore.__sowCuStore ?? new Map<string, string>();
 globalStore.__sowCuStore = memory;
+const frameCache = globalStore.__sowFrameAncestors ?? new Map<string, { value: string; exp: number }>();
+globalStore.__sowFrameAncestors = frameCache;
+
+/** Set when a configured KV read fails. CSP must not treat memory or config seeds as that read. */
+let storeUnavailable = false;
+
+export function cuStoreUnavailable(): boolean {
+  return storeUnavailable;
+}
+
+export function markCuStoreUnavailable(): void {
+  storeUnavailable = true;
+}
+
+export function readFrameAncestorCache(id: string, now: number): string | undefined {
+  const hit = frameCache.get(id);
+  if (!hit || hit.exp <= now) return undefined;
+  return hit.value;
+}
+
+export function writeFrameAncestorCache(id: string, value: string, exp: number): void {
+  frameCache.set(id, { value, exp });
+}
+
+export function clearFrameAncestorCache(id?: string): void {
+  if (id) frameCache.delete(id);
+  else frameCache.clear();
+}
 
 const BANNED = /sellingprice|msrp|vin|ssn|socialsecurity|dateofbirth|membername|worksheet|base64|password|monthlypayment|documenttext|imagebytes/i;
 const SSN = /\b\d{3}-\d{2}-\d{4}\b/;
@@ -105,8 +136,10 @@ async function readRaw(key: string): Promise<string | null> {
   if (!restConfig()) return memory.get(key) ?? null;
   try {
     const result = await restCommand(['GET', key]);
+    storeUnavailable = false;
     return typeof result === 'string' ? result : null;
   } catch {
+    storeUnavailable = true;
     return memory.get(key) ?? null;
   }
 }
@@ -225,20 +258,41 @@ export function storeKey(tenantId: string, kind: string): string {
   return keyFor(tenantId, kind);
 }
 
-/** One line: time, action, credit-union id. No names, emails, or origins. */
+/** One line: time, action, credit-union id, and who saved it. No emails or origins. */
 export interface AuditLine {
   t: string;
   action: string;
   id: string;
+  who: 'owner' | 'tenant';
 }
 
 const AUDIT_KEY = 'cu:directory:audit';
+const AUDIT_VERBS: Record<string, string> = {
+  create: 'Added',
+  profile: 'Updated',
+  branding: 'Branded',
+  settings: 'Updated',
+  pause: 'Paused',
+  resume: 'Resumed',
+  remove: 'Removed',
+};
+const AUDIT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export async function appendAudit(action: string, id: string): Promise<void> {
+export function formatAuditLine(line: Pick<AuditLine, 't' | 'action'>, name: string): string {
+  const date = new Date(line.t);
+  const when = Number.isNaN(date.getTime())
+    ? line.t
+    : `${AUDIT_MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}, ${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
+  const verb = AUDIT_VERBS[line.action] ?? line.action;
+  return `${when} · ${verb} ${name}`;
+}
+
+export async function appendAudit(action: string, id: string, who: 'owner' | 'tenant' = 'owner'): Promise<void> {
   if (!/^[a-z]{3,16}$/.test(action) || !/^[a-z0-9-]+$/.test(id)) return;
+  if (who !== 'owner' && who !== 'tenant') return;
   try {
     const current = (await readStoreJson<AuditLine[]>(AUDIT_KEY)) ?? [];
-    const next = [...current, { t: new Date().toISOString(), action, id }].slice(-40);
+    const next = [...current, { t: new Date().toISOString(), action, id, who }].slice(-40);
     await writeStoreJson(AUDIT_KEY, next);
   } catch {
     /* A rejected line is dropped. The owner action still completes. */
@@ -254,6 +308,7 @@ export async function readAudit(): Promise<AuditLine[]> {
       && typeof line.t === 'string'
       && typeof line.action === 'string'
       && typeof line.id === 'string'
+      && (line.who === 'owner' || line.who === 'tenant')
     ));
   } catch {
     return [];
@@ -262,4 +317,6 @@ export async function readAudit(): Promise<AuditLine[]> {
 
 export function resetCuStore(): void {
   memory.clear();
+  frameCache.clear();
+  storeUnavailable = false;
 }

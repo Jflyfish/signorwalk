@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, demoTenantId, verifySession } from '@/cu/auth';
-import { getAggregates, getBranding, getSettings, readAudit, type AuditLine } from '@/cu/cu-store';
+import { formatAuditLine, getAggregates, getBranding, getSettings, readAudit, type AuditLine } from '@/cu/cu-store';
 import { resolveBrand } from '@/cu/brand';
 import { getTenantProfile, listCreditUnions, STATUS_ACTIVE, STATUS_PAUSED, type ResolvedTenant } from '@/cu/tenant-directory';
 import { StaffHeader } from '../StaffHeader';
@@ -128,10 +128,11 @@ function Directory({
       {audit.length > 0 ? (
         <section className="mt-10" aria-labelledby="audit-heading">
           <h2 id="audit-heading" className="text-[24px] font-bold leading-[30px]">Audit</h2>
-          <ul className="mt-4 max-w-full space-y-2 overflow-x-auto font-mono text-[14px] leading-[20px]">
-            {audit.map(line => (
-              <li key={`${line.t}-${line.action}-${line.id}`} className="whitespace-nowrap">{line.t} {line.action} {line.id}</li>
-            ))}
+          <ul className="mt-4 max-w-full space-y-2 font-mono text-[14px] leading-[20px]">
+            {audit.map(line => {
+              const name = tenants.find(tenant => tenant.id === line.id)?.brand.shortName ?? line.id;
+              return <li key={`${line.t}-${line.action}-${line.id}`}>{formatAuditLine(line, name)}</li>;
+            })}
           </ul>
         </section>
       ) : null}
@@ -169,7 +170,7 @@ async function DirectoryTable({ tenants }: { tenants: ResolvedTenant[] }) {
             <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
               <th className="py-3 pr-4 font-semibold">Credit union</th>
               <th className="py-3 pr-4 text-right font-semibold">Checks</th>
-              <th className="py-3 pr-4 text-right font-semibold">Uploads</th>
+              <th className="hidden py-3 pr-4 text-right font-semibold md:table-cell">Uploads</th>
               <th className="hidden py-3 pr-4 font-semibold md:table-cell">Email</th>
               <th className="py-3 pr-4 font-semibold">Status</th>
               <th className="py-3 font-semibold">Edit</th>
@@ -180,9 +181,12 @@ async function DirectoryTable({ tenants }: { tenants: ResolvedTenant[] }) {
               <tr key={row.tenant.id} className="border-b cu-line text-[15px] leading-[20px]">
                 <td className="py-3 pr-4">{row.tenant.name}</td>
                 <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.checks}</td>
-                <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.uploads}</td>
+                <td className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{row.aggregates.uploads}</td>
                 <td className="hidden py-3 pr-4 md:table-cell">{row.settings.emailEnabled ? 'On' : 'Off'}</td>
-                <td className="py-3 pr-4">{row.tenant.status === 'paused' ? STATUS_PAUSED : STATUS_ACTIVE}</td>
+                <td className="py-3 pr-4">
+                  <span className="md:hidden">{row.tenant.status === 'paused' ? 'Paused' : 'Active'}</span>
+                  <span className="hidden md:inline">{row.tenant.status === 'paused' ? STATUS_PAUSED : STATUS_ACTIVE}</span>
+                </td>
                 <td className="py-3"><a className="font-semibold underline underline-offset-4 cu-linkline" href={`/cu/admin?cu=${row.tenant.id}`}>Edit</a></td>
               </tr>
             ))}
@@ -223,14 +227,14 @@ async function Usage({ tenants }: { tenants: ResolvedTenant[] }) {
         </p>
       </div>
       <div className="mt-10 overflow-x-auto">
-        <table className="w-full min-w-[640px] border-collapse text-left">
+        <table className="w-full border-collapse text-left md:min-w-[640px]">
           <thead>
             <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
               <th className="py-3 pr-4 font-semibold">Credit union</th>
               <th className="py-3 pr-4 text-right font-semibold">Checks</th>
-              <th className="py-3 pr-4 text-right font-semibold">Uploads</th>
+              <th className="hidden py-3 pr-4 text-right font-semibold md:table-cell">Uploads</th>
               {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
-                <th key={grade} className="py-3 pr-4 text-right font-semibold">{grade}</th>
+                <th key={grade} className="hidden py-3 pr-4 text-right font-semibold md:table-cell">{grade}</th>
               ))}
             </tr>
           </thead>
@@ -239,18 +243,18 @@ async function Usage({ tenants }: { tenants: ResolvedTenant[] }) {
               <tr key={row.tenant.id} className="border-b cu-line text-[15px] leading-[20px]">
                 <td className="py-3 pr-4">{row.tenant.name}</td>
                 <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.checks}</td>
-                <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.uploads}</td>
+                <td className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{row.aggregates.uploads}</td>
                 {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
-                  <td key={grade} className="py-3 pr-4 text-right tabular-nums">{row.aggregates.grades[grade]}</td>
+                  <td key={grade} className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{row.aggregates.grades[grade]}</td>
                 ))}
               </tr>
             ))}
             <tr className="text-[15px] font-semibold leading-[20px]">
               <td className="py-3 pr-4">Total</td>
               <td className="py-3 pr-4 text-right tabular-nums">{checks}</td>
-              <td className="py-3 pr-4 text-right tabular-nums">{uploads}</td>
+              <td className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{uploads}</td>
               {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
-                <td key={grade} className="py-3 pr-4 text-right tabular-nums">{grades[grade]}</td>
+                <td key={grade} className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{grades[grade]}</td>
               ))}
             </tr>
           </tbody>

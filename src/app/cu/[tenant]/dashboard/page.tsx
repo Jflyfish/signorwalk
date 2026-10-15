@@ -217,7 +217,7 @@ export default async function DashboardPage({
 
           <h2 className="mt-10 text-[24px] font-bold leading-[30px]">Iframe</h2>
           <p className="mt-2 max-w-[560px] text-[14px] leading-[20px] cu-muted">Paste this on a page whose origin is on your allowlist. The script sets the height from signorwalk.cu.resize.</p>
-          <pre className="mt-4 max-w-full overflow-x-auto whitespace-pre rounded-lg border cu-line bg-[#FAFAFA] p-4 font-mono text-[14px] leading-[20px]">{snippet}</pre>
+          <pre className="mt-4 max-w-full whitespace-pre overflow-x-auto rounded-lg border cu-line bg-[#FAFAFA] p-4 font-mono text-[14px] leading-[20px]">{snippet}</pre>
           <CopyLink text={snippet} label="Copy snippet" />
 
           <h2 className="mt-10 text-[24px] font-bold leading-[30px]">App deep link</h2>

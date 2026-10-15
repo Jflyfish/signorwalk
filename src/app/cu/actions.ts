@@ -131,7 +131,7 @@ export async function saveBrandingAction(formData: FormData) {
   } catch {
     redirect(brandingError);
   }
-  if (owner) await appendAudit('branding', tenant);
+  await appendAudit('branding', tenant, owner ? 'owner' : 'tenant');
   redirect(owner ? `/cu/admin?cu=${tenant}&saved=branding` : `/cu/${tenant}/dashboard?section=branding&saved=branding`);
 }
 
@@ -181,7 +181,7 @@ export async function createOwnerTenantAction(formData: FormData) {
   } catch {
     redirect('/cu/admin?cu=new&error=profile');
   }
-  await appendAudit('create', profile.id);
+  await appendAudit('create', profile.id, 'owner');
   redirect(`/cu/admin?cu=${profile.id}&saved=profile`);
 }
 
@@ -209,7 +209,7 @@ export async function saveOwnerProfileAction(formData: FormData) {
   } catch {
     redirect(`/cu/admin?cu=${id}&error=profile`);
   }
-  await appendAudit('profile', id);
+  await appendAudit('profile', id, 'owner');
   redirect(`/cu/admin?cu=${id}&saved=profile`);
 }
 
@@ -228,7 +228,7 @@ export async function saveOwnerSettingsAction(formData: FormData) {
     await saveSettings(id, previous);
     redirect(`/cu/admin?cu=${id}&error=settings`);
   }
-  await appendAudit('settings', id);
+  await appendAudit('settings', id, 'owner');
   redirect(`/cu/admin?cu=${id}&saved=settings`);
 }
 
@@ -245,7 +245,7 @@ export async function setOwnerStatusAction(formData: FormData) {
   } catch {
     redirect(`/cu/admin?cu=${id}&error=profile`);
   }
-  await appendAudit(status === 'paused' ? 'pause' : 'resume', id);
+  await appendAudit(status === 'paused' ? 'pause' : 'resume', id, 'owner');
   redirect(`/cu/admin?cu=${id}&saved=${status === 'paused' ? 'paused' : 'resumed'}`);
 }
 
@@ -258,6 +258,6 @@ export async function removeTenantAction(formData: FormData) {
   }
   if (!(await loadCuTenant(id))) redirect('/cu/admin?error=missing');
   await removeTenant(id);
-  await appendAudit('remove', id);
+  await appendAudit('remove', id, 'owner');
   redirect('/cu/admin?removed=1');
 }

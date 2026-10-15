@@ -75,7 +75,7 @@ export default function CreditUnionsPage() {
           </ul>
 
           <p className="mt-10 text-[14px] leading-[20px] cu-muted">{UPLOAD_DISCLOSURE}</p>
-          <p className="mt-4 max-w-full overflow-x-auto whitespace-nowrap text-[14px] leading-[20px]">
+          <p className="mt-4 flex flex-wrap items-baseline gap-x-2 text-[14px] leading-[20px]">
             <a href={`mailto:${TALK_TO_US_EMAIL}`} className={textLink}>Over $5B? Email us.</a>
             {' · '}
             <a href="/credit-unions/packet" className={textLink}>Download due-diligence packet ({DOCUMENT_VERSION_LABEL})</a>

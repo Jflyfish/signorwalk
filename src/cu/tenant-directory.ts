@@ -1,5 +1,6 @@
 import { deriveBrand, parseHex } from './contrast';
 import {
+  clearFrameAncestorCache,
   deleteTenantData,
   getBranding,
   readStoreJson,
@@ -267,6 +268,7 @@ export async function saveTenantProfile(profile: StoredTenantProfile, branding?:
       font: 'inter',
     });
   }
+  clearFrameAncestorCache(profile.id);
 }
 
 export async function setTenantStatus(id: string, status: 'active' | 'paused'): Promise<void> {
@@ -281,6 +283,7 @@ export async function replaceEmbedOrigins(id: string, origins: string[]): Promis
   if (!profile) throw new Error('missing');
   profile.embedOrigins = origins;
   await writeStoreJson(storeKey(id, 'profile'), profile);
+  clearFrameAncestorCache(id);
 }
 
 export async function removeTenant(id: string): Promise<void> {
@@ -288,4 +291,5 @@ export async function removeTenant(id: string): Promise<void> {
   const index = (await readIndex()) ?? [];
   await writeIndex(index.filter(item => item !== id));
   await deleteTenantData(id);
+  clearFrameAncestorCache(id);
 }

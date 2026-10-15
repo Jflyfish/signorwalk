@@ -64,6 +64,19 @@ test('a pale yellow primary is darkened until text and buttons clear 4.5:1', () 
   assert.match(brand.tint, /253 230 138/);
 });
 
+test('Larkspur #FDE68A button contrast stays at least 4.5:1', () => {
+  const tenant = getCuTenant('larkspur-cu');
+  assert.ok(tenant);
+  assert.equal(tenant.brand.primary, '#FDE68A');
+  const brand = deriveBrand(tenant.id, tenant.brand, () => undefined);
+  const fill = parseHex(brand.brandFill);
+  const onBrand = parseHex(brand.onBrand);
+  assert.ok(fill && onBrand);
+  assert.ok(contrastRatio(onBrand, fill) >= 4.5);
+  assert.equal(brand.onBrand, '#ffffff');
+  assert.equal(brand.fallback, false);
+});
+
 test('an unusable primary falls back to #111 and logs the tenant only', () => {
   const logs: string[] = [];
   const brand = deriveBrand('example-cu', {
@@ -226,6 +239,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(page, /\{VALUE_LINE\}/);
   assert.equal(page.includes(value), true);
   assert.match(page, /description: VALUE_LINE/);
+  assert.match(page, /flex flex-wrap items-baseline gap-x-2/);
   assert.match(page, /Over \$5B\? Email us\./);
   assert.match(page, /\{' · '\}/);
   assert.match(page, /mailto:\$\{TALK_TO_US_EMAIL\}/);
@@ -240,6 +254,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(dashboard, /text-left/);
   assert.equal(dashboard.includes('text-center'), false);
   assert.match(dashboard, /CopyLink/);
+  assert.match(dashboard, /whitespace-pre overflow-x-auto/);
+  assert.match(dashboard, /text-\[14px\]/);
+  assert.match(dashboard, /md:w-auto/);
   assert.match(readFileSync('src/app/cu/[tenant]/dashboard/CopyLink.tsx', 'utf8'), /Copy link/);
   const account = readFileSync('src/app/cu/AccountMenu.tsx', 'utf8');
   assert.match(account, />\s*Account\s*</);

@@ -1,23 +1,33 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
 import {
   EMBED_COMPLETED,
   EMBED_RESIZE,
+  FRAME_ANCESTORS_HEADER,
   allowEmbed,
   completedMessage,
   deepLink,
   embedTenantId,
   frameAncestorSources,
   frameAncestorsForPath,
+  frameAncestorsToken,
   iframeSnippet,
   isEmbedOrigin,
   resizeMessage,
+  resolveFrameAncestors,
 } from '../src/cu/embed';
 import { securityHeaderList } from '../src/cu/headers';
 import { GET as framePolicy } from '../src/app/api/cu/frame-ancestors/route';
-import { resetCuStore } from '../src/cu/cu-store';
+import { markCuStoreUnavailable, resetCuStore } from '../src/cu/cu-store';
 import { NextRequest } from 'next/server';
 import { normalizeProfile, removeTenant, replaceEmbedOrigins, saveTenantProfile } from '../src/cu/tenant-directory';
+
+function policyRequest(path: string, header?: string | null): NextRequest {
+  const headers = new Headers();
+  if (header !== null) headers.set(FRAME_ANCESTORS_HEADER, header ?? frameAncestorsToken());
+  return new NextRequest(`https://signorwalk.com/api/cu/frame-ancestors?path=${encodeURIComponent(path)}`, { headers });
+}
 
 async function csp(pathname: string): Promise<string> {
   const list = await securityHeaderList(pathname);
@@ -154,17 +164,17 @@ test('a console-added tenant and an origin edit change the embed header', async 
   assert.match(added, /frame-ancestors 'self' https:\/\/www\.northpiercu\.example/);
   assert.equal(await frameOptions('/cu/north-pier-cu/embed'), undefined);
 
-  const before = await framePolicy(new NextRequest('https://signorwalk.com/api/cu/frame-ancestors?path=/cu/harborlight-cu/embed'));
+  const before = await framePolicy(policyRequest('/cu/harborlight-cu/embed'));
   assert.match(before.headers.get('content-security-policy') ?? '', /www\.harborlightcu\.example/);
 
   await replaceEmbedOrigins('harborlight-cu', ['https://members.harborlightcu.example']);
-  const edited = await framePolicy(new NextRequest('https://signorwalk.com/api/cu/frame-ancestors?path=/cu/harborlight-cu/embed'));
+  const edited = await framePolicy(policyRequest('/cu/harborlight-cu/embed'));
   const policy = edited.headers.get('content-security-policy') ?? '';
   assert.match(policy, /members\.harborlightcu\.example/);
   assert.equal(policy.includes('www.harborlightcu.example'), false);
 
   await replaceEmbedOrigins('harborlight-cu', []);
-  const cleared = await framePolicy(new NextRequest('https://signorwalk.com/api/cu/frame-ancestors?path=/cu/harborlight-cu/embed'));
+  const cleared = await framePolicy(policyRequest('/cu/harborlight-cu/embed'));
   const empty = cleared.headers.get('content-security-policy') ?? '';
   assert.match(empty, /frame-ancestors 'self'/);
   assert.equal(empty.includes('harborlightcu.example'), false);
@@ -172,5 +182,107 @@ test('a console-added tenant and an origin edit change the embed header', async 
   await removeTenant('harborlight-cu');
   assert.match(await csp('/cu/harborlight-cu/embed'), /frame-ancestors 'none'/);
   assert.equal(await frameOptions('/cu/harborlight-cu/embed'), 'DENY');
+  resetCuStore();
+});
+
+test('embed CSP fails closed and does not fall back to the config seeds', async () => {
+  resetCuStore();
+  const embedSrc = readFileSync('src/cu/embed.ts', 'utf8');
+  const lookup = embedSrc.slice(embedSrc.indexOf('export async function frameAncestorsForPath'), embedSrc.indexOf('export function allowEmbed'));
+  assert.equal(lookup.includes('getCuTenant'), false);
+  assert.match(lookup, /cuStoreUnavailable/);
+  const middleware = readFileSync('src/middleware.ts', 'utf8');
+  assert.match(middleware, /AbortSignal\.timeout\(1500\)/);
+  assert.match(middleware, /FRAME_ANCESTORS_HEADER/);
+  assert.equal(FRAME_ANCESTORS_HEADER, 'x-cu-frame-ancestors');
+  assert.match(middleware, /return "'self'"/);
+
+  const path = '/cu/harborlight-cu/embed';
+  const thrown = await resolveFrameAncestors(path, async () => {
+    throw new Error('lookup-failed');
+  }, 1_700_000_000_000, 50);
+  assert.equal(thrown, "'self'");
+  assert.equal(thrown.includes('harborlightcu.example'), false);
+
+  const slow = await resolveFrameAncestors(path, () => new Promise(() => {}), Date.now(), 20);
+  assert.equal(slow, "'self'");
+  assert.equal(slow.includes('harborlightcu.example'), false);
+
+  markCuStoreUnavailable();
+  const kv = await frameAncestorsForPath(path);
+  assert.equal(kv, "'self'");
+  assert.equal(kv.includes('harborlightcu.example'), false);
+
+  const savedUrl = process.env.KV_REST_API_URL;
+  const savedToken = process.env.KV_REST_API_TOKEN;
+  process.env.KV_REST_API_URL = 'http://127.0.0.1:9';
+  process.env.KV_REST_API_TOKEN = 'test-token-not-a-secret';
+  resetCuStore();
+  try {
+    const down = await frameAncestorsForPath(path);
+    assert.equal(down, "'self'");
+    assert.equal(down.includes('harborlightcu.example'), false);
+  } finally {
+    if (savedUrl === undefined) delete process.env.KV_REST_API_URL;
+    else process.env.KV_REST_API_URL = savedUrl;
+    if (savedToken === undefined) delete process.env.KV_REST_API_TOKEN;
+    else process.env.KV_REST_API_TOKEN = savedToken;
+    resetCuStore();
+  }
+});
+
+test('embed ancestor lookups are cached for about 30s and the route requires the internal header', async () => {
+  resetCuStore();
+  const path = '/cu/harborlight-cu/embed';
+  const now = 1_700_000_000_000;
+  let calls = 0;
+  const load = async () => {
+    calls += 1;
+    return { embedOrigins: ['https://www.harborlightcu.example'] };
+  };
+  const first = await resolveFrameAncestors(path, load, now, 50);
+  const second = await resolveFrameAncestors(path, load, now + 29_000, 50);
+  assert.equal(first, second);
+  assert.equal(calls, 1);
+  await resolveFrameAncestors(path, load, now + 30_000, 50);
+  assert.equal(calls, 2);
+
+  resetCuStore();
+  let failures = 0;
+  const fail = async () => {
+    failures += 1;
+    throw new Error('lookup-failed');
+  };
+  assert.equal(await resolveFrameAncestors(path, fail, now, 50), "'self'");
+  assert.equal(await resolveFrameAncestors(path, fail, now + 1_000, 50), "'self'");
+  assert.equal(failures, 2);
+
+  resetCuStore();
+  let misses = 0;
+  const missing = async () => {
+    misses += 1;
+    return null;
+  };
+  assert.equal(await resolveFrameAncestors(path, missing, now, 50), "'none'");
+  assert.equal(await resolveFrameAncestors(path, missing, now + 1_000, 50), "'none'");
+  assert.equal(misses, 1);
+
+  const denied = await framePolicy(policyRequest(path, null));
+  assert.equal(denied.status, 404);
+  const deniedBody = await denied.json() as { ancestors: string };
+  assert.equal(deniedBody.ancestors, "'self'");
+  assert.equal(JSON.stringify(deniedBody).includes('harborlight'), false);
+
+  const wrong = await framePolicy(policyRequest(path, 'not-the-token'));
+  assert.equal(wrong.status, 404);
+  const wrongBody = await wrong.json() as { ancestors: string };
+  assert.equal(wrongBody.ancestors, "'self'");
+  assert.equal(JSON.stringify(wrongBody).includes('harborlight'), false);
+
+  resetCuStore();
+  const allowed = await framePolicy(policyRequest(path));
+  assert.equal(allowed.status, 200);
+  const allowedBody = await allowed.json() as { ancestors: string };
+  assert.match(allowedBody.ancestors, /https:\/\/www\.harborlightcu\.example/);
   resetCuStore();
 });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { acceptAncestors, embedTenantId } from '@/cu/embed';
+import { readFrameAncestorCache } from '@/cu/cu-store';
+import { FRAME_ANCESTORS_HEADER, acceptAncestors, embedTenantId, frameAncestorsToken } from '@/cu/embed';
 import { securityHeaderList } from '@/cu/headers';
 
 /**
@@ -13,17 +14,24 @@ export const runtime = 'nodejs';
 
 async function ancestorsFromNode(req: NextRequest): Promise<string | null> {
   const pathname = req.nextUrl.pathname;
-  if (!embedTenantId(pathname)) return null;
+  const id = embedTenantId(pathname);
+  if (!id) return null;
+  const cached = readFrameAncestorCache(id, Date.now());
+  if (cached) return cached;
   try {
     const url = req.nextUrl.clone();
     url.pathname = '/api/cu/frame-ancestors';
     url.search = `?path=${encodeURIComponent(pathname)}`;
-    const res = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(1500) });
-    if (!res.ok) return null;
+    const res = await fetch(url, {
+      cache: 'no-store',
+      headers: { [FRAME_ANCESTORS_HEADER]: frameAncestorsToken() },
+      signal: AbortSignal.timeout(1500),
+    });
+    if (!res.ok) return "'self'";
     const data = await res.json() as { ancestors?: unknown };
-    return acceptAncestors(data.ancestors);
+    return acceptAncestors(data.ancestors) ?? "'self'";
   } catch {
-    return null;
+    return "'self'";
   }
 }
 

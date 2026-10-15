@@ -40,7 +40,7 @@ export async function securityHeaderList(pathname: string, ancestors?: string): 
   return headers.filter(header => header.key !== 'X-Frame-Options');
 }
 
-export async function applySecurityHeaders(res: NextResponse, pathname = '/cu'): Promise<NextResponse> {
-  for (const header of await securityHeaderList(pathname)) res.headers.set(header.key, header.value);
+export async function applySecurityHeaders(res: NextResponse, pathname = '/cu', ancestors?: string): Promise<NextResponse> {
+  for (const header of await securityHeaderList(pathname, ancestors)) res.headers.set(header.key, header.value);
   return res;
 }

@@ -2,7 +2,7 @@
 
 A credit union can place the check on its own site or open it inside a mobile app. The page is `/cu/{tenant}/embed`. It has the credit union's brand and none of the marketing site navigation.
 
-Only origins on that tenant's allowlist may frame the page. The allowlist is the stored credit-union profile (`embedOrigins`). Config seeds are the fallback when the store cannot be read. The list is sent as `Content-Security-Policy: frame-ancestors` on the embed route alone. Other `/cu` and `/credit-unions` pages stay `frame-ancestors 'none'` with `X-Frame-Options: DENY`. An unknown tenant, or a parent origin that is not on the list, does not render the form.
+Only origins on that tenant's allowlist may frame the page. The allowlist is the stored credit-union profile (`embedOrigins`). A successful lookup is cached for about 30 seconds. If the store read fails, the lookup throws, or it takes longer than 1.5 seconds, the embed route uses `frame-ancestors 'self'` and does not fall back to the config seeds. The list is sent as `Content-Security-Policy: frame-ancestors` on the embed route alone. Other `/cu` and `/credit-unions` pages stay `frame-ancestors 'none'` with `X-Frame-Options: DENY`. An unknown or removed tenant stays `'none'`. A parent origin that is not on the list does not render the form.
 
 The page posts two messages to the parent. It never uses `*` as the target origin.
 

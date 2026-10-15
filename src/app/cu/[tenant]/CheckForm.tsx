@@ -384,14 +384,9 @@ export function CheckForm({ tenant, brand, onGrade, embedded = false }: { tenant
         {error ? <p id={`${formId}-error`} role="alert" className="mb-6 text-[14px] font-semibold leading-[20px]">{error}</p> : null}
 
         <div className="mb-6">
-          <div className={embedded ? 'flex flex-nowrap items-baseline justify-between gap-2' : ''}>
-            <label htmlFor="worksheet" className={embedded
-              ? 'cu-link shrink-0 text-[14px] font-semibold underline decoration-1 underline-offset-4 cu-linkline'
-              : `${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
-              Upload a dealer worksheet
-            </label>
-            {embedded ? <p className="shrink-0 whitespace-nowrap text-[14px] leading-[20px] cu-muted">Powered by Sign or Walk</p> : null}
-          </div>
+          <label htmlFor="worksheet" className={`${textLink} underline decoration-1 underline-offset-4 cu-linkline`}>
+            Upload a dealer worksheet
+          </label>
           <input
             id="worksheet"
             type="file"
