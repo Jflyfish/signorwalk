@@ -39,6 +39,9 @@ test('offer quality names the offer, and a blank APR does not keep a sign verdic
 test('readout rows stay within five scored lines and never invent a market comparison', () => {
   const average = report('fin-average');
   assert.equal(average.grade, 'B');
+  const averageVerdict = verdictSentence(average, false);
+  assert.equal(averageVerdict, 'The price is 4.3% under MSRP.');
+  assert.ok(wordCount(averageVerdict) <= 14);
   const rows = readoutRows(average);
   assert.ok(rows.length > 0 && rows.length <= 5);
   assert.equal(rows.some(row => row.label === 'APR'), true);

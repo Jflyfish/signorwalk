@@ -42,6 +42,15 @@ function sentence(value: string): string {
   return trimmed ? `${trimmed}.` : '';
 }
 
+/** A complete clause from a long headline, still 14 words or fewer. */
+function headlineClause(headline: string): string {
+  const trimmed = headline.trim().replace(/[.]+$/g, '');
+  const parts = trimmed.split(/[,;]/).map(part => part.trim()).filter(Boolean);
+  if (parts.length < 2) return '';
+  const first = parts[0];
+  return words(first).length <= 14 ? sentence(first) : '';
+}
+
 /** One sentence, 14 words or fewer, from the headline or the recommendation label. */
 export function verdictSentence(
   report: Pick<TenantReport, 'headline' | 'recommendation' | 'recommendationLabel' | 'grade' | 'notes'>,
@@ -53,10 +62,10 @@ export function verdictSentence(
   }
   const headline = sentence(report.headline);
   if (headline && words(headline).length <= 14) return headline;
-  if (report.recommendation !== 'sign') {
-    const label = sentence(report.recommendationLabel);
-    if (label && words(label).length <= 14) return label;
-  }
+  const clause = headlineClause(report.headline);
+  if (clause) return clause;
+  const label = sentence(report.recommendationLabel);
+  if (label && words(label).length <= 14 && !/\bsign\b/i.test(label)) return label;
   return sentence(words(report.headline).slice(0, 14).join(' '));
 }
 
