@@ -1,4 +1,3 @@
-import { TALK_TO_US_EMAIL } from '@/app/(cu)/credit-unions/pricing';
 import { getAggregates, getSettings, type Aggregates } from './cu-store';
 import { loadCuTenant } from './tenant-directory';
 
@@ -17,25 +16,29 @@ export function summaryText(name: string, agg: Aggregates): string {
   ].join('\n');
 }
 
-/** Inbox for a new trial. `CU_SIGNUP_NOTIFY_EMAIL` when it is an address, otherwise the team inbox. */
-export function signupNotifyAddress(): string {
+/**
+ * Inbox for a new trial. Only `CU_SIGNUP_NOTIFY_EMAIL`.
+ * A missing or invalid value does not fall back to a hardcoded address.
+ */
+export function signupNotifyAddress(): string | null {
   const configured = process.env.CU_SIGNUP_NOTIFY_EMAIL?.trim() ?? '';
-  if (configured.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(configured)) return configured;
-  return TALK_TO_US_EMAIL;
+  if (configured.length > 0 && configured.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(configured)) return configured;
+  return null;
 }
 
 /** Tells the team a trial started. Returns false when Resend is unset. Does not log addresses. */
 export async function sendSignupNotice(name: string, id: string, tier?: string): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM;
-  if (!apiKey || !from || !name || !id) return false;
+  const to = signupNotifyAddress();
+  if (!apiKey || !from || !name || !id || !to) return false;
   const plan = tier === 'starter' || tier === 'growth' || tier === 'pro' ? tier : 'not chosen';
   try {
     const { Resend } = await import('resend');
     const resend = new Resend(apiKey);
     await resend.emails.send({
       from,
-      to: signupNotifyAddress(),
+      to,
       subject: `New Sign or Walk trial — ${name}`,
       text: `${name} started a 90-day trial.\nSlug: ${id}\nTier: ${plan}\n`,
     });

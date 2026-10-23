@@ -78,6 +78,8 @@ export async function createTrial(input: {
     verified: false,
     tier: input.tier,
     loanLinksSet: false,
+    onboardingStep: 1,
+    onboardingComplete: false,
   });
   if (!profile) return { ok: false, error: 'name' };
   const confirmToken = randomBytes(32).toString('hex');

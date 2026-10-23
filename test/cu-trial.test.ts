@@ -155,11 +155,11 @@ test('signup is limited to five an hour and an ended trial is unavailable', asyn
   assert.match(readFileSync('src/cu/notify.ts', 'utf8'), /CU_SIGNUP_NOTIFY_EMAIL/);
   const savedNotify = process.env.CU_SIGNUP_NOTIFY_EMAIL;
   delete process.env.CU_SIGNUP_NOTIFY_EMAIL;
-  assert.equal(signupNotifyAddress(), 'team@signorwalk.com');
+  assert.equal(signupNotifyAddress(), null);
   process.env.CU_SIGNUP_NOTIFY_EMAIL = 'ops@example.com';
   assert.equal(signupNotifyAddress(), 'ops@example.com');
   process.env.CU_SIGNUP_NOTIFY_EMAIL = 'not-an-email';
-  assert.equal(signupNotifyAddress(), 'team@signorwalk.com');
+  assert.equal(signupNotifyAddress(), null);
   if (savedNotify === undefined) delete process.env.CU_SIGNUP_NOTIFY_EMAIL;
   else process.env.CU_SIGNUP_NOTIFY_EMAIL = savedNotify;
   const middleware = readFileSync('src/middleware.ts', 'utf8');

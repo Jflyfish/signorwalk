@@ -3,12 +3,13 @@ import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
-import { getAggregates, getBranding, getSettings } from '@/cu/cu-store';
+import { getAggregates, getBranding, getSettings, getTenantCounters } from '@/cu/cu-store';
 import { deepLink, iframeSnippet, memberOrigin } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
 import { resendConfirmAction, saveEmbedOriginsAction, saveLoanLinksAction, saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 import { StaffHeader } from '../../StaffHeader';
+import { MemberPreview } from '../MemberPreview';
 import { BrandingForm } from './BrandingForm';
 import { CopyLink } from './CopyLink';
 
@@ -30,13 +31,13 @@ function sectionFrom(query: { section?: string; saved?: string; error?: string; 
   return 'usage';
 }
 
-function trialCopy(iso: string, now = Date.now()): string {
+function trialDaysLeft(iso: string, now = Date.now()): string {
   const ends = Date.parse(iso);
   if (!Number.isFinite(ends)) return '';
   if (ends <= now) return 'This free trial has ended.';
-  const d = new Date(ends);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `Free trial ends ${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}.`;
+  const days = Math.ceil((ends - now) / 86_400_000);
+  if (days <= 1) return '1 day left in this free trial.';
+  return `${days} days left in this free trial.`;
 }
 
 function AlertIcon({ tone }: { tone: 'ok' | 'err' }) {
@@ -89,6 +90,7 @@ export default async function DashboardPage({
   if (!canOpenTenant(session, tenant.id)) redirect(`/cu/${tenant.id}/sign-in`);
   const brand = await resolveBrand(tenant);
   const aggregates = await getAggregates(tenant.id);
+  const counters = await getTenantCounters(tenant.id);
   const settings = await getSettings(tenant.id);
   const stored = await getBranding(tenant.id);
   const query = await searchParams;
@@ -106,7 +108,7 @@ export default async function DashboardPage({
   const caution = query.notice === 'mail'
     ? 'Email is not configured on this server.'
     : query.notice && query.notice !== 'confirm' && query.notice !== 'sent' ? NOTICES[query.notice] : '';
-  const trialLine = tenant.trialEndsAt ? trialCopy(tenant.trialEndsAt) : '';
+  const trialLine = tenant.trialEndsAt ? trialDaysLeft(tenant.trialEndsAt) : '';
   const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
   const requestHeaders = await headers();
   const origin = memberOrigin(name => requestHeaders.get(name), process.env.VERCEL_URL);
@@ -162,7 +164,10 @@ export default async function DashboardPage({
             <button type="submit" className="cu-link mt-4 text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline">Resend link</button>
           </form>
         ) : null}
-        {trialLine ? <p className="mb-6 text-[14px] leading-[20px] cu-muted">{trialLine}</p> : null}
+        <p className="mb-6 text-[14px] leading-[20px]">
+          {trialLine ? <span className="cu-muted">{trialLine} </span> : null}
+          <a href="/credit-unions/packet" className="font-semibold underline underline-offset-4 cu-linkline">Get contract + DD packet</a>
+        </p>
         {section === 'usage' ? (
           <section aria-labelledby="member-link-heading" className="mb-10 max-w-[560px] text-left">
             <h1 id="member-link-heading" className="text-[32px] font-bold leading-[38px]">Your member link</h1>
@@ -170,7 +175,15 @@ export default async function DashboardPage({
             <p className="mt-4 break-all text-[15px] leading-[24px]">
               <a href={shareUrl} className="underline underline-offset-4 cu-linkline">{shareUrl}</a>
             </p>
-            <CopyLink url={shareUrl} />
+            <div className="mt-4 flex flex-wrap gap-3">
+              <CopyLink text={shareUrl} label="Copy link" />
+              <CopyLink text={snippet} label="Copy embed" />
+            </div>
+            <div className="mt-6">
+              <MemberPreview href={shareUrl} title={`${tenant.name} page`} />
+            </div>
+            <p className="mt-6 text-[14px] leading-[20px]">Grades run: {counters.gradesRun}</p>
+            <p className="text-[14px] leading-[20px]">Loan-CTA clicks: {counters.loanClicks}</p>
           </section>
         ) : null}
         {section === 'usage' && tenant.loanLinksSet === false ? (
