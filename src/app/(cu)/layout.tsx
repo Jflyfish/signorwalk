@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import '../globals.css';
-import { ClientAnalytics } from './ClientAnalytics';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://signorwalk.com'),
@@ -14,7 +13,6 @@ export default function CreditUnionRootLayout({ children }: { children: React.Re
     <html lang="en">
       <body className="min-h-screen bg-white">
         {children}
-        <ClientAnalytics />
       </body>
     </html>
   );

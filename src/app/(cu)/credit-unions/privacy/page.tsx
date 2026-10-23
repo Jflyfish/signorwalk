@@ -38,7 +38,7 @@ export default function CreditUnionPrivacyPage() {
         The member form does not ask for a name, email, or account number. The grade is rules in this application (template pack tp-1.0.0). A model does not write the sentences a member reads.
       </p>
       <p className="mt-6 text-[18px] leading-[28px] cu-muted">
-        When email delivery is configured, Resend sends the trial confirmation to the staff email, a signup notice to the operator address, and an optional summary of aggregate counts. Resend does not receive the worksheet. Completing a grade does not send a Vercel Analytics analysis_completed event. The credit-union layout still loads Vercel Analytics for page views.
+        When email delivery is configured, Resend sends the trial confirmation to the staff email, a signup notice to the operator address, and an optional summary of aggregate counts. Resend does not receive the worksheet.
       </p>
       <p className="mt-6 text-[18px] leading-[28px] cu-muted">
         There is no connection in this code to a core, online banking, or loan origination system. Online checkout is not built. The trial form does not ask for a card.

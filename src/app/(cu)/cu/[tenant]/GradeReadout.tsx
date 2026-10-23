@@ -67,7 +67,6 @@ export function GradeReadout({
   disclosure,
   samplePage = false,
   demoPage = false,
-  onCta,
   onCheckAnother,
 }: {
   report: TenantReport;
@@ -86,7 +85,6 @@ export function GradeReadout({
   disclosure?: string;
   samplePage?: boolean;
   demoPage?: boolean;
-  onCta: (target: 'preapproval' | 'rates') => void;
   onCheckAnother: () => void;
 }) {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -244,7 +242,6 @@ export function GradeReadout({
       target="_top"
       className={`cu-primary cu-ring flex w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? 'h-8' : 'h-11 md:w-auto'}`}
       onClick={() => {
-        onCta('preapproval');
         void fetch(`/api/cu/${tenantId}/loan-click${samplePage ? '?sample=1' : ''}`, { method: 'POST', keepalive: true }).catch(() => undefined);
       }}
     >
@@ -374,7 +371,6 @@ export function GradeReadout({
             href={memberLink(ratesUrl)}
             target="_top"
             className={`${textLink} inline-flex items-center gap-2`}
-            onClick={() => onCta('rates')}
           >
             <span>See auto rates</span>
             {demoPage ? (

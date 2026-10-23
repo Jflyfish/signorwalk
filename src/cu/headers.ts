@@ -39,7 +39,7 @@ async function tenantLogoOrigin(pathname: string): Promise<string | null> {
  */
 export async function securityHeaderList(pathname: string, ancestors?: string): Promise<{ key: string; value: string }[]> {
   const marketing = pathname === '/credit-unions' || pathname.startsWith('/credit-unions/');
-  const script = ["'self'", "'unsafe-inline'", 'https://va.vercel-scripts.com'];
+  const script = ["'self'", "'unsafe-inline'"];
   if (process.env.NODE_ENV !== 'production') script.push("'unsafe-eval'");
   const style = ["'self'", "'unsafe-inline'"];
   const font = ["'self'", 'data:'];
@@ -57,7 +57,7 @@ export async function securityHeaderList(pathname: string, ancestors?: string): 
     `style-src ${style.join(' ')}`,
     `font-src ${font.join(' ')}`,
     `img-src ${img.join(' ')}`,
-    "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+    "connect-src 'self'",
     `frame-ancestors ${resolved}`,
     "base-uri 'self'",
     "form-action 'self'",

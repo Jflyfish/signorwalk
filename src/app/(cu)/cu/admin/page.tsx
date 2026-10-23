@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, demoTenantId, verifySession } from '@/cu/auth';
-import { formatAuditLine, getAggregates, getBranding, getSettings, readAudit, resetHarborlightPreviewCounters, type AuditLine } from '@/cu/cu-store';
+import { formatAuditLine, getBranding, getSettings, getTenantCounters, readAudit, resetHarborlightPreviewCounters, type AuditLine } from '@/cu/cu-store';
 import { resolveBrand } from '@/cu/brand';
 import { getTenantProfile, listCreditUnions, STATUS_ACTIVE, STATUS_PAUSED, type ResolvedTenant } from '@/cu/tenant-directory';
 import { StaffHeader } from '../StaffHeader';
@@ -147,34 +147,25 @@ function Directory({
 async function DirectoryTable({ tenants }: { tenants: ResolvedTenant[] }) {
   const rows = await Promise.all(tenants.map(async tenant => ({
     tenant,
-    aggregates: await getAggregates(tenant.id),
+    counters: await getTenantCounters(tenant.id),
     settings: await getSettings(tenant.id),
   })));
-  const checks = rows.reduce((sum, row) => sum + row.aggregates.checks, 0);
-  const uploads = rows.reduce((sum, row) => sum + row.aggregates.uploads, 0);
+  const gradesRun = rows.reduce((sum, row) => sum + row.counters.gradesRun, 0);
   return (
     <>
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
+      <div className="mt-8">
         <p>
-          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{checks}</span>
-          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Checks</span>
+          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{gradesRun}</span>
+          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Grades run</span>
         </p>
-        <p>
-          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{uploads}</span>
-          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Worksheet uploads</span>
-        </p>
-        <p>
-          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{rows.length}</span>
-          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Credit unions</span>
-        </p>
+        <p className="mt-4 text-[14px] leading-[20px] cu-muted">Grades describe offers, not members.</p>
       </div>
       <div className="mt-10 overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
               <th className="py-3 pr-4 font-semibold">Credit union</th>
-              <th className="py-3 pr-4 text-right font-semibold">Checks</th>
-              <th className="hidden py-3 pr-4 text-right font-semibold md:table-cell">Uploads</th>
+              <th className="py-3 pr-4 text-right font-semibold">Grades run</th>
               <th className="hidden py-3 pr-4 font-semibold md:table-cell">Email</th>
               <th className="py-3 pr-4 font-semibold">Status</th>
               <th className="py-3 font-semibold">Edit</th>
@@ -184,8 +175,7 @@ async function DirectoryTable({ tenants }: { tenants: ResolvedTenant[] }) {
             {rows.map(row => (
               <tr key={row.tenant.id} className="border-b cu-line text-[15px] leading-[20px]">
                 <td className="py-3 pr-4">{row.tenant.name}</td>
-                <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.checks}</td>
-                <td className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{row.aggregates.uploads}</td>
+                <td className="py-3 pr-4 text-right tabular-nums">{row.counters.gradesRun}</td>
                 <td className="hidden py-3 pr-4 md:table-cell">{row.settings.emailEnabled ? 'On' : 'Off'}</td>
                 <td className="py-3 pr-4">
                   <span className="md:hidden">{row.tenant.status === 'paused' ? 'Paused' : 'Active'}</span>
@@ -204,62 +194,36 @@ async function DirectoryTable({ tenants }: { tenants: ResolvedTenant[] }) {
 async function Usage({ tenants }: { tenants: ResolvedTenant[] }) {
   const rows = await Promise.all(tenants.map(async tenant => ({
     tenant,
-    aggregates: await getAggregates(tenant.id),
+    counters: await getTenantCounters(tenant.id),
   })));
-  const checks = rows.reduce((sum, row) => sum + row.aggregates.checks, 0);
-  const uploads = rows.reduce((sum, row) => sum + row.aggregates.uploads, 0);
-  const grades = { A: 0, B: 0, C: 0, D: 0, F: 0 };
-  for (const row of rows) {
-    for (const grade of ['A', 'B', 'C', 'D', 'F'] as const) grades[grade] += row.aggregates.grades[grade];
-  }
+  const gradesRun = rows.reduce((sum, row) => sum + row.counters.gradesRun, 0);
   return (
     <section aria-labelledby="usage-heading">
       <h1 id="usage-heading" className="text-[32px] font-bold leading-[38px]">Usage</h1>
       <p className="mt-4 text-[14px] leading-[20px] cu-muted">All time</p>
-      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
-        <p>
-          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{checks}</span>
-          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Checks</span>
-        </p>
-        <p>
-          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{uploads}</span>
-          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Worksheet uploads</span>
-        </p>
-        <p>
-          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{rows.length}</span>
-          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Credit unions</span>
-        </p>
-      </div>
+      <p className="mt-8">
+        <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{gradesRun}</span>
+        <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Grades run</span>
+      </p>
+      <p className="mt-4 text-[14px] leading-[20px] cu-muted">Grades describe offers, not members.</p>
       <div className="mt-10 overflow-x-auto">
-        <table className="w-full border-collapse text-left md:min-w-[640px]">
+        <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
               <th className="py-3 pr-4 font-semibold">Credit union</th>
-              <th className="py-3 pr-4 text-right font-semibold">Checks</th>
-              <th className="hidden py-3 pr-4 text-right font-semibold md:table-cell">Uploads</th>
-              {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
-                <th key={grade} className="hidden py-3 pr-4 text-right font-semibold md:table-cell">{grade}</th>
-              ))}
+              <th className="py-3 pr-4 text-right font-semibold">Grades run</th>
             </tr>
           </thead>
           <tbody>
             {rows.map(row => (
               <tr key={row.tenant.id} className="border-b cu-line text-[15px] leading-[20px]">
                 <td className="py-3 pr-4">{row.tenant.name}</td>
-                <td className="py-3 pr-4 text-right tabular-nums">{row.aggregates.checks}</td>
-                <td className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{row.aggregates.uploads}</td>
-                {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
-                  <td key={grade} className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{row.aggregates.grades[grade]}</td>
-                ))}
+                <td className="py-3 pr-4 text-right tabular-nums">{row.counters.gradesRun}</td>
               </tr>
             ))}
             <tr className="text-[15px] font-semibold leading-[20px]">
               <td className="py-3 pr-4">Total</td>
-              <td className="py-3 pr-4 text-right tabular-nums">{checks}</td>
-              <td className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{uploads}</td>
-              {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
-                <td key={grade} className="hidden py-3 pr-4 text-right tabular-nums md:table-cell">{grades[grade]}</td>
-              ))}
+              <td className="py-3 pr-4 text-right tabular-nums">{gradesRun}</td>
             </tr>
           </tbody>
         </table>

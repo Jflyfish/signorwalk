@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import { track } from '@vercel/analytics';
 import { FILE_READ_ERROR } from '@/cu/copy';
 import { UploadDisclosure } from '@/cu/UploadDisclosure';
 import type { DerivedBrand } from '@/cu/contrast';
@@ -90,14 +89,6 @@ function Field({
       {error ? <p id={errorId} className="mt-2 text-[14px] leading-[20px]" style={{ color: '#B42318' }}>{error}</p> : null}
     </div>
   );
-}
-
-function trackSafe(name: 'cta_clicked', props: Record<string, string>) {
-  try {
-    track(name, props);
-  } catch {
-    /* analytics must never block the result */
-  }
 }
 
 function Primary({
@@ -406,7 +397,6 @@ export function CheckForm({
         disclosure={disclosure}
         samplePage={sampleRun}
         demoPage={demoPage}
-        onCta={target => trackSafe('cta_clicked', { tenant: tenant.id, target })}
         onCheckAnother={() => { setReport(null); setError(''); }}
       />
     );

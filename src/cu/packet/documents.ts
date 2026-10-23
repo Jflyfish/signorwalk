@@ -105,7 +105,7 @@ Answer: [Draft design] A person using the credit union's branded page. The servi
 ## 3. Data
 
 3.1 Is member nonpublic personal information stored?
-Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, per-tenant integers only (grades run, loan-application clicks, worksheet uploads, and a count of each letter grade), and audit lines (time, action, id, who). A sample grade is not added to those integers. Completing a grade does not send a Vercel Analytics analysis_completed event. Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — ${OWNER_BLANK}
+Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, per-tenant integers only (grades run, loan-application clicks, worksheet uploads, and a count of each letter grade), and audit lines (time, action, id, who). A sample grade is not added to those integers. Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — ${OWNER_BLANK}
 
 3.2 Are quote numbers stored?
 Answer: [Draft design] Quote figures are used to produce the result for that visit. They are not written to an application database as a member file. Usage is stored as per-tenant integers only: grades run, loan-application clicks, worksheet uploads, and how many results returned each letter. They do not record the quote. A sample grade (?sample=1) is not added.
@@ -451,7 +451,7 @@ Process the quote figures only to show the educational result and the credit uni
 | Resend | Trial confirmation, signup notice, and an optional count summary. Does not receive the worksheet. | In use when configured |
 | Stripe | Card checkout | Not implemented |
 
-Vercel Analytics loads on credit-union pages for page views. It is not sent an analysis_completed event with the grade. Grade and loan-link counters stay in the application store as per-tenant integers, not a member record.
+Grade and loan-link counters stay in the application store as per-tenant integers, not a member record.
 
 A change-notice process for new subprocessors is [To be completed].
 

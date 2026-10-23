@@ -363,7 +363,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(dashboard.includes('No checks yet'), false);
   assert.equal(dashboard.includes('Get contract + DD packet'), false);
   assert.match(admin, /hidden py-3 pr-4 font-semibold md:table-cell">Email/);
-  assert.match(admin, /text-right font-semibold">Checks/);
+  assert.match(admin, /text-right font-semibold">Grades run/);
+  assert.match(admin, /Grades describe offers, not members\./);
+  assert.equal(admin.includes('">Checks'), false);
   assert.match(admin, /text-right tabular-nums/);
   const branding = readFileSync('src/app/(cu)/cu/[tenant]/dashboard/BrandingForm.tsx', 'utf8');
   assert.match(branding, /h-8 /);
