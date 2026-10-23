@@ -15,7 +15,14 @@ export async function generateMetadata({ params }: { params: Promise<{ tenant: s
   return {};
 }
 
-export default async function CuPage({ params }: { params: Promise<{ tenant: string }> }) {
+export default async function CuPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ tenant: string }>;
+  searchParams: Promise<{ sample?: string }>;
+}) {
+  const sample = (await searchParams).sample === '1';
   const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) notFound();
   if (tenantUnavailable(tenant)) return <Unavailable />;
@@ -37,7 +44,7 @@ export default async function CuPage({ params }: { params: Promise<{ tenant: str
           logoAspect={brand.logoAspect}
         />
       </header>
-      <CheckForm tenant={pub} brand={brand} />
+      <CheckForm tenant={pub} brand={brand} demoSample={sample} autoGrade={sample} disclosure={tenant.disclosure} />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { DOCUMENT_VERSION_LABEL, TALK_TO_US_EMAIL } from '../../app/(cu)/credit-unions/pricing';
-import { aprGradeExplanation } from '../grade-readout';
+import { GRADE_DISCLAIMER_NO_CHARACTERISTICS, GRADE_DISCLAIMER_NO_CREDIT, aprGradeExplanation } from '../grade-readout';
 import { OWNER_BLANK, OWNER_OPEN_ITEMS } from '../owner-open-items';
 
 export interface DueDiligenceDoc {
@@ -185,6 +185,8 @@ Answer: [Draft design] No. Member-facing sentences come from template pack tp-1.
 
 8.2 Fair-lending inputs
 Answer: [Draft design] The service does not ask for race, sex, age, ZIP code, or other demographic fields. It does not estimate a credit tier.
+${GRADE_DISCLAIMER_NO_CREDIT}
+${GRADE_DISCLAIMER_NO_CHARACTERISTICS}
 
 ## 9. Accessibility
 

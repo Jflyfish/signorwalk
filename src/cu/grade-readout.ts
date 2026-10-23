@@ -22,6 +22,10 @@ export type OfferQuality = (typeof OFFER_QUALITY)[keyof typeof OFFER_QUALITY];
 export const GRADE_DISCLAIMER_NOT_AN_OFFER = 'This grade is educational. This is not a loan offer.';
 export const GRADE_DISCLAIMER_VERIFY = 'Confirm every figure on the dealer\'s written worksheet before you agree to anything.';
 export const GRADE_DISCLAIMER_NO_TIER = 'The grade does not estimate credit standing or use demographic data. It uses fixed grading cutoffs.';
+/** Checked against EngineInput: no credit-history field and no score field. */
+export const GRADE_DISCLAIMER_NO_CREDIT = 'This grade doesn\'t look at your credit history or score.';
+/** Checked against EngineInput: no age, race, sex, or ZIP field. */
+export const GRADE_DISCLAIMER_NO_CHARACTERISTICS = 'Grades never use age, race, sex, ZIP code, or other personal characteristics.';
 export const LOAN_CTA_HELPER = 'Not an offer of credit.';
 export const PRINT_NOT_ADVICE = 'Not financial advice.';
 export const APR_NOT_A_MARKET_RATE = '(not a market rate or an offer)';
@@ -33,6 +37,8 @@ export const PINNED_BAR_HEIGHT = `calc(${PINNED_BAR_BODY_PX}px + env(safe-area-i
 export function gradeDisclaimerLines(shortName: string): readonly string[] {
   return [
     GRADE_DISCLAIMER_NOT_AN_OFFER,
+    GRADE_DISCLAIMER_NO_CREDIT,
+    GRADE_DISCLAIMER_NO_CHARACTERISTICS,
     `${shortName} does not endorse the dealer. ${GRADE_DISCLAIMER_NO_TIER}`,
     GRADE_DISCLAIMER_VERIFY,
   ];

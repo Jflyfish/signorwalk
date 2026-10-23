@@ -36,6 +36,12 @@ export interface StoredTenantProfile {
   tier?: 'starter' | 'growth' | 'pro';
   /** False until staff save their own pre-approval and rates URLs. Absent means the stored URLs are real. */
   loanLinksSet?: boolean;
+  /** 1, 2, or 3. Absent on a seeded credit union. */
+  onboardingStep?: 1 | 2 | 3;
+  /** False until the three setup steps are done. Absent on a seeded credit union. */
+  onboardingComplete?: boolean;
+  /** Optional line the credit union wrote. Not a member record. */
+  disclosure?: string;
 }
 
 export interface ResolvedTenant extends CuTenant {
@@ -45,6 +51,9 @@ export interface ResolvedTenant extends CuTenant {
   verified: boolean;
   tier?: 'starter' | 'growth' | 'pro';
   loanLinksSet?: boolean;
+  onboardingStep?: 1 | 2 | 3;
+  onboardingComplete?: boolean;
+  disclosure?: string;
 }
 
 export const TENANT_UNAVAILABLE = 'This check is unavailable.';
@@ -148,6 +157,9 @@ export function normalizeProfile(input: {
   confirmHash?: string;
   tier?: 'starter' | 'growth' | 'pro';
   loanLinksSet?: boolean;
+  onboardingStep?: 1 | 2 | 3;
+  onboardingComplete?: boolean;
+  disclosure?: string;
 }): StoredTenantProfile | null {
   const id = input.id.trim().toLowerCase();
   if (!SLUG.test(id) || id.length > 48 || RESERVED.has(id)) return null;
@@ -185,6 +197,9 @@ export function normalizeProfile(input: {
     confirmHash: input.confirmHash,
     tier: input.tier === 'starter' || input.tier === 'growth' || input.tier === 'pro' ? input.tier : undefined,
     loanLinksSet: input.loanLinksSet === true ? true : input.loanLinksSet === false ? false : undefined,
+    onboardingStep: input.onboardingStep === 1 || input.onboardingStep === 2 || input.onboardingStep === 3 ? input.onboardingStep : undefined,
+    onboardingComplete: input.onboardingComplete === true ? true : input.onboardingComplete === false ? false : undefined,
+    disclosure: input.disclosure?.trim() ? clip(input.disclosure, 180) : undefined,
   };
 }
 
@@ -295,6 +310,9 @@ function materialize(profile: StoredTenantProfile, branding: StoredBranding | nu
     verified: profile.verified !== false,
     tier: profile.tier,
     loanLinksSet: profile.loanLinksSet,
+    onboardingStep: profile.onboardingStep,
+    onboardingComplete: profile.onboardingComplete,
+    disclosure: profile.disclosure,
   };
 }
 

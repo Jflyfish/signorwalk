@@ -60,15 +60,18 @@ const embedFile =
   'cu-ring mt-2 block w-full text-[14px] font-normal cu-muted file:mr-3 file:h-12 file:cursor-pointer file:rounded-lg file:border file:border-solid file:border-[#E5E5E5] file:bg-white file:px-4 file:text-[15px] file:font-semibold file:text-[#111] md:file:h-11';
 
 function Field({
-  id, label, hint, value, onChange,
+  id, label, hint, error, value, onChange,
 }: {
   id: string;
   label: string;
   hint?: string;
+  error?: string;
   value: string;
   onChange: (value: string) => void;
 }) {
   const hintId = hint ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;
   return (
     <div>
       <label htmlFor={id} className="mb-2 block text-[14px] font-semibold leading-[20px]">{label}</label>
@@ -79,10 +82,12 @@ function Field({
         inputMode="decimal"
         autoComplete="off"
         value={value}
-        aria-describedby={hintId}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
         onChange={e => onChange(e.target.value)}
         className={inputClass}
       />
+      {error ? <p id={errorId} className="mt-2 text-[14px] leading-[20px]" style={{ color: '#B42318' }}>{error}</p> : null}
     </div>
   );
 }
@@ -121,6 +126,8 @@ export function CheckForm({
   embedded = false,
   numbersOnly = false,
   demoSample = false,
+  autoGrade = false,
+  disclosure,
 }: {
   tenant: CuPublic;
   brand: DerivedBrand;
@@ -129,6 +136,9 @@ export function CheckForm({
   numbersOnly?: boolean;
   /** Landing and embed demos only. Member checks stay empty. */
   demoSample?: boolean;
+  /** One-click sample from the credit-union landing page. Grades once. */
+  autoGrade?: boolean;
+  disclosure?: string;
 }) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -141,13 +151,23 @@ export function CheckForm({
   const [showTrade, setShowTrade] = useState(false);
   const [showAddons, setShowAddons] = useState(false);
   const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({});
+  const [busy, setBusy] = useState(autoGrade);
+  const gradedSample = useRef(false);
+  const focusField = useRef<FieldKey | null>(null);
   const [report, setReport] = useState<TenantReport | null>(null);
   const [needsApr, setNeedsApr] = useState(false);
 
   useEffect(() => {
     if (error) errorRef.current?.focus();
   }, [error]);
+
+  useEffect(() => {
+    const id = focusField.current;
+    if (!id) return;
+    focusField.current = null;
+    document.getElementById(id)?.focus();
+  }, [fieldErrors]);
 
   useEffect(() => {
     if (needsApr) {
@@ -244,17 +264,26 @@ export function CheckForm({
     }
     const payload: Record<string, string> = { dealType: snapshot.dealType, termMonths: snapshot.term };
     if (state) payload.state = state;
+    const invalid: Partial<Record<FieldKey, string>> = {};
+    let firstInvalid: FieldKey | null = null;
     let any = false;
     for (const key of Object.keys(EMPTY) as FieldKey[]) {
       if (skip.has(key)) continue;
       const raw = snapshot.fields[key].trim();
       if (!raw) continue;
       if (!/^\d+(\.\d+)?$/.test(raw.replace(/[$,]/g, ''))) {
-        setError('Use numbers only. Leave a line blank if you do not have it.');
-        return;
+        invalid[key] = 'Use a number, or leave this blank.';
+        if (!firstInvalid) firstInvalid = key;
+        continue;
       }
       payload[key] = raw.replace(/[$,]/g, '');
       any = true;
+    }
+    setFieldErrors(invalid);
+    if (firstInvalid) {
+      focusField.current = firstInvalid;
+      setError('');
+      return;
     }
     if (snapshot.dealType === 'finance' && !payload.apr) {
       if (!any) {
@@ -306,6 +335,22 @@ export function CheckForm({
     await gradeSnapshot({ fields, term, dealType, showTrade, showAddons });
   }
 
+  useEffect(() => {
+    if (!autoGrade || gradedSample.current) return;
+    gradedSample.current = true;
+    const next = sampleFields(DEMO_FINANCE_SAMPLE);
+    setDealType('finance');
+    setTerm(DEMO_FINANCE_SAMPLE.term);
+    setFields(next);
+    void gradeSnapshot({
+      fields: next,
+      term: DEMO_FINANCE_SAMPLE.term,
+      dealType: 'finance',
+      showTrade: false,
+      showAddons: false,
+    });
+  }, [autoGrade]);
+
   if (needsApr) {
     return (
       <div className={embedded
@@ -350,6 +395,7 @@ export function CheckForm({
         logoLight={brand.logoLight}
         logoAspect={brand.logoAspect}
         logoColor={brand.brandText}
+        tenantId={tenant.id}
         preApprovalUrl={tenant.preApprovalUrl}
         ratesUrl={tenant.ratesUrl}
         embedded={embedded}
@@ -367,6 +413,7 @@ export function CheckForm({
     <div className="mx-auto w-full max-w-[560px] px-4 pb-[max(4rem,env(safe-area-inset-bottom))] pt-16 md:pb-24 md:pt-24">
       <h1 className="text-[32px] font-extrabold leading-[38px] md:text-[48px] md:leading-[52px]">Check a dealer offer</h1>
       <p className="mt-6 text-[18px] leading-[28px] cu-muted">Enter the numbers from the dealer worksheet.</p>
+      {disclosure ? <p className="mt-4 text-[14px] leading-[20px] cu-muted">{disclosure}</p> : null}
       {demoSample ? (
         <>
           <p className="mt-4 text-[15px] leading-[24px]">
@@ -443,12 +490,12 @@ export function CheckForm({
         </fieldset>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <Field id="sellingPrice" label={dealType === 'lease' ? 'Selling price (cap cost)' : 'Selling price'} value={fields.sellingPrice} onChange={v => setField('sellingPrice', v)} />
-          <Field id="msrp" label="MSRP" value={fields.msrp} onChange={v => setField('msrp', v)} />
-          <Field id="monthlyPayment" label="Quoted monthly payment" value={fields.monthlyPayment} onChange={v => setField('monthlyPayment', v)} />
-          <Field id="downPayment" label={dealType === 'lease' ? 'Cap cost reduction' : 'Cash down payment'} value={fields.downPayment} onChange={v => setField('downPayment', v)} />
-          <Field id="docFee" label="Documentation fee" value={fields.docFee} onChange={v => setField('docFee', v)} />
-          <Field id="rebates" label="Rebates" value={fields.rebates} onChange={v => setField('rebates', v)} />
+          <Field id="sellingPrice" label={dealType === 'lease' ? 'Selling price (cap cost) (optional)' : 'Selling price (optional)'} hint="Example: 32000" error={fieldErrors.sellingPrice} value={fields.sellingPrice} onChange={v => setField('sellingPrice', v)} />
+          <Field id="msrp" label="MSRP (optional)" hint="Example: 35000" error={fieldErrors.msrp} value={fields.msrp} onChange={v => setField('msrp', v)} />
+          <Field id="monthlyPayment" label="Quoted monthly payment (optional)" hint="Example: 584" error={fieldErrors.monthlyPayment} value={fields.monthlyPayment} onChange={v => setField('monthlyPayment', v)} />
+          <Field id="downPayment" label={dealType === 'lease' ? 'Cap cost reduction (optional)' : 'Cash down payment (optional)'} hint="Example: 2000" error={fieldErrors.downPayment} value={fields.downPayment} onChange={v => setField('downPayment', v)} />
+          <Field id="docFee" label="Documentation fee (optional)" hint="Example: 299" error={fieldErrors.docFee} value={fields.docFee} onChange={v => setField('docFee', v)} />
+          <Field id="rebates" label="Rebates (optional)" hint="Example: 500" error={fieldErrors.rebates} value={fields.rebates} onChange={v => setField('rebates', v)} />
           <div>
             <label htmlFor="termMonths" className="mb-2 block text-[14px] font-semibold leading-[20px]">Term (months)</label>
             <select id="termMonths" name="termMonths" value={term} onChange={e => setTerm(e.target.value)} className={inputClass}>
@@ -456,8 +503,9 @@ export function CheckForm({
             </select>
           </div>
           <div>
-            <label htmlFor="state" className="mb-2 block text-[14px] font-semibold leading-[20px]">State</label>
-            <select id="state" name="state" value={state} onChange={e => setState(e.target.value)} className={inputClass}>
+            <label htmlFor="state" className="mb-2 block text-[14px] font-semibold leading-[20px]">State (optional)</label>
+            <p id="state-hint" className="mb-2 text-[14px] leading-[20px] cu-muted">Example: CA</p>
+            <select id="state" name="state" value={state} aria-describedby="state-hint" onChange={e => setState(e.target.value)} className={inputClass}>
               <option value="">Not specified</option>
               {US_STATES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
@@ -469,15 +517,15 @@ export function CheckForm({
                   ? 'Add the APR for a full grade.'
                   : 'Add the APR for a full grade. A blank APR stays incomplete and does not show a letter.'}
               </p>
-              <Field id="apr" label="APR" hint="Percent from the worksheet, such as 5.9" value={fields.apr} onChange={v => setField('apr', v)} />
-              <Field id="amountFinanced" label="Amount financed" value={fields.amountFinanced} onChange={v => setField('amountFinanced', v)} />
+              <Field id="apr" label="APR (optional)" hint="Example: 5.9" error={fieldErrors.apr} value={fields.apr} onChange={v => setField('apr', v)} />
+              <Field id="amountFinanced" label="Amount financed (optional)" hint="Example: 28000" error={fieldErrors.amountFinanced} value={fields.amountFinanced} onChange={v => setField('amountFinanced', v)} />
             </>
           ) : (
             <>
-              <Field id="moneyFactor" label="Money factor" value={fields.moneyFactor} onChange={v => setField('moneyFactor', v)} />
-              <Field id="buyRateMoneyFactor" label="Base money factor" value={fields.buyRateMoneyFactor} onChange={v => setField('buyRateMoneyFactor', v)} />
-              <Field id="residualPercent" label="Residual percent of MSRP" value={fields.residualPercent} onChange={v => setField('residualPercent', v)} />
-              <Field id="acquisitionFee" label="Acquisition fee" value={fields.acquisitionFee} onChange={v => setField('acquisitionFee', v)} />
+              <Field id="moneyFactor" label="Money factor (optional)" hint="Example: 0.002" error={fieldErrors.moneyFactor} value={fields.moneyFactor} onChange={v => setField('moneyFactor', v)} />
+              <Field id="buyRateMoneyFactor" label="Base money factor (optional)" hint="Example: 0.0018" error={fieldErrors.buyRateMoneyFactor} value={fields.buyRateMoneyFactor} onChange={v => setField('buyRateMoneyFactor', v)} />
+              <Field id="residualPercent" label="Residual percent of MSRP (optional)" hint="Example: 55" error={fieldErrors.residualPercent} value={fields.residualPercent} onChange={v => setField('residualPercent', v)} />
+              <Field id="acquisitionFee" label="Acquisition fee (optional)" hint="Example: 695" error={fieldErrors.acquisitionFee} value={fields.acquisitionFee} onChange={v => setField('acquisitionFee', v)} />
             </>
           )}
         </div>
@@ -489,8 +537,8 @@ export function CheckForm({
           </label>
           {showTrade && (
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Field id="tradeDealerOffer" label="Dealer offer for the trade" value={fields.tradeDealerOffer} onChange={v => setField('tradeDealerOffer', v)} />
-              <Field id="tradePayoff" label="Payoff still owed" value={fields.tradePayoff} onChange={v => setField('tradePayoff', v)} />
+              <Field id="tradeDealerOffer" label="Dealer offer for the trade (optional)" hint="Example: 8000" error={fieldErrors.tradeDealerOffer} value={fields.tradeDealerOffer} onChange={v => setField('tradeDealerOffer', v)} />
+              <Field id="tradePayoff" label="Payoff still owed (optional)" hint="Example: 5000" error={fieldErrors.tradePayoff} value={fields.tradePayoff} onChange={v => setField('tradePayoff', v)} />
             </div>
           )}
         </div>
@@ -502,10 +550,10 @@ export function CheckForm({
           </label>
           {showAddons && (
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <Field id="gapInsurance" label="GAP product" value={fields.gapInsurance} onChange={v => setField('gapInsurance', v)} />
-              <Field id="extendedWarranty" label="Service contract" value={fields.extendedWarranty} onChange={v => setField('extendedWarranty', v)} />
-              <Field id="tireWheel" label="Tire and wheel product" value={fields.tireWheel} onChange={v => setField('tireWheel', v)} />
-              <Field id="paintInterior" label="Appearance product" value={fields.paintInterior} onChange={v => setField('paintInterior', v)} />
+              <Field id="gapInsurance" label="GAP product (optional)" hint="Example: 895" error={fieldErrors.gapInsurance} value={fields.gapInsurance} onChange={v => setField('gapInsurance', v)} />
+              <Field id="extendedWarranty" label="Service contract (optional)" hint="Example: 1500" error={fieldErrors.extendedWarranty} value={fields.extendedWarranty} onChange={v => setField('extendedWarranty', v)} />
+              <Field id="tireWheel" label="Tire and wheel product (optional)" hint="Example: 599" error={fieldErrors.tireWheel} value={fields.tireWheel} onChange={v => setField('tireWheel', v)} />
+              <Field id="paintInterior" label="Appearance product (optional)" hint="Example: 499" error={fieldErrors.paintInterior} value={fields.paintInterior} onChange={v => setField('paintInterior', v)} />
             </div>
           )}
         </div>

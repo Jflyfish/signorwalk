@@ -37,6 +37,12 @@ export interface Aggregates {
   grades: GradeCounts;
 }
 
+/** Two integers. No inputs, grades, addresses, or timestamps. */
+export interface TenantCounters {
+  gradesRun: number;
+  loanClicks: number;
+}
+
 export interface StaffLabel {
   label: string;
   role: 'cu' | 'admin';
@@ -209,6 +215,40 @@ export async function recordCheck(tenantId: string, grade: keyof GradeCounts): P
   await writeRaw(keyFor(tenantId, 'aggregates'), JSON.stringify(current));
 }
 
+function emptyCounters(): TenantCounters {
+  return { gradesRun: 0, loanClicks: 0 };
+}
+
+function whole(value: unknown): number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value < 1_000_000_000 ? value : 0;
+}
+
+export async function getTenantCounters(tenantId: string): Promise<TenantCounters> {
+  const raw = await readRaw(keyFor(tenantId, 'counters'));
+  if (!raw) return emptyCounters();
+  const parsed = JSON.parse(raw) as Partial<TenantCounters>;
+  assertCuRecord(parsed);
+  return { gradesRun: whole(parsed.gradesRun), loanClicks: whole(parsed.loanClicks) };
+}
+
+async function bumpCounter(tenantId: string, field: keyof TenantCounters): Promise<void> {
+  const current = await getTenantCounters(tenantId);
+  const next = { gradesRun: current.gradesRun, loanClicks: current.loanClicks };
+  next[field] += 1;
+  assertCuRecord(next);
+  await writeRaw(keyFor(tenantId, 'counters'), JSON.stringify(next));
+}
+
+/** Grades run. Stores the new integer only. */
+export function recordGradeRun(tenantId: string): Promise<void> {
+  return bumpCounter(tenantId, 'gradesRun');
+}
+
+/** Loan-application clicks. Stores the new integer only. */
+export function recordLoanClick(tenantId: string): Promise<void> {
+  return bumpCounter(tenantId, 'loanClicks');
+}
+
 export async function recordUpload(tenantId: string): Promise<void> {
   const current = await getAggregates(tenantId);
   current.uploads += 1;
@@ -249,7 +289,7 @@ export async function deleteStoreKey(key: string): Promise<void> {
 }
 
 export async function deleteTenantData(tenantId: string): Promise<void> {
-  for (const kind of ['profile', 'branding', 'settings', 'aggregates']) {
+  for (const kind of ['profile', 'branding', 'settings', 'aggregates', 'counters']) {
     await deleteStoreKey(keyFor(tenantId, kind));
   }
 }

@@ -1,5 +1,6 @@
+import { after } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { recordCheck } from '@/cu/cu-store';
+import { recordCheck, recordGradeRun } from '@/cu/cu-store';
 import { formatAnalyzeLog } from '@/cu/log';
 import { InputError } from '@/cu/engine/normalize';
 import { gradePayload } from '@/cu/engine/report';
@@ -71,8 +72,17 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
       flagIds: analysis.itemsToReview.map(item => item.id),
       archetype: analysis.archetype,
     });
-    if (analysis.grade === 'A' || analysis.grade === 'B' || analysis.grade === 'C' || analysis.grade === 'D' || analysis.grade === 'F') {
-      await recordCheck(tenant.id, analysis.grade).catch(() => undefined);
+    const grade = analysis.grade;
+    const record = () => {
+      void recordGradeRun(tenant.id).catch(() => undefined);
+      if (grade === 'A' || grade === 'B' || grade === 'C' || grade === 'D' || grade === 'F') {
+        void recordCheck(tenant.id, grade).catch(() => undefined);
+      }
+    };
+    try {
+      after(record);
+    } catch {
+      void Promise.resolve().then(record);
     }
     return json(pathname, { success: true, mode: 'rules', templatePack: 'tp-1.0.0', analysis }, 200);
   } catch (error) {

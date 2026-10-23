@@ -8,6 +8,8 @@ const PAGE_URL = 'https://signorwalk.com/credit-unions';
 const HEADLINE = 'Help your members spot a bad car deal before they sign.';
 const VALUE_LINE = 'Members enter or upload a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
 
+const STARTER = pricedTiers.find(tier => tier.id === 'starter') ?? pricedTiers[0];
+
 const ASSETS: Record<PricedTierId, string> = {
   starter: 'Under $250M in assets',
   growth: '$250M–$1B in assets',
@@ -55,6 +57,18 @@ export default function CreditUnionsPage() {
           {HEADLINE}
         </h1>
         <p className="mt-6 max-w-[640px] text-[18px] leading-[28px] cu-muted">{VALUE_LINE}</p>
+        <div className="mt-8 flex flex-col items-start gap-4">
+          <Link href="/credit-unions/get-started" className="inline-flex h-12 w-full items-center justify-center rounded-lg cu-solid px-4 text-[15px] font-semibold cu-ring md:w-auto">
+            Start 90-day free trial
+          </Link>
+          <Link href="/cu/harborlight-cu?sample=1" className={textLink}>See a sample grade</Link>
+        </div>
+        <p className="mt-6 text-[15px] leading-[24px]">
+          {`Starter ${formatUsd(STARTER.annualUsd)}/yr. ${STARTER.setupUsd === 0 ? 'No setup fee. ' : ''}No card to start.`}
+        </p>
+        <p className="mt-2">
+          <Link href="/credit-unions/packet" className={textLink}>Get contract + DD packet</Link>
+        </p>
       </div>
 
       <div className="mx-auto mt-10 w-full max-w-[960px] px-4">

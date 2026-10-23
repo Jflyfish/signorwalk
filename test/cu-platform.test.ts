@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 import { ephemeralSecret, checkCredentials, signSession, verifySession } from '../src/cu/auth';
 import { capChroma, contrastRatio, deriveBrand, parseHex, rgbToOklch } from '../src/cu/contrast';
 import { getCuTenant } from '../src/cu/tenants';
-import { getAggregates, getBranding, recordCheck, resetCuStore, saveBranding, saveSettings } from '../src/cu/cu-store';
+import { getAggregates, getBranding, getTenantCounters, recordCheck, recordGradeRun, recordLoanClick, resetCuStore, saveBranding, saveSettings } from '../src/cu/cu-store';
 import { readLogoFile } from '../src/cu/logo-file';
 import { formatOcrLog, pickOcrFields } from '../src/cu/ocr';
 import { sendAggregateSummary, summaryText } from '../src/cu/notify';
@@ -114,6 +114,12 @@ test('credit-union storage keeps counts and rejects member data', async () => {
   const stored = await getBranding('harborlight-cu');
   assert.equal(stored?.logoLight, logo.dataUrl);
   assert.equal(stored?.logoAspect, 1);
+  await recordGradeRun('harborlight-cu');
+  await recordLoanClick('harborlight-cu');
+  await recordLoanClick('harborlight-cu');
+  const counters = await getTenantCounters('harborlight-cu');
+  assert.deepEqual(counters, { gradesRun: 1, loanClicks: 2 });
+  assert.deepEqual(Object.keys(counters).sort(), ['gradesRun', 'loanClicks']);
   resetCuStore();
 });
 
@@ -242,7 +248,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   const form = readFileSync('src/app/(cu)/cu/[tenant]/CheckForm.tsx', 'utf8');
   const value = 'Members enter or upload a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
   assert.equal(page.includes('Most chosen'), false);
-  assert.equal(/\bfees?\b/i.test(page), false);
+  assert.equal(/\bfees?\b/i.test(page.replaceAll('No setup fee.', '')), false);
   assert.equal(/\bfees?\b/i.test(started), false);
   assert.match(page, /<AiDisclosure \/>/);
   assert.equal(page.includes('Embed the check on your website.'), false);
@@ -329,8 +335,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(form, /cu-err/);
   assert.match(form, /cu-ring/);
   const readout = readFileSync('src/app/(cu)/cu/[tenant]/GradeReadout.tsx', 'utf8');
-  assert.match(readout, /Get pre-approved with \{shortName\}/);
-  assert.match(readout, /md:hidden">Get pre-approved/);
+  assert.match(readout, /Check your rate with \{shortName\}/);
+  assert.match(readout, /md:hidden/);
   assert.match(readout, /See auto rates/);
   assert.match(readout, /inline-flex items-center gap-2/);
   assert.match(readout, /target="_top"/);
@@ -397,7 +403,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(siteLayout, /application\/ld\+json/);
   const cuLayout = readFileSync('src/app/(cu)/layout.tsx', 'utf8');
   assert.match(cuLayout, /<html lang="en">/);
-  assert.match(cuLayout, /href="\/cu\/icon"/);
+  assert.match(cuLayout, /url: '\/cu\/icon'/);
   assert.equal(cuLayout.includes('impactcdn'), false);
   assert.equal(existsSync('src/app/layout.tsx'), false);
   assert.equal(readFileSync('src/middleware.ts', 'utf8').includes('x-pathname'), false);

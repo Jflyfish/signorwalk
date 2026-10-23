@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { GRADE_FILL } from '@/cu/grades';
 import {
+  GRADE_DISCLAIMER_NO_CHARACTERISTICS,
+  GRADE_DISCLAIMER_NO_CREDIT,
   LOAN_CTA_HELPER,
   PINNED_BAR_BODY_PX,
   PINNED_BAR_HEIGHT,
@@ -56,6 +58,7 @@ export function GradeReadout({
   logoLight,
   logoAspect,
   logoColor,
+  tenantId,
   preApprovalUrl,
   ratesUrl,
   embedded,
@@ -71,6 +74,7 @@ export function GradeReadout({
   logoLight?: string;
   logoAspect?: number;
   logoColor: string;
+  tenantId: string;
   preApprovalUrl: string;
   ratesUrl: string;
   embedded: boolean;
@@ -123,7 +127,7 @@ export function GradeReadout({
   useEffect(() => {
     const button = inlineButtonRef.current;
     if (!button || embedded) {
-      setPinCta(false);
+      setPinCta(current => (current ? false : current));
       return;
     }
     const safeProbe = document.createElement('div');
@@ -132,7 +136,9 @@ export function GradeReadout({
     const safe = parseFloat(getComputedStyle(safeProbe).paddingBottom) || 0;
     safeProbe.remove();
     const barPx = PINNED_BAR_BODY_PX + safe;
+    let ready = false;
     const place = () => {
+      if (!ready) return;
       const rect = button.getBoundingClientRect();
       const scrolledAbove = rect.bottom <= 0;
       const barTop = window.innerHeight - barPx;
@@ -141,12 +147,21 @@ export function GradeReadout({
         const box = el.getBoundingClientRect();
         return box.top < window.innerHeight && box.bottom > barTop;
       };
-      setPinCta(scrolledAbove && !overlaps(rowsRef.current) && !overlaps(questionsRef.current));
+      const next = scrolledAbove && !overlaps(rowsRef.current) && !overlaps(questionsRef.current);
+      setPinCta(current => (current === next ? current : next));
     };
-    place();
+    const enable = () => {
+      if (ready) return;
+      ready = true;
+      place();
+    };
+    const timer = window.setTimeout(enable, 400);
+    window.addEventListener('scrollend', enable, { once: true });
     window.addEventListener('scroll', place, { passive: true });
     window.addEventListener('resize', place);
     return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('scrollend', enable);
       window.removeEventListener('scroll', place);
       window.removeEventListener('resize', place);
     };
@@ -224,14 +239,12 @@ export function GradeReadout({
       href={memberLink(preApprovalUrl)}
       target="_top"
       className={`cu-primary cu-ring flex h-11 w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? '' : 'md:w-auto'}`}
-      onClick={() => onCta('preapproval')}
+      onClick={() => {
+        onCta('preapproval');
+        void fetch(`/api/cu/${tenantId}/loan-click`, { method: 'POST', keepalive: true }).catch(() => undefined);
+      }}
     >
-      {pinned ? <span className="truncate">Get pre-approved</span> : (
-        <>
-          <span className="truncate md:hidden">Get pre-approved</span>
-          <span className="hidden truncate md:inline">Get pre-approved with {shortName}</span>
-        </>
-      )}
+      <span className="truncate">Check your rate with {shortName}</span>
       {demoPreapproval ? (
         <span className="inline-flex shrink-0 items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
       ) : null}
@@ -466,6 +479,8 @@ export function GradeReadout({
               The letter compares this offer with the numbers you entered. Strong, Fair, and Weak describe the offer. They do not describe your credit.
             </p>
             <p className="mt-4 text-[16px] leading-[24px]">{grading}</p>
+            <p className="mt-4 text-[16px] leading-[24px]">{GRADE_DISCLAIMER_NO_CREDIT}</p>
+            <p className="mt-4 text-[16px] leading-[24px]">{GRADE_DISCLAIMER_NO_CHARACTERISTICS}</p>
             <p className="mt-6">
               <button type="button" className={textLink} onClick={closeHow}>Close</button>
             </p>

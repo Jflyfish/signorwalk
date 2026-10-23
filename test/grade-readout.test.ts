@@ -132,13 +132,16 @@ test('questions come from hurt rows and the summary is plain text', () => {
   assert.equal(text.includes('http'), false);
   assert.ok(figuresEntered(atMsrp) >= 1);
   const lines = gradeDisclaimerLines('Harborlight CU');
-  assert.equal(lines.length, 3);
+  assert.equal(lines.length, 5);
   assert.deepEqual(lines, [
     'This grade is educational. This is not a loan offer.',
+    'This grade doesn\'t look at your credit history or score.',
+    'Grades never use age, race, sex, ZIP code, or other personal characteristics.',
     'Harborlight CU does not endorse the dealer. The grade does not estimate credit standing or use demographic data. It uses fixed grading cutoffs.',
     'Confirm every figure on the dealer\'s written worksheet before you agree to anything.',
   ]);
   assert.equal(lines.some(line => /benchmark|assumption/i.test(line)), false);
+  assert.equal(shortestDisclaimerLine('Harborlight CU'), 'This grade is educational. This is not a loan offer.');
   assert.equal(shortestDisclaimerLine('Harborlight CU'), lines.reduce((shortest, line) => (line.length < shortest.length ? line : shortest)));
 });
 
