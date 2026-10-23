@@ -129,7 +129,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/glossary" className="text-gray-500 hover:text-gray-300 text-sm transition">Glossary</Link>
                 <Link href="/about" className="text-gray-500 hover:text-gray-300 text-sm transition">About</Link>
                 <Link href="/contact" className="text-gray-500 hover:text-gray-300 text-sm transition">Contact</Link>
-                <Link href="/credit-unions" className="text-gray-500 hover:text-gray-300 text-sm transition">Credit unions</Link>
               </nav>
             </div>
             <div className="border-t border-gray-800 pt-6 space-y-3">
@@ -137,6 +136,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <strong className="text-gray-500">Disclaimer:</strong> Sign or Walk provides AI-generated analysis for informational and educational purposes only. It is not financial, legal, or professional advice. Deal grades, payment calculations, and trade-in assessments are estimates based on the information you provide. Always verify numbers with your dealer, lender, and a qualified financial advisor before signing any contract. Sign or Walk assumes no liability for decisions made based on this analysis.
               </p>
               <p className="text-gray-700 text-xs">© 2026 Sign or Walk. Free. Always.</p>
+              <Link href="/credit-unions" className="text-gray-300 hover:text-white text-sm transition">Credit unions</Link>
             </div>
           </div>
         </footer>
