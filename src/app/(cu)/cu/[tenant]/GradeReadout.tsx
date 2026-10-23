@@ -102,9 +102,20 @@ export function GradeReadout({
     try {
       await navigator.clipboard.writeText(summary);
       setCopied(true);
+      return;
     } catch {
-      setCopied(false);
+      // The async clipboard API is denied in some browsers. The selection path still copies plain text.
     }
+    const area = document.createElement('textarea');
+    area.value = summary;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.left = '-9999px';
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand('copy');
+    area.remove();
+    setCopied(ok);
   }
 
   return (
