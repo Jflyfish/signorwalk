@@ -95,7 +95,7 @@ test('readout rows stay within five scored lines and never invent a market compa
   assert.equal(/longer than/.test(term?.why ?? ''), false);
   const atMsrp = readoutRows(report('fin-at-msrp')).find(row => row.label === 'Price');
   assert.equal(atMsrp?.tone, 'hurt');
-  assert.equal(atMsrp?.why, `discount under ${formatCut(gradeCutoffs().priceAtMsrp)}% of MSRP`);
+  assert.equal(atMsrp?.why, 'at MSRP');
 });
 
 test('questions come from hurt rows and the summary is plain text', () => {
@@ -112,13 +112,11 @@ test('questions come from hurt rows and the summary is plain text', () => {
   const highQuestions = dealerQuestions(high);
   assert.equal(highQuestions.some(question => question.startsWith('What APR')), true);
   assert.equal(highQuestions.some(question => /\d/.test(question) && question.startsWith('What APR')), false);
-  const withRate = dealerQuestions(high, 4.9);
-  assert.equal(withRate.some(question => question.includes('4.9%')), true);
   const stacked = dealerQuestions(report('fin-interest-stack'));
   assert.equal(stacked.filter(question => question === 'Can you show me total interest at this term and at a shorter term?').length, 1);
   assert.ok(QUESTIONS_ON_SCREEN >= 1);
   const verdict = verdictSentence(atMsrp, false);
-  assert.equal(verdict, 'Weak deal: ask about the discount under 1.0% of MSRP.');
+  assert.equal(verdict, 'Weak deal: ask about the price at MSRP.');
   assert.ok(wordCount(verdict) <= 16);
   assert.equal(/\b(overall|but|sign)\b/i.test(verdict), false);
   const text = copySummary({
@@ -132,13 +130,12 @@ test('questions come from hurt rows and the summary is plain text', () => {
   assert.equal(text.includes('http'), false);
   assert.ok(figuresEntered(atMsrp) >= 1);
   const lines = gradeDisclaimerLines('Harborlight CU');
-  assert.equal(lines.length, 5);
+  assert.equal(lines.length, 4);
   assert.deepEqual(lines, [
-    'This grade is educational. This is not a loan offer.',
     'This grade doesn\'t look at your credit history or score.',
     'Grades never use age, race, sex, ZIP code, or other personal characteristics.',
-    'Harborlight CU does not endorse the dealer. The grade does not estimate credit standing or use demographic data. It uses fixed grading cutoffs.',
     'Confirm every figure on the dealer\'s written worksheet before you agree to anything.',
+    'This grade is educational. This is not a loan offer.',
   ]);
   assert.equal(lines.some(line => /benchmark|assumption/i.test(line)), false);
   assert.equal(shortestDisclaimerLine('Harborlight CU'), 'This grade is educational. This is not a loan offer.');

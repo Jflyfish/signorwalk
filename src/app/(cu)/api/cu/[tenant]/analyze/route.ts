@@ -7,6 +7,7 @@ import { gradePayload } from '@/cu/engine/report';
 import { applySecurityHeaders } from '@/cu/headers';
 import { clientAddress, takeAnalyzeSlot } from '@/cu/rate-limit';
 import { missingTenantResponse } from '@/cu/missing-page';
+import { staffCanPreview } from '@/cu/preview-access';
 import { loadCuTenant, TENANT_UNAVAILABLE, tenantUnavailable } from '@/cu/tenant-directory';
 
 const MAX_BODY = 20_000;
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
   const pathname = `/api/cu/${slug}/analyze`;
   const tenant = await loadCuTenant(slug);
   if (!tenant) return missingTenantResponse(pathname);
-  if (tenantUnavailable(tenant)) {
+  if (tenantUnavailable(tenant) && !(await staffCanPreview(tenant.id))) {
     return json(pathname, { success: false, error: TENANT_UNAVAILABLE }, 404);
   }
   if (req.method !== 'POST') {
@@ -73,16 +74,26 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
       archetype: analysis.archetype,
     });
     const grade = analysis.grade;
-    const record = () => {
-      void recordGradeRun(tenant.id).catch(() => undefined);
+    const sample = req.nextUrl.searchParams.get('sample') === '1';
+    const record = async () => {
+      if (sample) return;
+      try {
+        await recordGradeRun(tenant.id);
+      } catch {
+        /* A failed counter write must not affect the grade. */
+      }
       if (grade === 'A' || grade === 'B' || grade === 'C' || grade === 'D' || grade === 'F') {
-        void recordCheck(tenant.id, grade).catch(() => undefined);
+        try {
+          await recordCheck(tenant.id, grade);
+        } catch {
+          /* The letter total is separate. A failed write stays off the response. */
+        }
       }
     };
     try {
-      after(record);
+      after(() => record());
     } catch {
-      void Promise.resolve().then(record);
+      void Promise.resolve().then(() => record());
     }
     return json(pathname, { success: true, mode: 'rules', templatePack: 'tp-1.0.0', analysis }, 200);
   } catch (error) {

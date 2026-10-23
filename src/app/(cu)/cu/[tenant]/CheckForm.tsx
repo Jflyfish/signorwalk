@@ -92,7 +92,7 @@ function Field({
   );
 }
 
-function trackSafe(name: 'analysis_completed' | 'cta_clicked', props: Record<string, string>) {
+function trackSafe(name: 'cta_clicked', props: Record<string, string>) {
   try {
     track(name, props);
   } catch {
@@ -128,6 +128,8 @@ export function CheckForm({
   demoSample = false,
   autoGrade = false,
   disclosure,
+  sampleRun = false,
+  demoPage = false,
 }: {
   tenant: CuPublic;
   brand: DerivedBrand;
@@ -139,6 +141,10 @@ export function CheckForm({
   /** One-click sample from the credit-union landing page. Grades once. */
   autoGrade?: boolean;
   disclosure?: string;
+  /** ?sample=1. Those runs are left out of every total. */
+  sampleRun?: boolean;
+  /** Seeded demo tenant or the sample grade. Real tenants stay unmarked. */
+  demoPage?: boolean;
 }) {
   const formId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -301,7 +307,7 @@ export function CheckForm({
     setNeedsApr(false);
     setBusy(true);
     try {
-      const res = await fetch(`/api/cu/${tenant.id}/analyze`, {
+      const res = await fetch(`/api/cu/${tenant.id}/analyze${sampleRun ? '?sample=1' : ''}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -313,11 +319,7 @@ export function CheckForm({
       }
       setReport(data.analysis as TenantReport);
       const grade = String(data.analysis.grade);
-      const archetype = String(data.analysis.archetype);
       if (/^[ABCDF]$/.test(grade)) onGrade?.(grade);
-      if (['A', 'B', 'C', 'D', 'F'].includes(grade) && /^(LEASE|FIN)_[A-Z_]+$/.test(archetype)) {
-        trackSafe('analysis_completed', { tenant: tenant.id, grade, dealType: snapshot.dealType, archetype });
-      }
     } catch {
       setError('Check the numbers and try again.');
     } finally {
@@ -401,6 +403,9 @@ export function CheckForm({
         embedded={embedded}
         aprBlank={aprBlank}
         limitedPill={limitedPill}
+        disclosure={disclosure}
+        samplePage={sampleRun}
+        demoPage={demoPage}
         onCta={target => trackSafe('cta_clicked', { tenant: tenant.id, target })}
         onCheckAnother={() => { setReport(null); setError(''); }}
       />
@@ -517,7 +522,7 @@ export function CheckForm({
                   ? 'Add the APR for a full grade.'
                   : 'Add the APR for a full grade. A blank APR stays incomplete and does not show a letter.'}
               </p>
-              <Field id="apr" label="APR (optional)" hint="Example: 5.9" error={fieldErrors.apr} value={fields.apr} onChange={v => setField('apr', v)} />
+              <Field id="apr" label="APR (needed for a grade)" hint="Example: 5.9" error={fieldErrors.apr} value={fields.apr} onChange={v => setField('apr', v)} />
               <Field id="amountFinanced" label="Amount financed (optional)" hint="Example: 28000" error={fieldErrors.amountFinanced} value={fields.amountFinanced} onChange={v => setField('amountFinanced', v)} />
             </>
           ) : (

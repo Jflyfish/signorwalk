@@ -64,6 +64,9 @@ export function GradeReadout({
   embedded,
   aprBlank,
   limitedPill,
+  disclosure,
+  samplePage = false,
+  demoPage = false,
   onCta,
   onCheckAnother,
 }: {
@@ -80,6 +83,9 @@ export function GradeReadout({
   embedded: boolean;
   aprBlank: boolean;
   limitedPill: string | null;
+  disclosure?: string;
+  samplePage?: boolean;
+  demoPage?: boolean;
   onCta: (target: 'preapproval' | 'rates') => void;
   onCheckAnother: () => void;
 }) {
@@ -105,8 +111,6 @@ export function GradeReadout({
   const entered = figuresEntered(report);
   const disclaimers = gradeDisclaimerLines(shortName);
   const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
-  const demoPreapproval = preApprovalUrl.includes('/credit-unions/demo/');
-  const demoRates = ratesUrl.includes('/credit-unions/demo/');
   const showPreapproval = Boolean(preApprovalUrl);
   const showRates = Boolean(ratesUrl);
   const summary = copySummary({ grade: report.grade, quality, verdict, questions });
@@ -238,14 +242,14 @@ export function GradeReadout({
       ref={pinned ? undefined : inlineButtonRef}
       href={memberLink(preApprovalUrl)}
       target="_top"
-      className={`cu-primary cu-ring flex h-11 w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? '' : 'md:w-auto'}`}
+      className={`cu-primary cu-ring flex w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? 'h-8' : 'h-11 md:w-auto'}`}
       onClick={() => {
         onCta('preapproval');
-        void fetch(`/api/cu/${tenantId}/loan-click`, { method: 'POST', keepalive: true }).catch(() => undefined);
+        void fetch(`/api/cu/${tenantId}/loan-click${samplePage ? '?sample=1' : ''}`, { method: 'POST', keepalive: true }).catch(() => undefined);
       }}
     >
-      <span className="truncate">Check your rate with {shortName}</span>
-      {demoPreapproval ? (
+      <span className={pinned ? 'whitespace-nowrap' : 'truncate'}>{pinned ? 'Check your rate' : `Check your rate with ${shortName}`}</span>
+      {demoPage ? (
         <span className="inline-flex shrink-0 items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
       ) : null}
     </a>
@@ -270,6 +274,7 @@ export function GradeReadout({
           {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
         </p>
         <p className="mt-1 text-[14px] font-semibold leading-[20px]">{PRINT_NOT_ADVICE}</p>
+        {disclosure ? <p className="mt-2 text-[14px] leading-[20px]">{disclosure}</p> : null}
         {preApprovalUrl ? (
           <p className="mt-2 break-all text-[14px] leading-[20px]" suppressHydrationWarning>
             {loanUrlForPrint(preApprovalUrl, origin)}
@@ -299,6 +304,12 @@ export function GradeReadout({
         {verdict}
       </h1>
       <DisclaimerList lines={disclaimers} />
+      {disclosure ? <p className="mt-4 text-[14px] leading-[20px]">{disclosure}</p> : null}
+      {samplePage ? (
+        <p className="cu-no-print mt-4">
+          <a href="/credit-unions/get-started" className={textLink}>Start free trial</a>
+        </p>
+      ) : null}
 
       {entered > 0 ? (
         <p className="cu-no-print mt-4">
@@ -366,7 +377,7 @@ export function GradeReadout({
             onClick={() => onCta('rates')}
           >
             <span>See auto rates</span>
-            {demoRates ? (
+            {demoPage ? (
               <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
             ) : null}
           </a>
@@ -378,7 +389,7 @@ export function GradeReadout({
           {loanButton(false)}
           <p className="mt-2 flex items-center gap-2 text-[13px] leading-[18px] cu-muted">
             <span>{LOAN_CTA_HELPER}</span>
-            {demoPreapproval ? (
+            {demoPage ? (
               <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
             ) : null}
           </p>
@@ -451,15 +462,17 @@ export function GradeReadout({
 
       {showPreapproval && pinCta && !embedded ? (
         <div
-          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 flex items-center border-t bg-white px-3 md:hidden"
+          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 flex flex-col justify-center overflow-hidden border-t bg-white px-3 md:hidden"
           style={{
             borderColor: '#E5E5E5',
             boxSizing: 'border-box',
             height: PINNED_BAR_HEIGHT,
+            maxHeight: PINNED_BAR_HEIGHT,
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
           {loanButton(true)}
+          <p className="mt-0.5 text-center text-[12px] leading-[14px] whitespace-nowrap cu-muted">{LOAN_CTA_HELPER}</p>
         </div>
       ) : null}
 

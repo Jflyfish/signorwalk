@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { AiDisclosure } from './AiDisclosure';
-import { LiveEmbed } from './LiveEmbed';
 import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
@@ -9,6 +8,7 @@ const HEADLINE = 'Help your members spot a bad car deal before they sign.';
 const VALUE_LINE = 'Members enter or upload a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
 
 const STARTER = pricedTiers.find(tier => tier.id === 'starter') ?? pricedTiers[0];
+const STARTER_IS_LOWEST = pricedTiers.every(tier => tier.annualUsd >= STARTER.annualUsd);
 
 const ASSETS: Record<PricedTierId, string> = {
   starter: 'Under $250M in assets',
@@ -63,20 +63,9 @@ export default function CreditUnionsPage() {
           </Link>
           <Link href="/cu/harborlight-cu?sample=1" className={textLink}>See a sample grade</Link>
         </div>
-        <p className="mt-6 text-[15px] leading-[24px]">
-          {`Starter ${formatUsd(STARTER.annualUsd)}/yr. ${STARTER.setupUsd === 0 ? 'No setup fee. ' : ''}No card to start.`}
+        <p className="mt-6 text-[14px] leading-[20px] text-[#555]">
+          {`${STARTER_IS_LOWEST ? 'From ' : ''}${formatUsd(STARTER.annualUsd)}/yr. ${STARTER.setupUsd === 0 ? 'No setup fee. ' : ''}No card to start.`}
         </p>
-        <p className="mt-2">
-          <Link href="/credit-unions/packet" className={textLink}>Get contract + DD packet</Link>
-        </p>
-      </div>
-
-      <div className="mx-auto mt-10 w-full max-w-[960px] px-4">
-        <p className="text-[14px] leading-[20px] cu-muted">
-          See it in action.{' '}
-          <Link href="/credit-unions/embed-demo" className={textLink}>Open live demo</Link>
-        </p>
-        <LiveEmbed title="Check a dealer offer" src="/cu/harborlight-cu/embed?entry=numbers" />
       </div>
 
       <div className="mt-16 cu-band py-16 md:mt-24">
@@ -100,7 +89,10 @@ export default function CreditUnionsPage() {
             })}
           </ul>
 
-          <p className="mt-10 max-w-[640px] text-[14px] leading-[20px] cu-muted">
+          <p className="mt-10">
+            <Link href="/credit-unions/packet" className={textLink}>Get contract + DD packet</Link>
+          </p>
+          <p className="mt-4 max-w-[640px] text-[14px] leading-[20px] cu-muted">
             The trial requires an email confirmation before you can save.
           </p>
 

@@ -2,7 +2,7 @@ import { type BrandTokens, contrastRatio, deriveBrand, parseRgbChannels } from '
 import { withUtm } from './utm';
 
 /** Closed set of demo credit unions. The URL slug is the tenant. There is no cookie override. */
-export type CuTenantId = 'harborlight-cu' | 'summit-ridge-fcu' | 'larkspur-cu';
+export type CuTenantId = 'harborlight-cu' | 'summit-ridge-fcu' | 'larkspur-cu' | 'preview-sample-cu';
 
 export interface CuTenant {
   id: string;
@@ -99,6 +99,26 @@ export const CU_TENANTS: readonly CuTenant[] = [
     preApprovalLabel: 'Demo only: pre-approval',
     ratesLabel: 'Demo only: auto rates',
     embedOrigins: ['https://www.larkspurcu.example'],
+  },
+  {
+    id: 'preview-sample-cu',
+    name: 'Preview Sample Credit Union',
+    legalName: 'Preview Sample Credit Union',
+    tagline: 'Fictional preview. Not a real credit union.',
+    colors: { primary: '15 23 42', primaryFg: '255 255 255', accent: '15 23 42' },
+    brand: {
+      name: 'Preview Sample Credit Union',
+      shortName: 'Preview Sample CU',
+      primary: '#0F172A',
+      logoAspect: 1,
+    },
+    supportUrl: DEMO_HELP,
+    privacyUrl: DEMO_PRIVACY,
+    preApprovalUrl: DEMO_PREAPPROVAL,
+    ratesUrl: DEMO_RATES,
+    preApprovalLabel: 'Demo only: pre-approval',
+    ratesLabel: 'Demo only: auto rates',
+    embedOrigins: ['https://www.previewsample.example'],
   },
 ];
 

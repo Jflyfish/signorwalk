@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, demoTenantId, verifySession } from '@/cu/auth';
-import { formatAuditLine, getAggregates, getBranding, getSettings, readAudit, type AuditLine } from '@/cu/cu-store';
+import { formatAuditLine, getAggregates, getBranding, getSettings, readAudit, resetHarborlightPreviewCounters, type AuditLine } from '@/cu/cu-store';
 import { resolveBrand } from '@/cu/brand';
 import { getTenantProfile, listCreditUnions, STATUS_ACTIVE, STATUS_PAUSED, type ResolvedTenant } from '@/cu/tenant-directory';
 import { StaffHeader } from '../StaffHeader';
@@ -46,6 +46,7 @@ export default async function AdminPage({
   if (session.role !== 'admin') redirect(`/cu/${session.tenantId}/dashboard`);
 
   const query = await searchParams;
+  await resetHarborlightPreviewCounters();
   const tenants = await listCreditUnions();
   const notice = noticeFor(query);
   const selected = query.cu && query.cu !== 'new' ? tenants.find(tenant => tenant.id === query.cu) : undefined;

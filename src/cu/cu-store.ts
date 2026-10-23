@@ -215,38 +215,85 @@ export async function recordCheck(tenantId: string, grade: keyof GradeCounts): P
   await writeRaw(keyFor(tenantId, 'aggregates'), JSON.stringify(current));
 }
 
-function emptyCounters(): TenantCounters {
-  return { gradesRun: 0, loanClicks: 0 };
+function counterKey(tenantId: string, field: keyof TenantCounters): string {
+  return `cu:${field}:${tenantId}`;
 }
 
 function whole(value: unknown): number {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value < 1_000_000_000 ? value : 0;
+  const n = typeof value === 'number' ? value : Number(value);
+  return Number.isInteger(n) && n >= 0 && n < 1_000_000_000 ? n : 0;
+}
+
+async function readInteger(key: string): Promise<number> {
+  if (!restConfig()) return whole(memory.get(key) ?? 0);
+  try {
+    const result = await restCommand(['GET', key]);
+    storeUnavailable = false;
+    if (typeof result === 'number' || typeof result === 'string') return whole(result);
+    return 0;
+  } catch {
+    storeUnavailable = true;
+    return 0;
+  }
+}
+
+/** One INCR. No read before the write. Throws when the configured store rejects it. */
+async function incrInteger(key: string): Promise<void> {
+  if (!/^cu:(?:gradesRun|loanClicks):[a-z0-9-]+$/.test(key)) return;
+  if (restConfig()) {
+    const result = await restCommand(['INCR', key]);
+    const n = Number(result);
+    if (!Number.isInteger(n) || n < 1) throw new Error('store-unavailable');
+    memory.set(key, String(n));
+    return;
+  }
+  const current = whole(memory.get(key) ?? 0);
+  memory.set(key, String(current + 1));
 }
 
 export async function getTenantCounters(tenantId: string): Promise<TenantCounters> {
-  const raw = await readRaw(keyFor(tenantId, 'counters'));
-  if (!raw) return emptyCounters();
-  const parsed = JSON.parse(raw) as Partial<TenantCounters>;
-  assertCuRecord(parsed);
-  return { gradesRun: whole(parsed.gradesRun), loanClicks: whole(parsed.loanClicks) };
+  const [gradesRun, loanClicks] = await Promise.all([
+    readInteger(counterKey(tenantId, 'gradesRun')),
+    readInteger(counterKey(tenantId, 'loanClicks')),
+  ]);
+  return { gradesRun, loanClicks };
 }
 
-async function bumpCounter(tenantId: string, field: keyof TenantCounters): Promise<void> {
-  const current = await getTenantCounters(tenantId);
-  const next = { gradesRun: current.gradesRun, loanClicks: current.loanClicks };
-  next[field] += 1;
-  assertCuRecord(next);
-  await writeRaw(keyFor(tenantId, 'counters'), JSON.stringify(next));
-}
-
-/** Grades run. Stores the new integer only. */
+/** Grades run. One atomic increment. */
 export function recordGradeRun(tenantId: string): Promise<void> {
-  return bumpCounter(tenantId, 'gradesRun');
+  return incrInteger(counterKey(tenantId, 'gradesRun'));
 }
 
-/** Loan-application clicks. Stores the new integer only. */
+/** Loan-application clicks. One atomic increment. */
 export function recordLoanClick(tenantId: string): Promise<void> {
-  return bumpCounter(tenantId, 'loanClicks');
+  return incrInteger(counterKey(tenantId, 'loanClicks'));
+}
+
+const HARBORLIGHT_PREVIEW_RESET = 'cu:preview-reset:harborlight-cu';
+
+/**
+ * Zeros Harborlight's preview counters once.
+ * Runs only when VERCEL_ENV is preview. Production KV is never written.
+ */
+export async function resetHarborlightPreviewCounters(): Promise<void> {
+  if (process.env.VERCEL_ENV !== 'preview') return;
+  try {
+    const marker = await readRaw(HARBORLIGHT_PREVIEW_RESET);
+    if (marker === 'qa-r9') return;
+    const id = 'harborlight-cu';
+    for (const field of ['gradesRun', 'loanClicks'] as const) {
+      const key = counterKey(id, field);
+      memory.set(key, '0');
+      if (restConfig()) await restCommand(['SET', key, '0']);
+    }
+    memory.delete(keyFor(id, 'counters'));
+    if (restConfig()) await restCommand(['DEL', keyFor(id, 'counters')]);
+    await writeRaw(keyFor(id, 'aggregates'), JSON.stringify(emptyAggregates()));
+    memory.set(HARBORLIGHT_PREVIEW_RESET, 'qa-r9');
+    if (restConfig()) await restCommand(['SET', HARBORLIGHT_PREVIEW_RESET, 'qa-r9']);
+  } catch {
+    /* A failed preview reset must not block the page. */
+  }
 }
 
 export async function recordUpload(tenantId: string): Promise<void> {
@@ -289,7 +336,7 @@ export async function deleteStoreKey(key: string): Promise<void> {
 }
 
 export async function deleteTenantData(tenantId: string): Promise<void> {
-  for (const kind of ['profile', 'branding', 'settings', 'aggregates', 'counters']) {
+  for (const kind of ['profile', 'branding', 'settings', 'aggregates', 'counters', 'gradesRun', 'loanClicks']) {
     await deleteStoreKey(keyFor(tenantId, kind));
   }
 }

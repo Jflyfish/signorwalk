@@ -34,8 +34,10 @@ export interface StoredTenantProfile {
   confirmHash?: string;
   /** Plan chosen at signup. Absent for a seed or an owner-created credit union. */
   tier?: 'starter' | 'growth' | 'pro';
-  /** False until staff save their own pre-approval and rates URLs. Absent means the stored URLs are real. */
+  /** False until staff save their own pre-approval URL. Absent means the stored URL is real. */
   loanLinksSet?: boolean;
+  /** False until staff save a rates URL. Absent on a seed that ships a demo rates path. */
+  ratesLinkSet?: boolean;
   /** 1, 2, or 3. Absent on a seeded credit union. */
   onboardingStep?: 1 | 2 | 3;
   /** False until the three setup steps are done. Absent on a seeded credit union. */
@@ -51,6 +53,7 @@ export interface ResolvedTenant extends CuTenant {
   verified: boolean;
   tier?: 'starter' | 'growth' | 'pro';
   loanLinksSet?: boolean;
+  ratesLinkSet?: boolean;
   onboardingStep?: 1 | 2 | 3;
   onboardingComplete?: boolean;
   disclosure?: string;
@@ -93,6 +96,8 @@ export const STATUS_ACTIVE = 'Active. Members can use the check.';
 
 const INDEX_KEY = 'cu:directory:index';
 const SEEDED_KEY = 'cu:directory:seeded';
+/** Ids removed on purpose. A later seed backfill must not put them back. */
+const REMOVED_KEY = 'cu:directory:removed';
 const RESERVED = new Set(['new', 'admin', 'api', 'embed', 'dashboard', 'sign-in']);
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -157,6 +162,7 @@ export function normalizeProfile(input: {
   confirmHash?: string;
   tier?: 'starter' | 'growth' | 'pro';
   loanLinksSet?: boolean;
+  ratesLinkSet?: boolean;
   onboardingStep?: 1 | 2 | 3;
   onboardingComplete?: boolean;
   disclosure?: string;
@@ -169,7 +175,8 @@ export function normalizeProfile(input: {
   const tagline = clip(input.tagline || 'Check a vehicle offer', 80);
   const preApprovalUrl = input.preApprovalUrl.trim();
   const ratesUrl = input.ratesUrl.trim();
-  if (!httpsUrl(preApprovalUrl) || !httpsUrl(ratesUrl)) return null;
+  if (!httpsUrl(preApprovalUrl)) return null;
+  if (ratesUrl && !httpsUrl(ratesUrl)) return null;
   const supportUrl = (input.supportUrl || preApprovalUrl).trim();
   const privacyUrl = (input.privacyUrl || preApprovalUrl).trim();
   if (!httpsUrl(supportUrl) || !httpsUrl(privacyUrl)) return null;
@@ -197,6 +204,7 @@ export function normalizeProfile(input: {
     confirmHash: input.confirmHash,
     tier: input.tier === 'starter' || input.tier === 'growth' || input.tier === 'pro' ? input.tier : undefined,
     loanLinksSet: input.loanLinksSet === true ? true : input.loanLinksSet === false ? false : undefined,
+    ratesLinkSet: input.ratesLinkSet === true ? true : input.ratesLinkSet === false ? false : undefined,
     onboardingStep: input.onboardingStep === 1 || input.onboardingStep === 2 || input.onboardingStep === 3 ? input.onboardingStep : undefined,
     onboardingComplete: input.onboardingComplete === true ? true : input.onboardingComplete === false ? false : undefined,
     disclosure: input.disclosure?.trim() ? clip(input.disclosure, 180) : undefined,
@@ -204,7 +212,7 @@ export function normalizeProfile(input: {
 }
 
 function fromSeed(seed: CuTenant): StoredTenantProfile {
-  return {
+  const profile: StoredTenantProfile = {
     id: seed.id,
     name: seed.name,
     legalName: seed.legalName,
@@ -218,6 +226,38 @@ function fromSeed(seed: CuTenant): StoredTenantProfile {
     embedOrigins: [...seed.embedOrigins],
     status: 'active',
   };
+  if (seed.id === 'preview-sample-cu') {
+    profile.trialEndsAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+    profile.disclosure = 'Fictional preview. Not a real credit union.';
+    profile.verified = true;
+  }
+  return profile;
+}
+
+/** Hide a rates link the credit union did not enter. Demo paths on the seeds stay. */
+export function memberRatesUrl(tenant: {
+  ratesUrl: string;
+  ratesLinkSet?: boolean;
+  embedOrigins?: readonly string[];
+}): string {
+  const url = tenant.ratesUrl.trim();
+  if (!url || tenant.ratesLinkSet === false) return '';
+  if (tenant.ratesLinkSet === true) return url;
+  return ratesFallback(url, tenant.embedOrigins ?? []) ? '' : url;
+}
+
+function ratesFallback(url: string, origins: readonly string[]): boolean {
+  try {
+    const parsed = new URL(url, 'https://signorwalk.com');
+    const path = parsed.pathname.replace(/\/+$/, '') || '/';
+    if (path === '/credit-unions/demo/rates') return false;
+    const origin = parsed.origin.toLowerCase();
+    if (path !== '/') return false;
+    if (origin === 'https://signorwalk.com') return true;
+    return origins.some(item => item.toLowerCase() === origin);
+  } catch {
+    return true;
+  }
 }
 
 async function readIndex(): Promise<string[] | null> {
@@ -231,16 +271,38 @@ async function writeIndex(ids: string[]): Promise<void> {
   await writeStoreJson(INDEX_KEY, ids);
 }
 
-export async function ensureTenantDirectory(): Promise<void> {
-  if (await readStoreJson(SEEDED_KEY)) return;
-  const index = await readIndex();
-  if (!index || index.length === 0) {
-    for (const seed of CU_TENANTS) {
-      await writeStoreJson(storeKey(seed.id, 'profile'), fromSeed(seed));
-    }
-    await writeIndex(CU_TENANTS.map(seed => seed.id));
+async function readRemoved(): Promise<string[]> {
+  const parsed = await readStoreJson<unknown>(REMOVED_KEY);
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter((id): id is string => typeof id === 'string');
+}
+
+async function insertMissingSeeds(): Promise<void> {
+  const index = (await readIndex()) ?? [];
+  const removed = new Set(await readRemoved());
+  let changed = false;
+  for (const seed of CU_TENANTS) {
+    if (index.includes(seed.id) || removed.has(seed.id)) continue;
+    const existing = await readStoreJson(storeKey(seed.id, 'profile'));
+    if (!existing) await writeStoreJson(storeKey(seed.id, 'profile'), fromSeed(seed));
+    index.push(seed.id);
+    changed = true;
   }
-  await writeStoreJson(SEEDED_KEY, { seeded: true });
+  if (changed) await writeIndex(index);
+}
+
+export async function ensureTenantDirectory(): Promise<void> {
+  if (!(await readStoreJson(SEEDED_KEY))) {
+    const index = await readIndex();
+    if (!index || index.length === 0) {
+      for (const seed of CU_TENANTS) {
+        await writeStoreJson(storeKey(seed.id, 'profile'), fromSeed(seed));
+      }
+      await writeIndex(CU_TENANTS.map(seed => seed.id));
+    }
+    await writeStoreJson(SEEDED_KEY, { seeded: true });
+  }
+  await insertMissingSeeds();
 }
 
 function channels(hex: string): string {
@@ -310,6 +372,7 @@ function materialize(profile: StoredTenantProfile, branding: StoredBranding | nu
     verified: profile.verified !== false,
     tier: profile.tier,
     loanLinksSet: profile.loanLinksSet,
+    ratesLinkSet: profile.ratesLinkSet,
     onboardingStep: profile.onboardingStep,
     onboardingComplete: profile.onboardingComplete,
     disclosure: profile.disclosure,
@@ -355,6 +418,10 @@ export async function saveTenantProfile(profile: StoredTenantProfile, branding?:
   await writeStoreJson(storeKey(profile.id, 'profile'), profile);
   const index = (await readIndex()) ?? [];
   if (!index.includes(profile.id)) await writeIndex([...index, profile.id]);
+  const removed = await readRemoved();
+  if (removed.includes(profile.id)) {
+    await writeStoreJson(REMOVED_KEY, removed.filter(item => item !== profile.id));
+  }
   if (branding) {
     const current = await getBranding(profile.id);
     await saveBranding(profile.id, {
@@ -387,6 +454,8 @@ export async function removeTenant(id: string): Promise<void> {
   await ensureTenantDirectory();
   const index = (await readIndex()) ?? [];
   await writeIndex(index.filter(item => item !== id));
+  const removed = await readRemoved();
+  if (!removed.includes(id)) await writeStoreJson(REMOVED_KEY, [...removed, id]);
   await deleteTenantData(id);
   await deleteStaffLogin(id);
   clearFrameAncestorCache(id);

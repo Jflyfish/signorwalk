@@ -21,7 +21,6 @@ export type OfferQuality = (typeof OFFER_QUALITY)[keyof typeof OFFER_QUALITY];
 /** Educational line and not-an-offer line, kept together as one line. */
 export const GRADE_DISCLAIMER_NOT_AN_OFFER = 'This grade is educational. This is not a loan offer.';
 export const GRADE_DISCLAIMER_VERIFY = 'Confirm every figure on the dealer\'s written worksheet before you agree to anything.';
-export const GRADE_DISCLAIMER_NO_TIER = 'The grade does not estimate credit standing or use demographic data. It uses fixed grading cutoffs.';
 /** Checked against EngineInput: no credit-history field and no score field. */
 export const GRADE_DISCLAIMER_NO_CREDIT = 'This grade doesn\'t look at your credit history or score.';
 /** Checked against EngineInput: no age, race, sex, or ZIP field. */
@@ -34,13 +33,12 @@ export const APR_NOT_A_MARKET_RATE = '(not a market rate or an offer)';
 export const PINNED_BAR_BODY_PX = 64;
 export const PINNED_BAR_HEIGHT = `calc(${PINNED_BAR_BODY_PX}px + env(safe-area-inset-bottom))`;
 
-export function gradeDisclaimerLines(shortName: string): readonly string[] {
+export function gradeDisclaimerLines(_shortName: string): readonly string[] {
   return [
-    GRADE_DISCLAIMER_NOT_AN_OFFER,
     GRADE_DISCLAIMER_NO_CREDIT,
     GRADE_DISCLAIMER_NO_CHARACTERISTICS,
-    `${shortName} does not endorse the dealer. ${GRADE_DISCLAIMER_NO_TIER}`,
     GRADE_DISCLAIMER_VERIFY,
+    GRADE_DISCLAIMER_NOT_AN_OFFER,
   ];
 }
 
@@ -291,8 +289,6 @@ const SHORT_LABEL: Record<string, string> = {
 
 /**
  * Questions a member can read to the dealer.
- * A credit-union rate is included only when the caller passes one.
- * No tenant stores that rate today. The argument stays for when one does.
  * Term and total interest share one question so the two lines do not repeat.
  */
 const INTEREST_QUESTION = 'Can you show me total interest at this term and at a shorter term?';
@@ -381,6 +377,8 @@ function classifyPrice(row: ReportRow, cuts: GradeCutoffs): Classified | null {
     return helped(gap ? `${gap} under MSRP` : 'under MSRP', 'MSRP');
   }
   if (row.status === 'good') return null;
+  const amounts = moneyAmounts(`${row.value} ${row.explanation}`);
+  if (amounts.length >= 2 && amounts[0] === amounts[1]) return hurt('at MSRP', 'MSRP', 1);
   return hurt(`discount under ${formatCut(cuts.priceAtMsrp)}% of MSRP`, 'MSRP', 1);
 }
 
@@ -495,6 +493,7 @@ function detailSentence(row: ReportRow, why: string): string {
   const figure = figureOf(row.value);
   const label = SHORT_LABEL[row.label] ?? row.label;
   if (row.label === 'Price versus MSRP') {
+    if (why === 'at MSRP') return `Price is ${figure}, at MSRP.`;
     const msrp = moneyAfter(row.explanation, 'MSRP of');
     const gap = dollarGap(row);
     if (row.value.includes('over MSRP') && gap && msrp) return `Price is ${gap} over the MSRP of ${msrp}.`;
@@ -514,7 +513,7 @@ function detailSentence(row: ReportRow, why: string): string {
   if (row.label === 'Monthly payment') {
     const calculated = moneyAfter(row.explanation, 'entered is');
     if (calculated && why.endsWith(' calculated payment')) {
-      return `Monthly payment is ${figure}, which is ${why.slice(0, -' calculated payment'.length)} the calculated payment of ${calculated}.`;
+      return `Monthly payment is ${figure}, which is ${why.replace(/ calculated payment$/, '')} calculated payment of ${calculated}.`;
     }
     return `Monthly payment is ${figure}, which is ${why}.`;
   }
@@ -608,7 +607,7 @@ function verdictName(label: string): string {
 }
 
 function hurtPhrase(row: ReadoutRow): string {
-  if (row.label === 'Price') return row.why;
+  if (row.label === 'Price') return row.why === 'at MSRP' ? 'price at MSRP' : row.why;
   if (row.label === 'APR') return `${row.figure} APR`;
   if (row.figure.startsWith('$')) return `${row.figure} ${verdictName(row.label)}`;
   return verdictName(row.label);
@@ -648,17 +647,12 @@ export function figuresEntered(report: Pick<TenantReport, 'breakdown'>): number 
 
 export function dealerQuestions(
   report: Pick<TenantReport, 'breakdown'>,
-  creditUnionApr?: number,
 ): string[] {
   const hurts = report.breakdown.filter(row => classify(row)?.tone === 'hurt');
   const seen = new Set<string>();
   const questions: string[] = [];
   for (const row of hurts) {
-    let text = HURT_QUESTION[row.label] ?? '';
-    if (row.label === 'APR' && creditUnionApr !== undefined && Number.isFinite(creditUnionApr)) {
-      text = `What APR can you offer if I bring my own financing at ${creditUnionApr}%?`;
-    }
-    text = text.trim();
+    const text = (HURT_QUESTION[row.label] ?? '').trim();
     if (!text || seen.has(text)) continue;
     seen.add(text);
     questions.push(text);

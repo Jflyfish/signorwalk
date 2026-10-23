@@ -57,6 +57,12 @@ export function embedTenantId(pathname: string): string | null {
   return match ? match[1] : null;
 }
 
+/** Staff preview. Framed only by this origin. Not the public embed. */
+export function previewTenantId(pathname: string): string | null {
+  const match = /^\/cu\/([a-z0-9-]+)\/preview\/?$/.exec(pathname.toLowerCase());
+  return match ? match[1] : null;
+}
+
 /** CSP source list for a known embed route. Always includes 'self'. */
 export function frameAncestorSources(origins: readonly string[]): string {
   const extra = origins.filter(isEmbedOrigin);
@@ -131,6 +137,7 @@ export async function resolveFrameAncestors(
 }
 
 export async function frameAncestorsForPath(pathname: string): Promise<string> {
+  if (previewTenantId(pathname)) return "'self'";
   const { loadCuTenant } = await import('./tenant-directory');
   return resolveFrameAncestors(pathname, async (id) => {
     const tenant = await loadCuTenant(id);

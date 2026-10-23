@@ -30,7 +30,7 @@ export default function CreditUnionPrivacyPage() {
       <h2 className="mt-10 text-[24px] font-bold leading-[30px]">What this application stores</h2>
       <ul className="mt-4 list-disc space-y-2 pl-5 text-[18px] leading-[28px]">
         <li>Credit union profile: name, contact name, work email, and optional website.</li>
-        <li>Branding, settings, and aggregate grade counts. Not the worksheet and not the numbers from it.</li>
+        <li>Branding, settings, and per-tenant integers only: grades run, loan-application clicks, worksheet uploads, and a count of each letter grade. Not the worksheet and not the numbers from it. A sample grade (?sample=1) is not added to those integers.</li>
         <li>A scrypt hash of the staff login. The stored text is not the password.</li>
         <li>Audit lines: time, action, id, and who. Not a member file.</li>
       </ul>
@@ -38,7 +38,7 @@ export default function CreditUnionPrivacyPage() {
         The member form does not ask for a name, email, or account number. The grade is rules in this application (template pack tp-1.0.0). A model does not write the sentences a member reads.
       </p>
       <p className="mt-6 text-[18px] leading-[28px] cu-muted">
-        When email delivery is configured, Resend sends the trial confirmation to the staff email, a signup notice to the operator address, and an optional summary of aggregate counts. Resend does not receive the worksheet.
+        When email delivery is configured, Resend sends the trial confirmation to the staff email, a signup notice to the operator address, and an optional summary of aggregate counts. Resend does not receive the worksheet. Completing a grade does not send a Vercel Analytics analysis_completed event. The credit-union layout still loads Vercel Analytics for page views.
       </p>
       <p className="mt-6 text-[18px] leading-[28px] cu-muted">
         There is no connection in this code to a core, online banking, or loan origination system. Online checkout is not built. The trial form does not ask for a card.

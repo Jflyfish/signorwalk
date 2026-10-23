@@ -3,7 +3,8 @@ import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
-import { getAggregates, getBranding, getSettings, getTenantCounters } from '@/cu/cu-store';
+import { getBranding, getSettings, getTenantCounters, resetHarborlightPreviewCounters } from '@/cu/cu-store';
+import { TALK_TO_US_EMAIL } from '@/app/(cu)/credit-unions/pricing';
 import { deepLink, iframeSnippet, memberOrigin } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
 import { resendConfirmAction, saveEmbedOriginsAction, saveLoanLinksAction, saveSettingsAction, sendSummaryAction } from '../../actions';
@@ -31,13 +32,11 @@ function sectionFrom(query: { section?: string; saved?: string; error?: string; 
   return 'usage';
 }
 
-function trialDaysLeft(iso: string, now = Date.now()): string {
+function trialDaysLeft(iso: string, now = Date.now()): number | null {
   const ends = Date.parse(iso);
-  if (!Number.isFinite(ends)) return '';
-  if (ends <= now) return 'This free trial has ended.';
-  const days = Math.ceil((ends - now) / 86_400_000);
-  if (days <= 1) return '1 day left in this free trial.';
-  return `${days} days left in this free trial.`;
+  if (!Number.isFinite(ends)) return null;
+  if (ends <= now) return 0;
+  return Math.ceil((ends - now) / 86_400_000);
 }
 
 function AlertIcon({ tone }: { tone: 'ok' | 'err' }) {
@@ -89,7 +88,7 @@ export default async function DashboardPage({
   const session = verifySession(jar.get(CU_SESSION_COOKIE)?.value);
   if (!canOpenTenant(session, tenant.id)) redirect(`/cu/${tenant.id}/sign-in`);
   const brand = await resolveBrand(tenant);
-  const aggregates = await getAggregates(tenant.id);
+  await resetHarborlightPreviewCounters();
   const counters = await getTenantCounters(tenant.id);
   const settings = await getSettings(tenant.id);
   const stored = await getBranding(tenant.id);
@@ -101,18 +100,19 @@ export default async function DashboardPage({
       ? 'Check the credit-union email address.'
         : query.error === 'origins'
         ? 'Use one https origin per line.'
-        : query.error === 'links'
-          ? 'Use https links for pre-approval and rates.'
+          : query.error === 'links'
+          ? 'Use a link that starts with https://'
           : '';
   const saved = query.saved ? NOTICES[query.saved] : query.notice === 'sent' ? 'Confirmation email sent.' : '';
   const caution = query.notice === 'mail'
     ? 'Email is not configured on this server.'
     : query.notice && query.notice !== 'confirm' && query.notice !== 'sent' ? NOTICES[query.notice] : '';
-  const trialLine = tenant.trialEndsAt ? trialDaysLeft(tenant.trialEndsAt) : '';
+  const trialDays = tenant.trialEndsAt ? trialDaysLeft(tenant.trialEndsAt) : null;
   const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
   const requestHeaders = await headers();
   const origin = memberOrigin(name => requestHeaders.get(name), process.env.VERCEL_URL);
   const shareUrl = `${origin}/cu/${tenant.id}`;
+  const previewUrl = `${origin}/cu/${tenant.id}/preview`;
   const embedUrl = deepLink(tenant.id, origin);
   const snippet = iframeSnippet(tenant.id, origin);
   const tabs: { id: Section; label: string }[] = [
@@ -152,7 +152,7 @@ export default async function DashboardPage({
       {query.saved === 'confirmed' && tenant.loanLinksSet === false ? (
         <div className="sticky top-0 z-20 border-b cu-line bg-white px-4 py-3">
           <p className="mx-auto w-full max-w-[1120px] text-[15px] font-semibold leading-[24px]">
-            Set the pre-approval URL and the rates URL before you share the member link.
+            Set the loan application URL before you share the member link.
           </p>
         </div>
       ) : null}
@@ -164,10 +164,11 @@ export default async function DashboardPage({
             <button type="submit" className="cu-link mt-4 text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline">Resend link</button>
           </form>
         ) : null}
-        <p className="mb-6 text-[14px] leading-[20px]">
-          {trialLine ? <span className="cu-muted">{trialLine} </span> : null}
-          <a href="/credit-unions/packet" className="font-semibold underline underline-offset-4 cu-linkline">Get contract + DD packet</a>
-        </p>
+        {trialDays !== null ? (
+          <p className="mb-6 text-[14px] leading-[20px]">
+            Trial: {trialDays} {trialDays === 1 ? 'day' : 'days'} left. <a href={`mailto:${TALK_TO_US_EMAIL}`} className="font-semibold underline underline-offset-4 cu-linkline">Email us</a> to upgrade.
+          </p>
+        ) : null}
         {section === 'usage' ? (
           <section aria-labelledby="member-link-heading" className="mb-10 max-w-[560px] text-left">
             <h1 id="member-link-heading" className="text-[32px] font-bold leading-[38px]">Your member link</h1>
@@ -179,11 +180,10 @@ export default async function DashboardPage({
               <CopyLink text={shareUrl} label="Copy link" />
               <CopyLink text={snippet} label="Copy embed" />
             </div>
+            <p className="mt-4 text-[14px] leading-[20px] cu-muted">The embed loads only on a domain in this credit union&apos;s allowlist.</p>
             <div className="mt-6">
-              <MemberPreview href={shareUrl} title={`${tenant.name} page`} />
+              <MemberPreview href={shareUrl} frameSrc={previewUrl} title={`${tenant.name} page`} />
             </div>
-            <p className="mt-6 text-[14px] leading-[20px]">Grades run: {counters.gradesRun}</p>
-            <p className="text-[14px] leading-[20px]">Loan-CTA clicks: {counters.loanClicks}</p>
           </section>
         ) : null}
         {section === 'usage' && tenant.loanLinksSet === false ? (
@@ -193,7 +193,7 @@ export default async function DashboardPage({
             <label className="text-[14px] font-semibold leading-[20px]">Pre-approval URL
               <input name="preApprovalUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="cu-ring mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
             </label>
-            <label className="text-[14px] font-semibold leading-[20px]">Rates URL
+            <label className="text-[14px] font-semibold leading-[20px]">Rates URL (optional)
               <input name="ratesUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="cu-ring mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
             </label>
             <input type="hidden" name="tenant" value={tenant.id} />
@@ -217,47 +217,11 @@ export default async function DashboardPage({
         {section === 'usage' ? <section aria-labelledby="usage-heading">
           <h2 id="usage-heading" className="text-[24px] font-bold leading-[30px]">Usage</h2>
           <p className="mt-4 text-[14px] leading-[20px] cu-muted">All time</p>
-          <div className="mt-8 grid grid-cols-2 gap-6">
-            <p>
-              <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{aggregates.checks}</span>
-              <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Checks</span>
-            </p>
-            <p>
-              <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{aggregates.uploads}</span>
-              <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Worksheet uploads</span>
-            </p>
-          </div>
-          {aggregates.checks === 0 ? (
-            <div className="mt-10 max-w-[560px] text-left">
-              <h2 className="text-[24px] font-bold leading-[30px]">No checks yet</h2>
-              <p className="mt-2 text-[14px] leading-[20px] cu-muted">Checks appear here after a member uses this link.</p>
-              <p className="mt-4 break-all text-[15px] leading-[24px]">
-                <a href={shareUrl} className="underline underline-offset-4 cu-linkline">{shareUrl}</a>
-              </p>
-              <CopyLink url={shareUrl} />
-            </div>
-          ) : (
-            <div className="mt-10">
-              <table className="w-full max-w-[560px] border-collapse text-left">
-                <thead>
-                  <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
-                    <th className="py-3 pr-4 font-semibold">Grade</th>
-                    <th className="py-3 text-right font-semibold">Count</th>
-                    <th className="py-3 pl-4 text-right font-semibold">Share</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
-                    <tr key={grade} className="border-b cu-line text-[15px]">
-                      <td className="py-3 pr-4">{grade}</td>
-                      <td className="py-3 text-right tabular-nums">{aggregates.grades[grade]}</td>
-                      <td className="py-3 pl-4 text-right tabular-nums">{Math.round((aggregates.grades[grade] / aggregates.checks) * 100)}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <p className="mt-8">
+            <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{counters.gradesRun}</span>
+            <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Grades run</span>
+          </p>
+          <p className="mt-4 text-[14px] leading-[20px] cu-muted">Grades describe offers, not members.</p>
         </section> : null}
 
         {section === 'branding' ? <section aria-labelledby="branding-heading">
@@ -297,7 +261,7 @@ export default async function DashboardPage({
 
         {section === 'embed' ? <section aria-labelledby="embed-heading">
           <h1 id="embed-heading" className="text-[32px] font-bold leading-[38px]">Embed</h1>
-          <p className="mt-4 max-w-[560px] text-[15px] leading-[24px]">Place the check on your site or in your app. The page uses your brand and leaves out the marketing navigation.</p>
+          <p className="mt-4 max-w-[560px] text-[15px] leading-[24px]">Place the check on your site or in your app. The page uses your brand and leaves out the marketing navigation. The embed loads only on a domain in this credit union&apos;s allowlist.</p>
 
           <h2 className="mt-10 text-[24px] font-bold leading-[30px]">Iframe</h2>
           <p className="mt-2 max-w-[560px] text-[14px] leading-[20px] cu-muted">Paste this on a page whose origin is on your allowlist. The script sets the height from signorwalk.cu.resize.</p>

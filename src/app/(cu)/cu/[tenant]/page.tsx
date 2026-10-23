@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { resolveBrand } from '@/cu/brand';
-import { loadCuTenant, tenantUnavailable } from '@/cu/tenant-directory';
-import { toCuPublic } from '@/cu/tenants';
+import { loadCuTenant, memberRatesUrl, tenantUnavailable } from '@/cu/tenant-directory';
+import { getCuTenant, toCuPublic } from '@/cu/tenants';
 import { Unavailable } from '../Unavailable';
 import { BrandLockup } from '../BrandLockup';
 import { CheckForm } from './CheckForm';
@@ -31,6 +31,8 @@ export default async function CuPage({
   if (tenant.loanLinksSet === false) {
     pub.preApprovalUrl = '';
     pub.ratesUrl = '';
+  } else {
+    pub.ratesUrl = memberRatesUrl(tenant);
   }
   return (
     <>
@@ -44,7 +46,15 @@ export default async function CuPage({
           logoAspect={brand.logoAspect}
         />
       </header>
-      <CheckForm tenant={pub} brand={brand} demoSample={sample} autoGrade={sample} disclosure={tenant.disclosure} />
+      <CheckForm
+        tenant={pub}
+        brand={brand}
+        demoSample={sample}
+        autoGrade={sample}
+        disclosure={tenant.disclosure}
+        sampleRun={sample}
+        demoPage={sample || Boolean(getCuTenant(tenant.id))}
+      />
     </>
   );
 }

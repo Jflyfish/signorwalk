@@ -4,8 +4,8 @@ import { headers } from 'next/headers';
 import { resolveBrand } from '@/cu/brand';
 import { numbersOnlyEmbed } from '@/cu/demo-upload';
 import { allowEmbed, deepLink, requestOriginFrom } from '@/cu/embed';
-import { loadCuTenant, tenantUnavailable } from '@/cu/tenant-directory';
-import { toCuPublic } from '@/cu/tenants';
+import { loadCuTenant, memberRatesUrl, tenantUnavailable } from '@/cu/tenant-directory';
+import { getCuTenant, toCuPublic } from '@/cu/tenants';
 import { Unavailable } from '../../Unavailable';
 import { BrandLockup } from '../../BrandLockup';
 import { EmbedFrame } from './EmbedFrame';
@@ -55,6 +55,8 @@ export default async function EmbedPage({
   if (tenant.loanLinksSet === false) {
     pub.preApprovalUrl = '';
     pub.ratesUrl = '';
+  } else {
+    pub.ratesUrl = memberRatesUrl(tenant);
   }
   return (
     <div id="sow-embed-root">
@@ -75,6 +77,8 @@ export default async function EmbedPage({
         targetOrigin={decision.targetOrigin}
         numbersOnly={numbersOnly}
         demoSample={query.entry === 'numbers'}
+        disclosure={tenant.disclosure}
+        demoPage={Boolean(getCuTenant(tenant.id))}
       />
     </div>
   );

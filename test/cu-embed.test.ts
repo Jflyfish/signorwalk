@@ -18,7 +18,7 @@ import {
   resizeMessage,
   resolveFrameAncestors,
 } from '../src/cu/embed';
-import { securityHeaderList } from '../src/cu/headers';
+import { logoImageOrigin, securityHeaderList } from '../src/cu/headers';
 import { GET as framePolicy } from '../src/app/(cu)/api/cu/frame-ancestors/route';
 import { markCuStoreUnavailable, resetCuStore } from '../src/cu/cu-store';
 import { NextRequest } from 'next/server';
@@ -63,6 +63,16 @@ test('embed CSP allowlist is per tenant and only on the embed route', async () =
   assert.match(await csp('/credit-unions/embed-demo'), /frame-ancestors 'none'/);
   assert.equal(await frameOptions('/credit-unions/embed-demo'), 'DENY');
   assert.match(await csp('/cu/harborlight-cu/dashboard'), /frame-ancestors 'none'/);
+  const preview = await csp('/cu/harborlight-cu/preview');
+  assert.match(preview, /frame-ancestors 'self'; base-uri/);
+  assert.equal(preview.includes('harborlightcu.example'), false);
+  assert.equal(preview.includes('*'), false);
+  assert.equal(await frameOptions('/cu/harborlight-cu/preview'), undefined);
+  assert.equal(await frameOptions('/cu/harborlight-cu'), 'DENY');
+  assert.equal(logoImageOrigin('https://cdn.example.com/logo.png'), 'https://cdn.example.com');
+  assert.equal(logoImageOrigin('http://cdn.example.com/logo.png'), null);
+  assert.equal(logoImageOrigin('*'), null);
+  assert.equal(logoImageOrigin('https://cdn.example.com'), 'https://cdn.example.com');
 });
 
 test('member links use the request host, then VERCEL_URL', () => {

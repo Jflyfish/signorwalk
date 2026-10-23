@@ -105,10 +105,10 @@ Answer: [Draft design] A person using the credit union's branded page. The servi
 ## 3. Data
 
 3.1 Is member nonpublic personal information stored?
-Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, aggregate grade counts, and audit lines (time, action, id, who). Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — ${OWNER_BLANK}
+Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, per-tenant integers only (grades run, loan-application clicks, worksheet uploads, and a count of each letter grade), and audit lines (time, action, id, who). A sample grade is not added to those integers. Completing a grade does not send a Vercel Analytics analysis_completed event. Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — ${OWNER_BLANK}
 
 3.2 Are quote numbers stored?
-Answer: [Draft design] Quote figures are used to produce the result for that visit. They are not written to an application database as a member file. Aggregate counts record how many checks returned each grade. They do not record the quote.
+Answer: [Draft design] Quote figures are used to produce the result for that visit. They are not written to an application database as a member file. Usage is stored as per-tenant integers only: grades run, loan-application clicks, worksheet uploads, and how many results returned each letter. They do not record the quote. A sample grade (?sample=1) is not added.
 
 3.3 Are documents or photos of contracts uploaded?
 Answer: [Draft design] Optional, on the member page. Every upload sends the full worksheet image, which may include a name or VIN, to Anthropic. Sign or Walk does not store that file. The Harborlight marketing embed hides that upload. The grade is produced by rules in this application (template pack tp-1.0.0). A model does not write the sentences a member reads.
@@ -434,7 +434,7 @@ An uploaded worksheet is different. It may contain a member name and VIN. See se
 
 [Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record. Also uploaded worksheet images or PDFs, sent to the AI vendor and not stored by us. Anthropic is the processor for that file. DPA, retention window, and region — ${OWNER_BLANK}
 
-Staff trial records (credit union name, contact name, work email, scrypt login hash), branding, settings, aggregate grade counts, and audit lines are stored. They are not a member worksheet.
+Staff trial records (credit union name, contact name, work email, scrypt login hash), branding, settings, per-tenant integers (grades run, loan-application clicks, worksheet uploads, and a count of each letter grade), and audit lines are stored. They are not a member worksheet. A sample grade is not added to those integers.
 
 [To be completed] Incidental technical data in host or edge logs (which may include IP address). The application log is intended to exclude quote inputs, IP address, and user agent. Retention of any platform log is not answered in this draft.
 
@@ -450,6 +450,8 @@ Process the quote figures only to show the educational result and the credit uni
 | Anthropic | Reads an uploaded worksheet image or PDF for that request. DPA, region, and retention are ${OWNER_BLANK}. | In use on extract when the API key is set |
 | Resend | Trial confirmation, signup notice, and an optional count summary. Does not receive the worksheet. | In use when configured |
 | Stripe | Card checkout | Not implemented |
+
+Vercel Analytics loads on credit-union pages for page views. It is not sent an analysis_completed event with the grade. Grade and loan-link counters stay in the application store as per-tenant integers, not a member record.
 
 A change-notice process for new subprocessors is [To be completed].
 

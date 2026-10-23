@@ -2,23 +2,22 @@
 
 Draft only. These sentences are on the member grade screen or on a printed copy of it. A credit union and its counsel still have to review them before a member sees a production page. This note does not say that any regulator has approved the wording.
 
-Shown once, under the grade and the verdict, above the rows. Five lines:
+Shown once, under the grade and the verdict, above the rows. Four lines, in this order:
 
-- `This grade is educational. This is not a loan offer.`
 - `This grade doesn't look at your credit history or score.`
 - `Grades never use age, race, sex, ZIP code, or other personal characteristics.`
-- `{credit union short name} does not endorse the dealer. The grade does not estimate credit standing or use demographic data. It uses fixed grading cutoffs.`
 - `Confirm every figure on the dealer's written worksheet before you agree to anything.`
+- `This grade is educational. This is not a loan offer.`
 
-The confirm sentence and the credit-standing sentence stay in this block. The block does not say "benchmarks" or "labeled assumptions". An incomplete grade, before any verdict, shows only the shortest of these lines.
+The block does not say the grade estimates credit standing, and it does not say "benchmarks" or "labeled assumptions". An incomplete grade, before any verdict, shows only the shortest of these lines.
 
 `EngineInput` has no credit-history, credit-score, age, race, sex, or ZIP field. It does have an optional `state` code. `evaluateDeal` does not read `state`. `report.ts` uses it only for a tax note. The two sentences above are also in How we grade, once each, and once each in the due-diligence questionnaire. They are not repeated under See details. This note does not say a regulator approved them.
 
-Shown under the inline pre-approval button, and not in the pinned bar:
+Shown under the inline pre-approval button and inside the pinned bar:
 
 - `Not an offer of credit.`
 
-The pinned bar is 64px plus the safe area. It appears only after that button has scrolled above the viewport, and it stays hidden while it would cover the rows or the questions. The button reads `Check your rate with {short name}` and links to the tenant loan application URL. See details does not repeat the disclaimer block. How we grade does not say "It is not a loan offer."
+The inline button reads `Check your rate with {short name}`. The pinned bar reads `Check your rate`, with no credit-union name, and stays at 64px plus the safe area. It appears only after the inline button has scrolled above the viewport, and it stays hidden while it would cover the rows or the questions. The Demo pill is limited to seeded demo tenants and the sample grade. See details does not repeat the disclaimer block. How we grade does not say "It is not a loan offer." When the price equals MSRP, the price row says `at MSRP`.
 
 Shown on a printed copy, and not as a claim about a statute:
 

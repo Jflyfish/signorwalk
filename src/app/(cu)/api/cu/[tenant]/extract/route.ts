@@ -6,6 +6,7 @@ import { recordUpload } from '@/cu/cu-store';
 import { missingTenantResponse } from '@/cu/missing-page';
 import { marketingDemoReferer, MARKETING_DEMO_TENANT } from '@/cu/demo-upload';
 import { clientAddress, takeDemoExtractSlot, takeExtractSlot } from '@/cu/rate-limit';
+import { staffCanPreview } from '@/cu/preview-access';
 import { loadCuTenant, TENANT_UNAVAILABLE, tenantUnavailable } from '@/cu/tenant-directory';
 
 const MAX_FILE = 5 * 1024 * 1024;
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
   const pathname = `/api/cu/${slug}/extract`;
   const tenant = await loadCuTenant(slug);
   if (!tenant) return missingTenantResponse(pathname);
-  if (tenantUnavailable(tenant)) {
+  if (tenantUnavailable(tenant) && !(await staffCanPreview(tenant.id))) {
     return json(pathname, { success: false, error: TENANT_UNAVAILABLE }, 404);
   }
   if (req.method !== 'POST') {
@@ -123,7 +124,14 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
       return json(pathname, { success: false, error: FILE_READ_ERROR }, 422);
     }
     const picked = pickOcrFields(parsed);
-    await recordUpload(tenant.id).catch(() => undefined);
+    const referer = req.headers.get('referer');
+    let sample = false;
+    try {
+      sample = Boolean(referer && new URL(referer).searchParams.get('sample') === '1');
+    } catch {
+      sample = false;
+    }
+    if (!sample) await recordUpload(tenant.id).catch(() => undefined);
     log('ok');
     return json(pathname, { success: true, ...picked }, 200);
   } catch {

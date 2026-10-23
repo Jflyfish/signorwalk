@@ -47,9 +47,11 @@ test('a trial creates a hashed staff login and a 90-day end', async () => {
   assert.match(staff?.hash ?? '', /^scrypt:/);
   assert.equal(await staffLoginMatches(created.id, email, secret), true);
   assert.equal(await staffLoginMatches(created.id, email, ephemeralSecret()), false);
-  const profile = await readStoreJson<{ confirmHash?: string; tier?: string; loanLinksSet?: boolean }>(storeKey(created.id, 'profile'));
+  const profile = await readStoreJson<{ confirmHash?: string; tier?: string; loanLinksSet?: boolean; ratesLinkSet?: boolean; ratesUrl?: string }>(storeKey(created.id, 'profile'));
   assert.equal(profile?.tier, 'growth');
   assert.equal(profile?.loanLinksSet, false);
+  assert.equal(profile?.ratesLinkSet, false);
+  assert.equal(profile?.ratesUrl, '');
   assert.equal(profile?.confirmHash, createHash('sha256').update(created.confirmToken).digest('hex'));
   assert.equal(JSON.stringify(profile).includes(secret), false);
   const again = await createTrial({
@@ -222,6 +224,7 @@ test('missing and removed credit unions answer 404', async () => {
   assert.equal(await missingCreditUnionResponse('/cu/apple-icon', async () => false), null);
   assert.equal(await missingCreditUnionResponse('/cu/harborlight-cu', async () => true), null);
   assert.equal(await missingCreditUnionResponse('/cu/harborlight-cu/onboarding', async () => true), null);
+  assert.equal(await missingCreditUnionResponse('/cu/harborlight-cu/preview', async () => true), null);
   assert.equal(await missingCreditUnionResponse('/cu/admin', async () => false), null);
   assert.equal(await missingCreditUnionResponse('/credit-unions', async () => false), null);
 

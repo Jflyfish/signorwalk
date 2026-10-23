@@ -26,7 +26,7 @@ export function ChromeStyle() {
         font-weight: 600;
       }
       .cu-ok { border-color: #15803d; background: rgb(21 128 61 / 0.06); color: #15803d; }
-      .cu-err { border-color: #b91c1c; background: rgb(185 28 28 / 0.06); color: #b91c1c; }
+      .cu-err { border-color: #B42318; background: rgb(180 35 24 / 0.06); color: #B42318; }
       .cu-ok svg, .cu-err svg { flex: none; margin-top: 2px; }
       .cu-linkline { text-decoration-color: var(--cu-muted); }
       .cu-linkline:hover { text-decoration-color: var(--cu-ink); }

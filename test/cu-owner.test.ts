@@ -22,7 +22,12 @@ import {
 test('demo tenants seed the store and stay in config', async () => {
   resetCuStore();
   const rows = await listCuTenants();
-  assert.deepEqual(rows.map(row => row.id), ['harborlight-cu', 'summit-ridge-fcu', 'larkspur-cu']);
+  assert.deepEqual(rows.map(row => row.id), ['harborlight-cu', 'summit-ridge-fcu', 'larkspur-cu', 'preview-sample-cu']);
+  const preview = rows.find(row => row.id === 'preview-sample-cu');
+  assert.equal(preview?.name, 'Preview Sample Credit Union');
+  assert.match(preview?.tagline ?? '', /Fictional preview/);
+  assert.ok(preview?.trialEndsAt && Date.parse(preview.trialEndsAt) > Date.now());
+  assert.match(preview?.disclosure ?? '', /Not a real credit union/);
   assert.equal(rows.every(row => row.status === 'active'), true);
   assert.equal(rows[0].preApprovalUrl, '/credit-unions/demo/preapproval');
   assert.equal(rows[0].preApprovalUrl.includes('signorwalk.com'), false);

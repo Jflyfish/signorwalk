@@ -110,7 +110,7 @@ export function OwnerEditor({
             <TextField name="primary" title="Primary" required />
             <TextField name="tagline" title="Tagline" />
             <TextField name="preApprovalUrl" title="Pre-approval URL" required />
-            <TextField name="ratesUrl" title="Rates URL" required />
+            <TextField name="ratesUrl" title="Rates URL (optional)" />
             <TextField name="supportUrl" title="Support URL" />
             <TextField name="privacyUrl" title="Privacy URL" />
             <TextField name="preApprovalLabel" title="Pre-approval label" />
@@ -131,7 +131,7 @@ export function OwnerEditor({
               <TextField name="legalName" title="Legal name" defaultValue={profile.legalName} required />
               <TextField name="tagline" title="Tagline" defaultValue={profile.tagline} required />
               <TextField name="preApprovalUrl" title="Pre-approval URL" defaultValue={profile.preApprovalUrl} required />
-              <TextField name="ratesUrl" title="Rates URL" defaultValue={profile.ratesUrl} required />
+              <TextField name="ratesUrl" title="Rates URL (optional)" defaultValue={profile.ratesUrl} />
               <TextField name="supportUrl" title="Support URL" defaultValue={profile.supportUrl} required />
               <TextField name="privacyUrl" title="Privacy URL" defaultValue={profile.privacyUrl} required />
               <TextField name="preApprovalLabel" title="Pre-approval label" defaultValue={profile.preApprovalLabel} required />

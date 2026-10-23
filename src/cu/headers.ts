@@ -1,5 +1,37 @@
 import { NextResponse } from 'next/server';
+import { getBranding } from './cu-store';
 import { frameAncestorsForPath } from './embed';
+
+/** Origin of one https logo, or null. Never a wildcard. */
+export function logoImageOrigin(url: string | null | undefined): string | null {
+  if (!url || !url.startsWith('https://')) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.username || parsed.password || parsed.origin === 'null') return null;
+    if (!/^https:\/\/[a-z0-9.-]+(?::\d+)?$/i.test(parsed.origin)) return null;
+    return parsed.origin;
+  } catch {
+    return null;
+  }
+}
+
+function tenantIdFromPath(pathname: string): string | null {
+  const match = /^\/cu\/([a-z0-9-]+)(?:\/|$)/.exec(pathname.toLowerCase());
+  if (!match) return null;
+  if (match[1] === 'admin' || match[1] === 'icon' || match[1] === 'apple-icon') return null;
+  return match[1];
+}
+
+async function tenantLogoOrigin(pathname: string): Promise<string | null> {
+  const id = tenantIdFromPath(pathname);
+  if (!id) return null;
+  try {
+    const branding = await getBranding(id);
+    return logoImageOrigin(branding?.logoLight);
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Response headers for /cu and /credit-unions only.
@@ -16,12 +48,15 @@ export async function securityHeaderList(pathname: string, ancestors?: string): 
     font.push('https://fonts.gstatic.com');
   }
   const resolved = ancestors ?? await frameAncestorsForPath(pathname);
+  const img = ["'self'", 'data:', 'blob:'];
+  const logoOrigin = await tenantLogoOrigin(pathname);
+  if (logoOrigin) img.push(logoOrigin);
   const csp = [
     "default-src 'self'",
     `script-src ${script.join(' ')}`,
     `style-src ${style.join(' ')}`,
     `font-src ${font.join(' ')}`,
-    "img-src 'self' data: blob:",
+    `img-src ${img.join(' ')}`,
     "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
     `frame-ancestors ${resolved}`,
     "base-uri 'self'",

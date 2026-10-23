@@ -136,11 +136,13 @@ export async function saveLoanLinksAction(formData: FormData) {
   await guardMutable(tenant);
   const current = await getTenantProfile(tenant);
   if (!current) redirect(`/cu/${tenant}/dashboard?error=links`);
+  const rates = String(formData.get('ratesUrl') ?? '').trim();
   const profile = normalizeProfile({
     ...current,
     preApprovalUrl: String(formData.get('preApprovalUrl') ?? ''),
-    ratesUrl: String(formData.get('ratesUrl') ?? ''),
+    ratesUrl: rates,
     loanLinksSet: true,
+    ratesLinkSet: Boolean(rates),
   });
   if (!profile) redirect(`/cu/${tenant}/dashboard?error=links`);
   profile.confirmHash = current.confirmHash;
@@ -233,7 +235,8 @@ export async function createOwnerTenantAction(formData: FormData) {
     supportUrl: String(formData.get('supportUrl') ?? ''),
     privacyUrl: String(formData.get('privacyUrl') ?? ''),
     preApprovalUrl: String(formData.get('preApprovalUrl') ?? ''),
-    ratesUrl: String(formData.get('ratesUrl') ?? ''),
+    ratesUrl: String(formData.get('ratesUrl') ?? '').trim(),
+    ratesLinkSet: Boolean(String(formData.get('ratesUrl') ?? '').trim()),
     preApprovalLabel: String(formData.get('preApprovalLabel') ?? ''),
     ratesLabel: String(formData.get('ratesLabel') ?? ''),
     embedOrigins: [],
@@ -265,7 +268,8 @@ export async function saveOwnerProfileAction(formData: FormData) {
     supportUrl: String(formData.get('supportUrl') ?? ''),
     privacyUrl: String(formData.get('privacyUrl') ?? ''),
     preApprovalUrl: String(formData.get('preApprovalUrl') ?? ''),
-    ratesUrl: String(formData.get('ratesUrl') ?? ''),
+    ratesUrl: String(formData.get('ratesUrl') ?? '').trim(),
+    ratesLinkSet: Boolean(String(formData.get('ratesUrl') ?? '').trim()),
     preApprovalLabel: String(formData.get('preApprovalLabel') ?? ''),
     ratesLabel: String(formData.get('ratesLabel') ?? ''),
     shortName: current.name,
