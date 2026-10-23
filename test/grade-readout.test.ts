@@ -10,9 +10,13 @@ import {
   copySummary,
   dealerQuestions,
   figuresEntered,
+  formatCut,
+  gradeCutoffs,
   gradeDisclaimerLines,
+  loanUrlForPrint,
   offerQuality,
   readoutRows,
+  renderedDetailsText,
   verdictSentence,
 } from '../src/cu/grade-readout';
 import { cases } from './cases';
@@ -58,49 +62,59 @@ test('readout rows stay within five scored lines and never invent a market compa
   const average = report('fin-average');
   assert.equal(average.grade, 'B');
   const averageVerdict = verdictSentence(average, false);
-  assert.equal(averageVerdict, 'Fair deal with 2 things to ask about.');
+  assert.equal(averageVerdict, 'Fair deal on the figures you entered.');
   assert.ok(wordCount(averageVerdict) <= 16);
   const rows = readoutRows(average);
   assert.ok(rows.length > 0 && rows.length <= 5);
   const apr = rows.find(row => row.label === 'APR');
   assert.ok(apr);
-  assert.match(apr.why, /^above this tool's \d+(\.\d+)?% grading threshold \(not a market rate or an offer\)$/);
+  assert.equal(apr.tone, 'helped');
+  assert.equal(apr.why, 'does not earn the strong-rate credit');
   const price = rows.find(row => row.label === 'Price');
   assert.equal(price?.versus, 'MSRP');
+  assert.equal(price?.tone, 'helped');
   assert.match(price?.why ?? '', /^\$[\d,]+ under MSRP$/);
   assert.equal(price?.figure.includes('('), false);
+  assert.equal(rows.some(row => row.label === 'Term' || row.label === 'Doc fee'), false);
   for (const row of rows) {
     assert.equal(/\bvs\b/i.test(row.figure), false);
     assert.equal(row.versus === 'market' || row.versus === 'average' || row.versus === 'typical', false);
     assert.equal(/point/i.test(row.figure), false);
-    assert.equal(/\btypical\b|\baverage\b/i.test(row.why), false);
+    assert.equal(/\b(typical|average|market|worksheet)\b/i.test(row.why), false);
   }
   const missingApr = report('fin-missing-apr');
   assert.equal(readoutRows(missingApr).some(row => row.label === 'APR'), false);
   const clean = readoutRows(report('fin-clean-strong'));
   assert.equal(clean.every(row => row.tone === 'helped'), true);
   assert.equal(dealerQuestions(report('fin-clean-strong')).length, 0);
+  const atMsrp = readoutRows(report('fin-at-msrp')).find(row => row.label === 'Price');
+  assert.equal(atMsrp?.tone, 'hurt');
+  assert.equal(atMsrp?.why, `discount under ${formatCut(gradeCutoffs().priceAtMsrp)}% of MSRP`);
 });
 
 test('questions come from hurt rows and the summary is plain text', () => {
   const atMsrp = report('fin-at-msrp');
   assert.equal(atMsrp.grade, 'C');
   const questions = dealerQuestions(atMsrp);
-  assert.ok(questions.length > 0);
-  assert.ok(questions.length <= atMsrp.breakdown.filter(row => row.status !== 'good').length);
+  assert.deepEqual(questions, ['Can you show me this price against MSRP in writing?']);
   for (const question of questions) {
     assert.match(question, /\?$/);
     assert.match(question, /\b(I|me|my)\b/);
+    assert.equal(/for me\b/i.test(question), false);
   }
-  assert.equal(questions.some(question => question.startsWith('What APR')), true);
-  assert.equal(questions.some(question => /\d/.test(question) && question.startsWith('What APR')), false);
-  const withRate = dealerQuestions(atMsrp, 4.9);
+  const high = report('fin-high-apr');
+  const highQuestions = dealerQuestions(high);
+  assert.equal(highQuestions.some(question => question.startsWith('What APR')), true);
+  assert.equal(highQuestions.some(question => /\d/.test(question) && question.startsWith('What APR')), false);
+  const withRate = dealerQuestions(high, 4.9);
   assert.equal(withRate.some(question => question.includes('4.9%')), true);
+  const stacked = dealerQuestions(report('fin-interest-stack'));
+  assert.equal(stacked.filter(question => question === 'Can you show me total interest at this term and at a shorter term?').length, 1);
   assert.ok(QUESTIONS_ON_SCREEN >= 1);
   const verdict = verdictSentence(atMsrp, false);
-  assert.equal(verdict, 'Weak deal with 2 things to ask about.');
+  assert.equal(verdict, 'Weak deal: ask about the discount under 1.0% of MSRP.');
   assert.ok(wordCount(verdict) <= 16);
-  assert.equal(/\bsign\b/i.test(verdict), false);
+  assert.equal(/\b(overall|but|sign)\b/i.test(verdict), false);
   const text = copySummary({
     grade: atMsrp.grade,
     quality: 'Weak',
@@ -132,13 +146,20 @@ test('vs and why strings are built from engine fields', () => {
   assert.equal(evaluateDeal({ dealType: 'finance', apr: Math.round((cuts.high + 0.01) * 100) / 100 }).flags.some(item => item.id === 'FLAG_APR_HIGH'), true);
   assert.equal(evaluateDeal({ dealType: 'finance', apr: Math.round((cuts.veryHigh + 0.01) * 100) / 100 }).flags.some(item => item.id === 'FLAG_APR_VERY_HIGH'), true);
   const explanation = aprGradeExplanation();
-  assert.match(explanation, new RegExp(`${cuts.strong}%`));
-  assert.match(explanation, new RegExp(`${cuts.high}%`));
-  assert.match(explanation, new RegExp(`${cuts.veryHigh}%`));
+  assert.match(explanation, new RegExp(`${formatCut(cuts.strong)}%`));
+  assert.match(explanation, new RegExp(`${formatCut(cuts.high)}%`));
+  assert.match(explanation, new RegExp(`${formatCut(cuts.veryHigh)}%`));
+  assert.match(explanation, /does not earn the strong-rate credit/);
+  assert.match(explanation, /is not flagged/);
+  assert.equal(/something to ask about/.test(explanation), false);
   assert.match(explanation, /does not read a credit tier/);
-  assert.equal(/\btypical\b|\baverage\b/i.test(explanation), false);
+  assert.equal(/\btypical\b|\baverage\b|often cited|6–8/.test(explanation), false);
+  const midBand = evaluateDeal({ dealType: 'finance', apr: Math.round((cuts.strong + 0.5) * 100) / 100 });
+  assert.equal(midBand.adjustments.some(item => item.id === 'APR_TYPICAL'), true);
+  assert.equal(midBand.flags.some(item => item.id === 'FLAG_APR_HIGH' || item.id === 'FLAG_APR_VERY_HIGH'), false);
 
-  const allowed = new Set([cuts.strong, cuts.high, cuts.veryHigh]);
+  const discovered = gradeCutoffs();
+  const allowed = new Set(Object.values(discovered));
   for (const item of cases) {
     const built = buildTenantReport(item.input, 'Harborlight Credit Union');
     for (const row of readoutRows(built)) {
@@ -153,12 +174,32 @@ test('vs and why strings are built from engine fields', () => {
       const spoken = `${row.versus ?? ''} ${row.why}`.replace(/\(not a market rate or an offer\)/g, '');
       assert.equal(/\b(typical|average|market)\b/i.test(spoken), false, spoken);
       assert.equal(row.why.includes('·'), false);
-      if (!/grading threshold/.test(row.why)) assert.ok(wordCount(row.why) <= 10, row.why);
+      assert.ok(wordCount(row.why) <= 10, row.why);
+      assert.equal(/worksheet|figures entered|grading threshold/.test(row.why), false, row.why);
       for (const match of spoken.matchAll(/\d[\d,]*(?:\.\d+)?/g)) {
         const number = Number(match[0].replace(/,/g, ''));
         const inBlob = blob.includes(match[0]) || blob.includes(String(number));
         assert.equal(inBlob || allowed.has(number) || diffs.has(number), true, `${row.label} ${match[0]} in ${spoken}`);
       }
     }
+    const details = renderedDetailsText(built);
+    assert.equal(/\b(typical|average|benchmarks?|assumptions?|market)\b|often[-\s]cited|6\s*[–-]\s*8\s*%/i.test(details), false, `${item.name}\n${details}`);
+    for (const line of built.disclaimers) assert.equal(details.includes(line), false, item.name);
+    const aprRow = built.breakdown.find(row => row.label === 'APR');
+    if (aprRow) {
+      const shown = readoutRows(built).find(row => row.label === 'APR');
+      if (shown) assert.ok(details.includes(shown.why), item.name);
+      assert.equal(details.includes(aprRow.explanation), false, item.name);
+    }
+    const verdict = verdictSentence(built, false);
+    assert.ok(wordCount(verdict) <= 16, `${item.name} ${verdict}`);
+    const hurts = readoutRows(built).filter(row => row.tone === 'hurt');
+    if (hurts.length >= 2 && (offerQuality(built.grade) === 'Weak')) {
+      assert.match(verdict, new RegExp(`^Weak deal: ask about the ${hurts[0].label} and `));
+    }
+    if (hurts.length >= 2 && offerQuality(built.grade) === 'Fair') {
+      assert.match(verdict, new RegExp(`ask about the ${hurts[0].label} and `));
+    }
   }
+  assert.equal(loanUrlForPrint('/credit-unions/demo/preapproval?utm_source=signorwalk&utm_medium=referral&keep=1', 'https://signorwalk.com'), 'https://signorwalk.com/credit-unions/demo/preapproval?keep=1');
 });

@@ -318,7 +318,7 @@ A custom hostname, if any, is [To be completed] and is not self-serve.
 
 ## 2. What the service is not
 
-Provider is not a lender and is not the Customer's agent for credit decisions. The service is not an offer of credit. Grades and flags are estimates from numbers the member enters and from benchmark ranges labeled as assumptions. Provider does not guarantee savings, approvals, funded loans, or a change in the Customer's auto-loan volume.
+Provider is not a lender and is not the Customer's agent for credit decisions. The service is not an offer of credit. Grades and flags are estimates from numbers the member enters and from fixed grading cutoffs. Provider does not guarantee savings, approvals, funded loans, or a change in the Customer's auto-loan volume.
 
 Provider does not endorse a dealer. The Customer does not, by using the service, endorse a dealer.
 
