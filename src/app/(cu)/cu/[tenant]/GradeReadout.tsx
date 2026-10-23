@@ -66,6 +66,7 @@ export function GradeReadout({
   limitedPill,
   disclosure,
   samplePage = false,
+  previewPage = false,
   demoPage = false,
   onCheckAnother,
 }: {
@@ -84,6 +85,8 @@ export function GradeReadout({
   limitedPill: string | null;
   disclosure?: string;
   samplePage?: boolean;
+  /** Owner /preview. Left out of grades run and loan clicks. Not a sample run. */
+  previewPage?: boolean;
   demoPage?: boolean;
   onCheckAnother: () => void;
 }) {
@@ -242,7 +245,7 @@ export function GradeReadout({
       target="_top"
       className={`cu-primary cu-ring flex w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? 'h-8' : 'h-11 md:w-auto'}`}
       onClick={() => {
-        void fetch(`/api/cu/${tenantId}/loan-click${samplePage ? '?sample=1' : ''}`, { method: 'POST', keepalive: true }).catch(() => undefined);
+        void fetch(`/api/cu/${tenantId}/loan-click${samplePage ? '?sample=1' : previewPage ? '?preview=1' : ''}`, { method: 'POST', keepalive: true }).catch(() => undefined);
       }}
     >
       <span className={pinned ? 'whitespace-nowrap' : 'truncate'}>{pinned ? 'Check your rate' : `Check your rate with ${shortName}`}</span>
@@ -271,7 +274,6 @@ export function GradeReadout({
           {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
         </p>
         <p className="mt-1 text-[14px] font-semibold leading-[20px]">{PRINT_NOT_ADVICE}</p>
-        {disclosure ? <p className="mt-2 text-[14px] leading-[20px]">{disclosure}</p> : null}
         {preApprovalUrl ? (
           <p className="mt-2 break-all text-[14px] leading-[20px]" suppressHydrationWarning>
             {loanUrlForPrint(preApprovalUrl, origin)}

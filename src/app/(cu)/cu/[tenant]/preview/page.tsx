@@ -9,10 +9,14 @@ import { CheckForm } from '../CheckForm';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Preview',
-  robots: { index: false, follow: false },
-};
+/** Logged-out HTML must not name the credit union. This replaces the tenant layout description. */
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Preview',
+    description: 'Sign in to preview this page. Educational comparison. Not an offer of credit.',
+    robots: { index: false, follow: false },
+  };
+}
 
 /**
  * Signed-in staff only. Shows the draft brand before email confirmation.
@@ -64,7 +68,7 @@ export default async function PreviewPage({
           logoAspect={brand.logoAspect}
         />
       </header>
-      <CheckForm tenant={pub} brand={brand} disclosure={tenant.disclosure} demoPage={demoPage} />
+      <CheckForm tenant={pub} brand={brand} disclosure={tenant.disclosure} demoPage={demoPage} previewRun />
     </>
   );
 }

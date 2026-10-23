@@ -105,10 +105,10 @@ Answer: [Draft design] A person using the credit union's branded page. The servi
 ## 3. Data
 
 3.1 Is member nonpublic personal information stored?
-Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, per-tenant integers only (grades run, loan-application clicks, worksheet uploads, and a count of each letter grade), and audit lines (time, action, id, who). A sample grade is not added to those integers. Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — ${OWNER_BLANK}
+Answer: [Draft design] The member form does not ask for name, email, address, phone, Social Security number, account number, member number, or date of birth. A worksheet image or PDF may include a member name and VIN. That file is sent to Anthropic for the request and is not stored by this application. Staff trial records store the credit union name, a contact name, a work email, and a scrypt hash of the staff login. The store also holds branding, settings, per-tenant integers only (grades run, loan-application clicks, worksheet uploads, and a count of each letter grade), and audit lines (time, action, id, who). The staff login record is a work email and a scrypt hash, not a name and not the password. The contact name is on the tenant profile. A sample grade is not added to those integers. An owner preview grade is not added to grades run or loan-application clicks. That preview grade is still added to the letter aggregate when it returns a letter. Whether a worksheet that contains a name or VIN is nonpublic personal information under the credit union's GLBA program — ${OWNER_BLANK}
 
 3.2 Are quote numbers stored?
-Answer: [Draft design] Quote figures are used to produce the result for that visit. They are not written to an application database as a member file. Usage is stored as per-tenant integers only: grades run, loan-application clicks, worksheet uploads, and how many results returned each letter. They do not record the quote. A sample grade (?sample=1) is not added.
+Answer: [Draft design] Quote figures are used to produce the result for that visit. They are not written to an application database as a member file. Usage is stored as per-tenant integers only: grades run, loan-application clicks, worksheet uploads, and how many results returned each letter. They do not record the quote. A sample grade (?sample=1) is not added. An owner preview grade (?preview=1) is not added to grades run or loan-application clicks. The letter aggregate is still written for that preview grade.
 
 3.3 Are documents or photos of contracts uploaded?
 Answer: [Draft design] Optional, on the member page. Every upload sends the full worksheet image, which may include a name or VIN, to Anthropic. Sign or Walk does not store that file. The Harborlight marketing embed hides that upload. The grade is produced by rules in this application (template pack tp-1.0.0). A model does not write the sentences a member reads.
@@ -143,6 +143,9 @@ Answer: [Draft design] Resend, when configured, sends the trial confirmation to 
 
 5.4 Payments
 Answer: [Draft design] Stripe Checkout is not implemented. No Stripe secret is required to build or run this marketing page.
+
+5.5 Redis/KV store
+Answer: [Draft design] When UPSTASH_REDIS_REST_URL or KV_REST_API_URL is set, with the matching token, credit-union records are written through that REST API (Upstash Redis or Vercel KV). The store holds the tenant profile (including the contact name and a SHA-256 hash of an unused confirmation token), the staff login (work email and a scrypt hash, not the password; the staff record has no name field), branding, settings (including the credit-union inbox), integer counters (grades run and loan-application clicks), the letter aggregate (counts of checks, worksheet uploads, and each letter A–F), the directory index, a seed marker, a removal list, audit lines (time, action, id, who), and signup and demo rate-window counts keyed by a hash. It does not hold the worksheet or the numbers typed into the form. A sample grade is not added to those counters or to the letter aggregate. An owner preview grade is not added to grades run or loan-application clicks. The letter aggregate is still written for that preview grade, and a preview worksheet upload is still counted. Without those variables, the process keeps an in-memory copy.
 
 ## 6. Access, change, and logging
 
@@ -434,7 +437,7 @@ An uploaded worksheet is different. It may contain a member name and VIN. See se
 
 [Draft design] Dealer-quote figures the person chooses to type (for example price, rate, and term), for long enough to build the on-screen result, and not as a retained member record. Also uploaded worksheet images or PDFs, sent to the AI vendor and not stored by us. Anthropic is the processor for that file. DPA, retention window, and region — ${OWNER_BLANK}
 
-Staff trial records (credit union name, contact name, work email, scrypt login hash), branding, settings, per-tenant integers (grades run, loan-application clicks, worksheet uploads, and a count of each letter grade), and audit lines are stored. They are not a member worksheet. A sample grade is not added to those integers.
+Staff trial records are stored: the tenant profile holds the credit union name and contact name, and the staff login holds the work email and a scrypt hash (not the password, and not a staff name). Branding, settings, per-tenant integers (grades run, loan-application clicks, worksheet uploads, and a count of each letter grade), and audit lines are stored. They are not a member worksheet. A sample grade is not added to those integers. An owner preview grade is not added to grades run or loan-application clicks. The letter aggregate is still written for that preview grade.
 
 [To be completed] Incidental technical data in host or edge logs (which may include IP address). The application log is intended to exclude quote inputs, IP address, and user agent. Retention of any platform log is not answered in this draft.
 
@@ -447,11 +450,12 @@ Process the quote figures only to show the educational result and the credit uni
 | Subprocessor | Role | Status in this draft |
 | --- | --- | --- |
 | Vercel | Application hosting | Intended |
+| Upstash Redis or Vercel KV | Redis/KV store. The client calls the REST URL in UPSTASH_REDIS_REST_URL or KV_REST_API_URL. It holds the tenant profile (contact name, URLs, trial and onboarding flags, and a SHA-256 hash of an unused confirmation token), branding, settings, the staff login (work email and a scrypt hash, not the password), grades-run and loan-click integers, the letter aggregate (counts of checks, worksheet uploads, and each letter), the directory index, audit lines (time, action, id, who), and hashed signup and demo rate-window counts. It does not hold the worksheet or the typed quote numbers. | In use when that URL and its token are set. Otherwise the process keeps an in-memory copy. |
 | Anthropic | Reads an uploaded worksheet image or PDF for that request. DPA, region, and retention are ${OWNER_BLANK}. | In use on extract when the API key is set |
 | Resend | Trial confirmation, signup notice, and an optional count summary. Does not receive the worksheet. | In use when configured |
 | Stripe | Card checkout | Not implemented |
 
-Grade and loan-link counters stay in the application store as per-tenant integers, not a member record.
+Grade and loan-link counters stay in that Redis/KV store as per-tenant integers, not a member record. A sample grade is not added to them or to the letter aggregate. An owner preview grade is not added to grades run or loan-application clicks. The letter aggregate is still written for that preview grade.
 
 A change-notice process for new subprocessors is [To be completed].
 

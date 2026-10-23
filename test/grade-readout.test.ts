@@ -135,10 +135,10 @@ test('questions come from hurt rows and the summary is plain text', () => {
     'This grade doesn\'t look at your credit history or score.',
     'Grades never use age, race, sex, ZIP code, or other personal characteristics.',
     'Confirm every figure on the dealer\'s written worksheet before you agree to anything.',
-    'This grade is educational. This is not a loan offer.',
+    'Educational only. Not an offer of credit, and Harborlight CU does not endorse any dealer, vehicle or offer.',
   ]);
   assert.equal(lines.some(line => /benchmark|assumption/i.test(line)), false);
-  assert.equal(shortestDisclaimerLine('Harborlight CU'), 'This grade is educational. This is not a loan offer.');
+  assert.equal(shortestDisclaimerLine('Harborlight CU'), 'This grade doesn\'t look at your credit history or score.');
   assert.equal(shortestDisclaimerLine('Harborlight CU'), lines.reduce((shortest, line) => (line.length < shortest.length ? line : shortest)));
 });
 

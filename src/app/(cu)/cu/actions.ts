@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { canOpenTenant, checkCredentials, CU_SESSION_COOKIE, demoTenantId, signSession, verifySession, type CuSession } from '@/cu/auth';
 import { appendAudit, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
 import { requestOriginFrom } from '@/cu/embed';
+import { HTTPS_LINK } from '@/cu/form-copy';
 import { readLogoFile } from '@/cu/logo-file';
 import { sendAggregateSummary, sendTrialConfirm } from '@/cu/notify';
 import { readStaffEmail, staffLoginMatches } from '@/cu/staff-login';
@@ -131,28 +132,49 @@ export async function saveSettingsAction(formData: FormData) {
   redirect(`/cu/${tenant}/dashboard?section=settings&saved=settings`);
 }
 
-export async function saveLoanLinksAction(formData: FormData) {
-  const tenant = String(formData.get('tenant') ?? '');
+function httpsUrl(value: string): boolean {
+  if (value.length === 0 || value.length > 300) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+/** Loan URL is required. Rates URL is optional. Both, when present, must be https. */
+export async function saveDashboardLoanLinks(
+  tenant: string,
+  preApprovalUrl: string,
+  ratesUrl: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
   await guardMutable(tenant);
   const current = await getTenantProfile(tenant);
-  if (!current) redirect(`/cu/${tenant}/dashboard?error=links`);
-  const rates = String(formData.get('ratesUrl') ?? '').trim();
-  const profile = normalizeProfile({
-    ...current,
-    preApprovalUrl: String(formData.get('preApprovalUrl') ?? ''),
-    ratesUrl: rates,
-    loanLinksSet: true,
-    ratesLinkSet: Boolean(rates),
-  });
-  if (!profile) redirect(`/cu/${tenant}/dashboard?error=links`);
-  profile.confirmHash = current.confirmHash;
-  profile.verified = current.verified;
-  profile.tier = current.tier;
+  if (!current) return { ok: false, error: HTTPS_LINK };
+  const loan = preApprovalUrl.trim();
+  const rates = ratesUrl.trim();
+  if (/^http:\/\//i.test(loan) || !httpsUrl(loan)) return { ok: false, error: HTTPS_LINK };
+  if (rates && (/^http:\/\//i.test(rates) || !httpsUrl(rates))) return { ok: false, error: HTTPS_LINK };
+  current.preApprovalUrl = loan;
+  current.loanLinksSet = true;
+  current.ratesUrl = rates;
+  current.ratesLinkSet = Boolean(rates);
   try {
-    await saveTenantProfile(profile);
+    await saveTenantProfile(current);
   } catch {
-    redirect(`/cu/${tenant}/dashboard?error=links`);
+    return { ok: false, error: HTTPS_LINK };
   }
+  return { ok: true };
+}
+
+export async function saveLoanLinksAction(formData: FormData) {
+  const tenant = String(formData.get('tenant') ?? '');
+  const saved = await saveDashboardLoanLinks(
+    tenant,
+    String(formData.get('preApprovalUrl') ?? ''),
+    String(formData.get('ratesUrl') ?? ''),
+  );
+  if (!saved.ok) redirect(`/cu/${tenant}/dashboard?error=links`);
   redirect(`/cu/${tenant}/dashboard?saved=links`);
 }
 

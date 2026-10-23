@@ -1,18 +1,17 @@
-import { getAggregates, getSettings, type Aggregates } from './cu-store';
+import { getSettings, getTenantCounters } from './cu-store';
 import { loadCuTenant } from './tenant-directory';
 
 /**
- * Optional aggregate email to the credit union. The tenant toggle defaults off.
- * The body is counts and the credit-union name. It has no member data.
+ * Optional count email to the credit union. The tenant toggle defaults off.
+ * The body matches the dashboard labels. It has no member data.
  */
 
-export function summaryText(name: string, agg: Aggregates): string {
+export function summaryText(name: string, counters: { gradesRun: number; loanClicks: number }): string {
   return [
     name,
-    `Checks: ${agg.checks}`,
-    `Worksheet uploads: ${agg.uploads}`,
-    `Grades: A ${agg.grades.A}, B ${agg.grades.B}, C ${agg.grades.C}, D ${agg.grades.D}, F ${agg.grades.F}`,
-    'No member information is included.',
+    `Grades run: ${counters.gradesRun}`,
+    `Loan button clicks (not applications or unique members): ${counters.loanClicks}`,
+    'Grades describe offers, not members.',
   ].join('\n');
 }
 
@@ -82,8 +81,8 @@ export async function sendAggregateSummary(
 
   const { Resend } = await import('resend');
   const resend = new Resend(apiKey);
-  const agg = await getAggregates(tenantId);
-  const text = summaryText(tenant.name, agg);
+  const counters = await getTenantCounters(tenantId);
+  const text = summaryText(tenant.name, counters);
   await resend.emails.send({
     from,
     to,

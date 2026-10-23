@@ -151,21 +151,27 @@ async function DirectoryTable({ tenants }: { tenants: ResolvedTenant[] }) {
     settings: await getSettings(tenant.id),
   })));
   const gradesRun = rows.reduce((sum, row) => sum + row.counters.gradesRun, 0);
+  const loanClicks = rows.reduce((sum, row) => sum + row.counters.loanClicks, 0);
   return (
     <>
-      <div className="mt-8">
+      <div className="mt-8 flex flex-wrap gap-10">
         <p>
           <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{gradesRun}</span>
           <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Grades run</span>
         </p>
-        <p className="mt-4 text-[14px] leading-[20px] cu-muted">Grades describe offers, not members.</p>
+        <p>
+          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{loanClicks}</span>
+          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Loan button clicks (not applications or unique members)</span>
+        </p>
       </div>
+      <p className="mt-4 text-[14px] leading-[20px] cu-muted">Grades describe offers, not members.</p>
       <div className="mt-10 overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
               <th className="py-3 pr-4 font-semibold">Credit union</th>
               <th className="py-3 pr-4 text-right font-semibold">Grades run</th>
+              <th className="py-3 pr-4 text-right font-semibold">Loan button clicks (not applications or unique members)</th>
               <th className="hidden py-3 pr-4 font-semibold md:table-cell">Email</th>
               <th className="py-3 pr-4 font-semibold">Status</th>
               <th className="py-3 font-semibold">Edit</th>
@@ -176,6 +182,7 @@ async function DirectoryTable({ tenants }: { tenants: ResolvedTenant[] }) {
               <tr key={row.tenant.id} className="border-b cu-line text-[15px] leading-[20px]">
                 <td className="py-3 pr-4">{row.tenant.name}</td>
                 <td className="py-3 pr-4 text-right tabular-nums">{row.counters.gradesRun}</td>
+                <td className="py-3 pr-4 text-right tabular-nums">{row.counters.loanClicks}</td>
                 <td className="hidden py-3 pr-4 md:table-cell">{row.settings.emailEnabled ? 'On' : 'Off'}</td>
                 <td className="py-3 pr-4">
                   <span className="md:hidden">{row.tenant.status === 'paused' ? 'Paused' : 'Active'}</span>
@@ -197,14 +204,21 @@ async function Usage({ tenants }: { tenants: ResolvedTenant[] }) {
     counters: await getTenantCounters(tenant.id),
   })));
   const gradesRun = rows.reduce((sum, row) => sum + row.counters.gradesRun, 0);
+  const loanClicks = rows.reduce((sum, row) => sum + row.counters.loanClicks, 0);
   return (
     <section aria-labelledby="usage-heading">
       <h1 id="usage-heading" className="text-[32px] font-bold leading-[38px]">Usage</h1>
       <p className="mt-4 text-[14px] leading-[20px] cu-muted">All time</p>
-      <p className="mt-8">
-        <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{gradesRun}</span>
-        <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Grades run</span>
-      </p>
+      <div className="mt-8 flex flex-wrap gap-10">
+        <p>
+          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{gradesRun}</span>
+          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Grades run</span>
+        </p>
+        <p>
+          <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{loanClicks}</span>
+          <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Loan button clicks (not applications or unique members)</span>
+        </p>
+      </div>
       <p className="mt-4 text-[14px] leading-[20px] cu-muted">Grades describe offers, not members.</p>
       <div className="mt-10 overflow-x-auto">
         <table className="w-full border-collapse text-left">
@@ -212,6 +226,7 @@ async function Usage({ tenants }: { tenants: ResolvedTenant[] }) {
             <tr className="border-b cu-line text-[14px] leading-[20px] cu-muted">
               <th className="py-3 pr-4 font-semibold">Credit union</th>
               <th className="py-3 pr-4 text-right font-semibold">Grades run</th>
+              <th className="py-3 pr-4 text-right font-semibold">Loan button clicks (not applications or unique members)</th>
             </tr>
           </thead>
           <tbody>
@@ -219,11 +234,13 @@ async function Usage({ tenants }: { tenants: ResolvedTenant[] }) {
               <tr key={row.tenant.id} className="border-b cu-line text-[15px] leading-[20px]">
                 <td className="py-3 pr-4">{row.tenant.name}</td>
                 <td className="py-3 pr-4 text-right tabular-nums">{row.counters.gradesRun}</td>
+                <td className="py-3 pr-4 text-right tabular-nums">{row.counters.loanClicks}</td>
               </tr>
             ))}
             <tr className="text-[15px] font-semibold leading-[20px]">
               <td className="py-3 pr-4">Total</td>
               <td className="py-3 pr-4 text-right tabular-nums">{gradesRun}</td>
+              <td className="py-3 pr-4 text-right tabular-nums">{loanClicks}</td>
             </tr>
           </tbody>
         </table>

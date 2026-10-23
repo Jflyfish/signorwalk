@@ -7,9 +7,9 @@ Shown once, under the grade and the verdict, above the rows. Four lines, in this
 - `This grade doesn't look at your credit history or score.`
 - `Grades never use age, race, sex, ZIP code, or other personal characteristics.`
 - `Confirm every figure on the dealer's written worksheet before you agree to anything.`
-- `This grade is educational. This is not a loan offer.`
+- `Educational only. Not an offer of credit, and {short name} does not endorse any dealer, vehicle or offer.`
 
-The block does not say the grade estimates credit standing, and it does not say "benchmarks" or "labeled assumptions". An incomplete grade, before any verdict, shows only the shortest of these lines.
+The block does not say the grade estimates credit standing, and it does not say "benchmarks" or "labeled assumptions". An incomplete grade, before any verdict, shows only the shortest of these lines. With the credit-union short name filled in, that shortest line is the credit-history line. The credit union's own disclosure, when one is set, is printed once from the line under this block. It is not repeated in the print header.
 
 `EngineInput` has no credit-history, credit-score, age, race, sex, or ZIP field. It does have an optional `state` code. `evaluateDeal` does not read `state`. `report.ts` uses it only for a tax note. The two sentences above are also in How we grade, once each, and once each in the due-diligence questionnaire. They are not repeated under See details. This note does not say a regulator approved them.
 

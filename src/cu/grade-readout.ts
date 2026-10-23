@@ -18,8 +18,6 @@ export type OfferQuality = (typeof OFFER_QUALITY)[keyof typeof OFFER_QUALITY];
  * Shown once, under the grade and verdict.
  * Draft wording. Counsel for the credit union has not reviewed these sentences.
  */
-/** Educational line and not-an-offer line, kept together as one line. */
-export const GRADE_DISCLAIMER_NOT_AN_OFFER = 'This grade is educational. This is not a loan offer.';
 export const GRADE_DISCLAIMER_VERIFY = 'Confirm every figure on the dealer\'s written worksheet before you agree to anything.';
 /** Checked against EngineInput: no credit-history field and no score field. */
 export const GRADE_DISCLAIMER_NO_CREDIT = 'This grade doesn\'t look at your credit history or score.';
@@ -33,12 +31,12 @@ export const APR_NOT_A_MARKET_RATE = '(not a market rate or an offer)';
 export const PINNED_BAR_BODY_PX = 64;
 export const PINNED_BAR_HEIGHT = `calc(${PINNED_BAR_BODY_PX}px + env(safe-area-inset-bottom))`;
 
-export function gradeDisclaimerLines(_shortName: string): readonly string[] {
+export function gradeDisclaimerLines(shortName: string): readonly string[] {
   return [
     GRADE_DISCLAIMER_NO_CREDIT,
     GRADE_DISCLAIMER_NO_CHARACTERISTICS,
     GRADE_DISCLAIMER_VERIFY,
-    GRADE_DISCLAIMER_NOT_AN_OFFER,
+    `Educational only. Not an offer of credit, and ${shortName} does not endorse any dealer, vehicle or offer.`,
   ];
 }
 

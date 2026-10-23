@@ -7,12 +7,13 @@ import { getBranding, getSettings, getTenantCounters, resetHarborlightPreviewCou
 import { TALK_TO_US_EMAIL } from '@/app/(cu)/credit-unions/pricing';
 import { deepLink, iframeSnippet, memberOrigin } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
-import { resendConfirmAction, saveEmbedOriginsAction, saveLoanLinksAction, saveSettingsAction, sendSummaryAction } from '../../actions';
+import { resendConfirmAction, saveEmbedOriginsAction, saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 import { StaffHeader } from '../../StaffHeader';
 import { MemberPreview } from '../MemberPreview';
 import { BrandingForm } from './BrandingForm';
 import { CopyLink } from './CopyLink';
+import { LoanLinksForm } from './LoanLinksForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +31,16 @@ function sectionFrom(query: { section?: string; saved?: string; error?: string; 
   const stay = query.notice === 'confirm' || query.notice === 'sent' || query.notice === 'mail';
   if (query.saved === 'settings' || query.saved === 'email' || query.error === 'email' || (query.notice && !stay)) return 'settings';
   return 'usage';
+}
+
+function httpsOrEmpty(value: string): string {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || url.username || url.password) return '';
+    return value;
+  } catch {
+    return '';
+  }
 }
 
 function trialDaysLeft(iso: string, now = Date.now()): number | null {
@@ -100,8 +111,6 @@ export default async function DashboardPage({
       ? 'Check the credit-union email address.'
         : query.error === 'origins'
         ? 'Use one https origin per line.'
-          : query.error === 'links'
-          ? 'Use a link that starts with https://'
           : '';
   const saved = query.saved ? NOTICES[query.saved] : query.notice === 'sent' ? 'Confirmation email sent.' : '';
   const caution = query.notice === 'mail'
@@ -186,19 +195,13 @@ export default async function DashboardPage({
             </div>
           </section>
         ) : null}
-        {section === 'usage' && tenant.loanLinksSet === false ? (
-          <form action={saveLoanLinksAction} className="mb-10 grid max-w-[560px] gap-4">
-            <h2 className="text-[24px] font-bold leading-[30px]">Pre-approval and rates</h2>
-            <p className="text-[14px] leading-[20px] cu-muted">Add the credit union&apos;s own pages. These fields start empty.</p>
-            <label className="text-[14px] font-semibold leading-[20px]">Pre-approval URL
-              <input name="preApprovalUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="cu-ring mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
-            </label>
-            <label className="text-[14px] font-semibold leading-[20px]">Rates URL (optional)
-              <input name="ratesUrl" type="url" inputMode="url" autoComplete="off" spellCheck={false} className="cu-ring mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal" />
-            </label>
-            <input type="hidden" name="tenant" value={tenant.id} />
-            <button type="submit" className="cu-primary cu-ring inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Save links</button>
-          </form>
+        {section === 'usage' ? (
+          <LoanLinksForm
+            tenantId={tenant.id}
+            initialLoan={tenant.loanLinksSet === false ? '' : httpsOrEmpty(tenant.preApprovalUrl)}
+            initialRates={tenant.ratesLinkSet === false ? '' : httpsOrEmpty(tenant.ratesUrl)}
+            serverRejected={query.error === 'links'}
+          />
         ) : null}
         {tenant.verified && tenant.embedOrigins.length === 0 ? (
           <form action={saveEmbedOriginsAction} className="mb-6 grid max-w-[560px] gap-4">
@@ -207,7 +210,7 @@ export default async function DashboardPage({
               <span className="mt-2 block font-normal cu-muted">Add at least one website that can show the tool.</span>
               <textarea id="embed-allowlist" name="embedOrigins" rows={3} className="cu-ring mt-2 block w-full rounded-lg border cu-line px-4 py-3 text-[16px] font-normal" />
             </label>
-            <button type="submit" className={`${section === 'usage' && tenant.loanLinksSet === false ? 'inline-flex h-12 w-full items-center justify-center rounded-lg border cu-line bg-white px-4 text-[15px] font-semibold cu-ink md:h-11 md:w-auto' : 'cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto'}`}>Save website</button>
+            <button type="submit" className={`${section === 'usage' ? 'inline-flex h-12 w-full items-center justify-center rounded-lg border cu-line bg-white px-4 text-[15px] font-semibold cu-ink md:h-11 md:w-auto' : 'cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto'}`}>Save website</button>
           </form>
         ) : null}
         {saved ? <Alert tone="ok">{saved}</Alert> : null}
@@ -217,10 +220,16 @@ export default async function DashboardPage({
         {section === 'usage' ? <section aria-labelledby="usage-heading">
           <h2 id="usage-heading" className="text-[24px] font-bold leading-[30px]">Usage</h2>
           <p className="mt-4 text-[14px] leading-[20px] cu-muted">All time</p>
-          <p className="mt-8">
-            <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{counters.gradesRun}</span>
-            <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Grades run</span>
-          </p>
+          <div className="mt-8 flex flex-wrap gap-10">
+            <p>
+              <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{counters.gradesRun}</span>
+              <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Grades run</span>
+            </p>
+            <p>
+              <span className="block text-[32px] font-bold leading-[32px] tabular-nums">{counters.loanClicks}</span>
+              <span className="mt-2 block text-[14px] leading-[20px] cu-muted">Loan button clicks (not applications or unique members)</span>
+            </p>
+          </div>
           <p className="mt-4 text-[14px] leading-[20px] cu-muted">Grades describe offers, not members.</p>
         </section> : null}
 

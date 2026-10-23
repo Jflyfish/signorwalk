@@ -120,6 +120,7 @@ export function CheckForm({
   autoGrade = false,
   disclosure,
   sampleRun = false,
+  previewRun = false,
   demoPage = false,
 }: {
   tenant: CuPublic;
@@ -134,6 +135,8 @@ export function CheckForm({
   disclosure?: string;
   /** ?sample=1. Those runs are left out of every total. */
   sampleRun?: boolean;
+  /** Owner /preview. Skips grades run and loan clicks only. */
+  previewRun?: boolean;
   /** Seeded demo tenant or the sample grade. Real tenants stay unmarked. */
   demoPage?: boolean;
 }) {
@@ -298,7 +301,7 @@ export function CheckForm({
     setNeedsApr(false);
     setBusy(true);
     try {
-      const res = await fetch(`/api/cu/${tenant.id}/analyze${sampleRun ? '?sample=1' : ''}`, {
+      const res = await fetch(`/api/cu/${tenant.id}/analyze${sampleRun ? '?sample=1' : previewRun ? '?preview=1' : ''}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -396,6 +399,7 @@ export function CheckForm({
         limitedPill={limitedPill}
         disclosure={disclosure}
         samplePage={sampleRun}
+        previewPage={previewRun}
         demoPage={demoPage}
         onCheckAnother={() => { setReport(null); setError(''); }}
       />

@@ -75,14 +75,16 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
     });
     const grade = analysis.grade;
     const sample = req.nextUrl.searchParams.get('sample') === '1';
+    const ownerPreview = req.nextUrl.searchParams.get('preview') === '1';
     const record = async () => {
-      if (sample) return;
-      try {
-        await recordGradeRun(tenant.id);
-      } catch {
-        /* A failed counter write must not affect the grade. */
+      if (!sample && !ownerPreview) {
+        try {
+          await recordGradeRun(tenant.id);
+        } catch {
+          /* A failed counter write must not affect the grade. */
+        }
       }
-      if (grade === 'A' || grade === 'B' || grade === 'C' || grade === 'D' || grade === 'F') {
+      if (!sample && (grade === 'A' || grade === 'B' || grade === 'C' || grade === 'D' || grade === 'F')) {
         try {
           await recordCheck(tenant.id, grade);
         } catch {
