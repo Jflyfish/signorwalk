@@ -310,9 +310,8 @@ export function CheckForm({
     return (
       <div className={embedded
         ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
-        : 'mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pt-24'} aria-label="Incomplete">
-        <p className="text-[14px] font-semibold leading-[20px]">Incomplete</p>
-        <h1 ref={headingRef} tabIndex={-1} className="mt-6 text-[24px] font-bold leading-[30px] outline-none">
+        : 'mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pt-24'}>
+        <h1 ref={headingRef} tabIndex={-1} className="text-[24px] font-bold leading-[30px] outline-none">
           Incomplete: add your APR for a full grade.
         </h1>
         <p className="mt-4 text-[18px] leading-[28px]">

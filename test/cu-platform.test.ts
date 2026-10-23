@@ -330,6 +330,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(form, /cu-ring/);
   const readout = readFileSync('src/app/(cu)/cu/[tenant]/GradeReadout.tsx', 'utf8');
   assert.match(readout, /Get pre-approved with \{shortName\}/);
+  assert.match(readout, /md:hidden">Get pre-approved/);
   assert.match(readout, /See auto rates/);
   assert.match(readout, /inline-flex items-center gap-2/);
   assert.match(readout, /target="_top"/);

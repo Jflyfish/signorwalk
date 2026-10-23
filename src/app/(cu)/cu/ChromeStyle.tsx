@@ -40,6 +40,7 @@ export function ChromeStyle() {
       @media print {
         .cu-no-print, .cu-embed-attribution, .cu-pinned { display: none !important; }
         .cu-print-only, .cu-details-collapsed, .cu-more-collapsed { display: block !important; }
+        .cu-figures { color: #555 !important; }
       }
     `}</style>
   );

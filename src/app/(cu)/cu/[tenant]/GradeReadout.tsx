@@ -4,13 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import { GRADE_FILL } from '@/cu/grades';
 import {
   LOAN_CTA_HELPER,
+  PINNED_BAR_HEIGHT,
   PRINT_NOT_ADVICE,
   QUESTIONS_ON_SCREEN,
   aprGradeExplanation,
   copySummary,
   dealerQuestions,
+  detailExplanation,
+  filterDetailSentences,
   figuresEntered,
   gradeDisclaimerLines,
+  loanUrlForPrint,
   offerQuality,
   readoutRows,
   verdictSentence,
@@ -76,7 +80,8 @@ export function GradeReadout({
 }) {
   const heroRef = useRef<HTMLDivElement>(null);
   const detailsRef = useRef<HTMLDivElement>(null);
-  const inlineCtaRef = useRef<HTMLDivElement>(null);
+  const inlineButtonRef = useRef<HTMLAnchorElement>(null);
+  const rowsRef = useRef<HTMLUListElement>(null);
   const howButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -84,6 +89,7 @@ export function GradeReadout({
   const [howOpen, setHowOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [pinCta, setPinCta] = useState(false);
+  const [origin, setOrigin] = useState('');
   const quality = offerQuality(report.grade) ?? 'Fair';
   const verdict = verdictSentence(report, aprBlank);
   const rows = readoutRows(report);
@@ -109,14 +115,36 @@ export function GradeReadout({
   }, [report]);
 
   useEffect(() => {
-    const node = inlineCtaRef.current;
-    if (!node || embedded) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      setPinCta(!entry.isIntersecting && entry.boundingClientRect.top < 0);
-    });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [embedded, report]);
+    setOrigin(window.location.origin);
+  }, []);
+
+  useEffect(() => {
+    const button = inlineButtonRef.current;
+    if (!button || embedded) {
+      setPinCta(false);
+      return;
+    }
+    const barZone = 120;
+    const place = () => {
+      const rect = button.getBoundingClientRect();
+      const topInView = rect.top >= 0 && rect.top < window.innerHeight;
+      const rows = rowsRef.current;
+      let coversRows = false;
+      if (rows) {
+        const rowsRect = rows.getBoundingClientRect();
+        const zoneTop = window.innerHeight - barZone;
+        coversRows = rowsRect.top < window.innerHeight && rowsRect.bottom > zoneTop;
+      }
+      setPinCta(!topInView && !coversRows);
+    };
+    place();
+    window.addEventListener('scroll', place, { passive: true });
+    window.addEventListener('resize', place);
+    return () => {
+      window.removeEventListener('scroll', place);
+      window.removeEventListener('resize', place);
+    };
+  }, [embedded, report, showPreapproval]);
 
   function closeHow() {
     setHowOpen(false);
@@ -186,12 +214,18 @@ export function GradeReadout({
 
   const loanButton = (pinned: boolean) => (
     <a
+      ref={pinned ? undefined : inlineButtonRef}
       href={memberLink(preApprovalUrl)}
       target="_top"
       className={`cu-primary cu-ring flex h-11 w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? '' : 'md:w-auto'}`}
       onClick={() => onCta('preapproval')}
     >
-      <span className="truncate">Get pre-approved with {shortName}</span>
+      {pinned ? <span className="truncate">Get pre-approved</span> : (
+        <>
+          <span className="truncate md:hidden">Get pre-approved</span>
+          <span className="hidden truncate md:inline">Get pre-approved with {shortName}</span>
+        </>
+      )}
       {demoPreapproval ? (
         <span className="inline-flex shrink-0 items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
       ) : null}
@@ -201,7 +235,8 @@ export function GradeReadout({
   return (
     <div className={embedded
       ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
-      : `mx-auto w-full max-w-[560px] px-4 ${showPreapproval ? 'pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-16' : 'pb-16'} pt-16 md:pt-24`}>
+      : `mx-auto w-full max-w-[560px] px-4 ${showPreapproval ? 'pb-[var(--cu-pin-h)] md:pb-16' : 'pb-16'} pt-16 md:pt-24`}
+      style={showPreapproval && !embedded ? { ['--cu-pin-h' as string]: PINNED_BAR_HEIGHT } : undefined}>
       <div className="cu-print-only mb-6">
         <BrandLockup
           name={creditUnionName}
@@ -216,7 +251,11 @@ export function GradeReadout({
           {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
         </p>
         <p className="mt-1 text-[14px] font-semibold leading-[20px]">{PRINT_NOT_ADVICE}</p>
-        {preApprovalUrl ? <p className="mt-2 break-all text-[14px] leading-[20px]">{preApprovalUrl}</p> : null}
+        {preApprovalUrl ? (
+          <p className="mt-2 break-all text-[14px] leading-[20px]" suppressHydrationWarning>
+            {loanUrlForPrint(preApprovalUrl, origin)}
+          </p>
+        ) : null}
       </div>
 
       <div
@@ -244,14 +283,14 @@ export function GradeReadout({
 
       {entered > 0 ? (
         <p className="mt-4">
-          <button type="button" className={textLink} onClick={openDetails}>
+          <button type="button" className={`${textLink} cu-figures`} onClick={openDetails}>
             Based on {entered} {entered === 1 ? 'figure' : 'figures'} you entered
           </button>
         </p>
       ) : null}
 
       {rows.length > 0 ? (
-        <ul className="mt-8" aria-label="What helped and what hurt">
+        <ul ref={rowsRef} className="mt-8" aria-label="What helped and what hurt">
           {rows.map(row => (
             <li key={row.label} className="border-t cu-line py-4">
               <div className="flex items-baseline gap-3">
@@ -296,7 +335,7 @@ export function GradeReadout({
       ) : null}
 
       {showRates ? (
-        <p className="mt-8">
+        <p className="cu-no-print mt-8">
           <a
             href={memberLink(ratesUrl)}
             target="_top"
@@ -312,7 +351,7 @@ export function GradeReadout({
       ) : null}
 
       {showPreapproval ? (
-        <div ref={inlineCtaRef} className="cu-no-print mt-4">
+        <div className="cu-no-print mt-4">
           {loanButton(false)}
           <p className="mt-2 flex items-center gap-2 text-[13px] leading-[18px] cu-muted">
             <span>{LOAN_CTA_HELPER}</span>
@@ -344,15 +383,20 @@ export function GradeReadout({
             <section aria-labelledby="breakdown-heading">
               <h2 id="breakdown-heading" className="text-[24px] font-bold leading-[30px]">Figures you entered</h2>
               <ul className="mt-4">
-                {report.breakdown.map(row => (
+                {report.breakdown.map(row => {
+                  const explanation = detailExplanation(row);
+                  return (
                   <li key={row.label} className="border-t cu-line py-4">
                     <div className="flex items-baseline justify-between gap-4">
                       <p className="text-[18px] leading-[28px]">{row.label}</p>
                       <p className="text-[18px] font-semibold leading-[28px] tabular-nums">{row.value}</p>
                     </div>
-                    <p className="mt-2 text-[14px] leading-[20px] cu-muted">{row.explanation}</p>
+                    {explanation ? (
+                      <p className="mt-2 text-[14px] leading-[20px] cu-muted">{explanation}</p>
+                    ) : null}
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </section>
           ) : null}
@@ -360,20 +404,16 @@ export function GradeReadout({
           {report.tradeIn ? (
             <section className="mt-10 border-t cu-line pt-6" aria-labelledby="trade-heading">
               <h2 id="trade-heading" className="text-[24px] font-bold leading-[30px]">{report.tradeIn.headline}</h2>
-              <p className="mt-4 text-[18px] leading-[28px]">{report.tradeIn.details}</p>
+              <p className="mt-4 text-[18px] leading-[28px]">{filterDetailSentences(report.tradeIn.details)}</p>
             </section>
           ) : null}
 
           {report.stateTaxNote ? (
             <section className="mt-10 border-t cu-line pt-6" aria-labelledby="tax-heading">
               <h2 id="tax-heading" className="text-[24px] font-bold leading-[30px]">Trade-in and tax</h2>
-              <p className="mt-4 text-[18px] leading-[28px]">{report.stateTaxNote}</p>
+              <p className="mt-4 text-[18px] leading-[28px]">{filterDetailSentences(report.stateTaxNote)}</p>
             </section>
           ) : null}
-
-          <ul className="mt-10 space-y-4 border-t cu-line pt-6 text-[14px] leading-[20px] cu-muted">
-            {report.disclaimers.map(line => <li key={line}>{line}</li>)}
-          </ul>
 
           <p className="cu-no-print mt-6">
             <button ref={howButtonRef} type="button" className={textLink} onClick={() => setHowOpen(true)}>How we grade</button>
@@ -388,14 +428,15 @@ export function GradeReadout({
 
       {showPreapproval && pinCta && !embedded ? (
         <div
-          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 flex items-center border-t bg-white px-3 md:hidden"
+          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 border-t bg-white px-3 md:hidden"
           style={{
             borderColor: '#E5E5E5',
-            height: 'calc(64px + env(safe-area-inset-bottom))',
-            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingTop: 12,
+            paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
           }}
         >
           {loanButton(true)}
+          <p className="mt-1 text-center text-[12px] leading-[16px] text-[#555]">{LOAN_CTA_HELPER}</p>
         </div>
       ) : null}
 
@@ -415,7 +456,6 @@ export function GradeReadout({
               The letter compares this offer with the numbers you entered. Strong, Fair, and Weak describe the offer. They do not describe your credit.
             </p>
             <p className="mt-4 text-[16px] leading-[24px]">{grading}</p>
-            <p className="mt-4 text-[16px] leading-[24px]">This grade is educational. It is not a loan offer.</p>
             <p className="mt-6">
               <button type="button" className={textLink} onClick={closeHow}>Close</button>
             </p>
