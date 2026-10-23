@@ -1,6 +1,6 @@
 /** Which /cu URLs are real pages, and which must answer 404. */
 
-const KNOWN_SUBPATH = new Set(['', 'embed', 'dashboard', 'sign-in', 'confirm']);
+const KNOWN_SUBPATH = new Set(['', 'embed', 'dashboard', 'sign-in', 'confirm', 'onboarding']);
 
 export type CuPathDisposition =
   | { kind: 'continue' }
