@@ -6,7 +6,7 @@ import { FILE_READ_ERROR } from '@/cu/copy';
 import { UploadDisclosure } from '@/cu/UploadDisclosure';
 import type { DerivedBrand } from '@/cu/contrast';
 import { DEMO_FINANCE_SAMPLE, DEMO_GRADE_C, DEMO_GRADE_D } from '@/cu/demo-sample';
-import { gradeDisclaimerLines } from '@/cu/grade-readout';
+import { shortestDisclaimerLine } from '@/cu/grade-readout';
 import type { TenantReport } from '@/cu/engine/types';
 import type { CuPublic } from '@/cu/tenants';
 import { US_STATES } from '@/lib/states';
@@ -317,9 +317,7 @@ export function CheckForm({
         <p className="mt-4 text-[18px] leading-[28px]">
           This finance offer has no APR from the worksheet, so there is no grade yet. A grade from this tool is a comparison, not a credit decision.
         </p>
-        <ul className="mt-4 space-y-1 text-[13px] leading-[18px] cu-muted">
-          {gradeDisclaimerLines(brand.shortName).map(line => <li key={line}>{line}</li>)}
-        </ul>
+        <p className="mt-4 text-[13px] leading-[18px] cu-muted">{shortestDisclaimerLine(brand.shortName)}</p>
         <p className="mt-10">
           <button
             type="button"
@@ -372,7 +370,7 @@ export function CheckForm({
       {demoSample ? (
         <>
           <p className="mt-4 text-[15px] leading-[24px]">
-            Sample finance offer for this demo, with a {DEMO_FINANCE_SAMPLE.apr}% APR. Replace any number with the worksheet.
+            {`Sample finance offer for this demo, with a ${DEMO_FINANCE_SAMPLE.apr}% APR. Replace any number with the worksheet.`}
           </p>
           <div className="cu-no-print mt-4 flex flex-wrap items-center gap-3">
             <button type="button" className={`${textLink} cu-ring`} onClick={() => applySample('a')}>Try a sample deal</button>

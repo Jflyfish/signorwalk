@@ -18,10 +18,10 @@ export type OfferQuality = (typeof OFFER_QUALITY)[keyof typeof OFFER_QUALITY];
  * Shown once, under the grade and verdict.
  * Draft wording. Counsel for the credit union has not reviewed these sentences.
  */
-export const GRADE_DISCLAIMER_NOT_AN_OFFER = 'This is not a loan offer.';
-export const GRADE_DISCLAIMER_EDUCATIONAL = 'This grade is educational.';
-export const GRADE_DISCLAIMER_VERIFY = 'Confirm every figure on the dealer\'s written worksheet before you agree to anything. Benchmarks are labeled assumptions and can differ from a lender\'s actual pricing.';
-export const GRADE_DISCLAIMER_NO_TIER = 'The grade does not estimate credit standing, does not use demographic information, and does not predict whether an application will be approved.';
+/** Educational line and not-an-offer line, kept together as one line. */
+export const GRADE_DISCLAIMER_NOT_AN_OFFER = 'This grade is educational. This is not a loan offer.';
+export const GRADE_DISCLAIMER_VERIFY = 'Confirm every figure on the dealer\'s written worksheet before you agree to anything.';
+export const GRADE_DISCLAIMER_NO_TIER = 'The grade does not estimate credit standing or use demographic data. It uses fixed grading cutoffs.';
 export const LOAN_CTA_HELPER = 'Not an offer of credit.';
 export const PRINT_NOT_ADVICE = 'Not financial advice.';
 export const APR_NOT_A_MARKET_RATE = '(not a market rate or an offer)';
@@ -33,11 +33,15 @@ export const PINNED_BAR_HEIGHT = `calc(${PINNED_BAR_BODY_PX}px + env(safe-area-i
 export function gradeDisclaimerLines(shortName: string): readonly string[] {
   return [
     GRADE_DISCLAIMER_NOT_AN_OFFER,
-    `${shortName} does not endorse the dealer.`,
-    GRADE_DISCLAIMER_EDUCATIONAL,
+    `${shortName} does not endorse the dealer. ${GRADE_DISCLAIMER_NO_TIER}`,
     GRADE_DISCLAIMER_VERIFY,
-    GRADE_DISCLAIMER_NO_TIER,
   ];
+}
+
+/** Incomplete state. The full block stays under a verdict. */
+export function shortestDisclaimerLine(shortName: string): string {
+  const lines = gradeDisclaimerLines(shortName);
+  return lines.reduce((shortest, line) => (line.length < shortest.length ? line : shortest));
 }
 
 export function offerQuality(grade: string): OfferQuality | null {
@@ -381,7 +385,7 @@ function classifyApr(row: ReportRow, cuts: GradeCutoffs): Classified | null {
   if (apr > cuts.veryHigh) return hurt(`above this tool's ${formatCut(cuts.veryHigh)}% cutoff ${APR_NOT_A_MARKET_RATE}`, undefined, 0);
   if (apr > cuts.high) return hurt(`above this tool's ${formatCut(cuts.high)}% cutoff ${APR_NOT_A_MARKET_RATE}`, undefined, 0);
   if (apr > 0 && apr <= cuts.strong) return helped(`at or under this tool's ${formatCut(cuts.strong)}% cutoff ${APR_NOT_A_MARKET_RATE}`);
-  if (apr <= cuts.high) return neutral(`does not earn the strong-rate credit ${APR_NOT_A_MARKET_RATE}`);
+  if (apr <= cuts.high) return neutral(`between ${formatCut(cuts.strong)}% and ${formatCut(cuts.high)}%: not flagged ${APR_NOT_A_MARKET_RATE}`);
   return null;
 }
 
@@ -476,10 +480,57 @@ export function filterDetailSentences(text: string): string {
     .join(' ');
 }
 
+function moneyAfter(text: string, label: string): string | null {
+  return text.match(new RegExp(`${label} (\\$[\\d,]+(?:\\.\\d+)?)`))?.[1] ?? null;
+}
+
+/** A full sentence. The figure and the cutoff come from the row and the engine. */
+function detailSentence(row: ReportRow, why: string): string {
+  const figure = figureOf(row.value);
+  const label = SHORT_LABEL[row.label] ?? row.label;
+  if (row.label === 'Price versus MSRP') {
+    const msrp = moneyAfter(row.explanation, 'MSRP of');
+    const gap = dollarGap(row);
+    if (row.value.includes('over MSRP') && gap && msrp) return `Price is ${gap} over the MSRP of ${msrp}.`;
+    if (row.value.includes('under MSRP') && gap && msrp) return `Price is ${gap} under the MSRP of ${msrp}.`;
+    const line = formatCut(gradeCutoffs().priceAtMsrp);
+    return msrp
+      ? `Price is ${figure}. The discount is under ${line}% of the MSRP of ${msrp}.`
+      : `Price is ${figure}. The discount is under ${line}% of MSRP.`;
+  }
+  if (row.label === 'Term') {
+    const line = why.match(/^(\d+) months or longer$/)?.[1];
+    if (line) return `Term is ${figure}, at or above this tool's ${line}-month line.`;
+  }
+  if (row.label === 'APR' && why.startsWith('between ')) {
+    return `APR is ${figure}, ${why.replace(': not flagged ', ' and is not flagged ')}.`;
+  }
+  if (row.label === 'Monthly payment') {
+    const calculated = moneyAfter(row.explanation, 'entered is');
+    if (calculated && why.endsWith(' calculated payment')) {
+      return `Monthly payment is ${figure}, which is ${why.slice(0, -' calculated payment'.length)} the calculated payment of ${calculated}.`;
+    }
+    return `Monthly payment is ${figure}, which is ${why}.`;
+  }
+  if (row.label === 'Total interest') return `Interest is ${figure}, which is ${why}.`;
+  if (row.label === 'Residual') return `Residual is ${figure}, ${why.replace(/^residual /, '')}.`;
+  if (row.label === 'Cap cost reduction') return `Cap reduction is ${figure}, paid up front on this lease.`;
+  if (row.label === 'Trade-in') {
+    const offer = moneyAfter(row.explanation, 'trade offer of');
+    const payoff = moneyAfter(row.explanation, 'payoff of');
+    const below = moneyAfter(row.explanation, 'is');
+    if (offer && payoff && below) return `The trade offer of ${offer} is ${below} below the payoff of ${payoff}.`;
+  }
+  if (row.label === 'Appearance product' && why === 'appearance product on this offer') {
+    return `An appearance product of ${figure} is on this offer.`;
+  }
+  return `${label} is ${figure}, ${why}.`;
+}
+
 /** What See details shows for one row: a full sentence that includes the reason. */
 export function detailExplanation(row: ReportRow): string {
   const reason = classify(row)?.why;
-  if (reason) return `${row.label} is ${figureOf(row.value)}, ${reason}.`;
+  if (reason) return detailSentence(row, reason);
   const filtered = filterDetailSentences(row.explanation).trim();
   if (!filtered) return '';
   return /[.!?]$/.test(filtered) ? filtered : `${filtered}.`;
@@ -545,8 +596,9 @@ export function readoutRows(report: Pick<TenantReport, 'breakdown'>): ReadoutRow
   return scoredRows(report).slice(0, 5);
 }
 
+/** Lowercase plain words. Leave an all-caps token, such as APR or GAP, as written. */
 function verdictName(label: string): string {
-  return label.toLowerCase();
+  return label.split(/(\s+)/).map(part => (/^[A-Z0-9]{2,}$/.test(part) ? part : part.toLowerCase())).join('');
 }
 
 function hurtPhrase(row: ReadoutRow): string {

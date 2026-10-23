@@ -9,11 +9,13 @@ import {
   aprGradeExplanation,
   copySummary,
   dealerQuestions,
+  detailExplanation,
   figuresEntered,
   formatCut,
   gradeCutoffs,
   gradeDisclaimerLines,
   loanUrlForPrint,
+  shortestDisclaimerLine,
   offerQuality,
   readoutRows,
   renderedDetailsText,
@@ -69,7 +71,8 @@ test('readout rows stay within five scored lines and never invent a market compa
   const apr = rows.find(row => row.label === 'APR');
   assert.ok(apr);
   assert.equal(apr.tone, 'neutral');
-  assert.equal(apr.why, 'does not earn the strong-rate credit (not a market rate or an offer)');
+  const cuts = gradeCutoffs();
+  assert.equal(apr.why, `between ${formatCut(cuts.strong)}% and ${formatCut(cuts.high)}%: not flagged (not a market rate or an offer)`);
   const price = rows.find(row => row.label === 'Price');
   assert.equal(price?.versus, 'MSRP');
   assert.equal(price?.tone, 'helped');
@@ -128,13 +131,15 @@ test('questions come from hurt rows and the summary is plain text', () => {
   assert.match(text, /What to ask the dealer/);
   assert.equal(text.includes('http'), false);
   assert.ok(figuresEntered(atMsrp) >= 1);
-  assert.deepEqual(gradeDisclaimerLines('Harborlight CU'), [
-    'This is not a loan offer.',
-    'Harborlight CU does not endorse the dealer.',
-    'This grade is educational.',
-    'Confirm every figure on the dealer\'s written worksheet before you agree to anything. Benchmarks are labeled assumptions and can differ from a lender\'s actual pricing.',
-    'The grade does not estimate credit standing, does not use demographic information, and does not predict whether an application will be approved.',
+  const lines = gradeDisclaimerLines('Harborlight CU');
+  assert.equal(lines.length, 3);
+  assert.deepEqual(lines, [
+    'This grade is educational. This is not a loan offer.',
+    'Harborlight CU does not endorse the dealer. The grade does not estimate credit standing or use demographic data. It uses fixed grading cutoffs.',
+    'Confirm every figure on the dealer\'s written worksheet before you agree to anything.',
   ]);
+  assert.equal(lines.some(line => /benchmark|assumption/i.test(line)), false);
+  assert.equal(shortestDisclaimerLine('Harborlight CU'), lines.reduce((shortest, line) => (line.length < shortest.length ? line : shortest)));
 });
 
 test('vs and why strings are built from engine fields', () => {
@@ -193,15 +198,19 @@ test('vs and why strings are built from engine fields', () => {
     for (const line of built.disclaimers) assert.equal(details.includes(line), false, item.name);
     const aprRow = built.breakdown.find(row => row.label === 'APR');
     if (aprRow) {
-      const shown = readoutRows(built).find(row => row.label === 'APR');
-      if (shown) assert.ok(details.includes(shown.why), item.name);
       assert.equal(details.includes(aprRow.explanation), false, item.name);
+    }
+    for (const row of built.breakdown) {
+      const explanation = detailExplanation(row);
+      if (!explanation) continue;
+      assert.match(explanation, /[.!?]$/, `${item.name} ${row.label}`);
+      assert.equal(/,\s+\d[\d,]* months or longer/.test(explanation), false, explanation);
     }
     const verdict = verdictSentence(built, false);
     assert.ok(wordCount(verdict) <= 16, `${item.name} ${verdict}`);
     assert.equal(/\bInterest\b/.test(verdict), false, verdict);
     const hurts = readoutRows(built).filter(row => row.tone === 'hurt');
-    const top = hurts[0]?.label.toLowerCase();
+    const top = hurts[0]?.label.split(/(\s+)/).map(part => (/^[A-Z0-9]{2,}$/.test(part) ? part : part.toLowerCase())).join('');
     if (hurts.length >= 2 && (offerQuality(built.grade) === 'Weak')) {
       assert.match(verdict, new RegExp(`^Weak deal: ask about the ${top} and `));
     }
@@ -210,4 +219,23 @@ test('vs and why strings are built from engine fields', () => {
     }
   }
   assert.equal(loanUrlForPrint('/credit-unions/demo/preapproval?utm_source=signorwalk&utm_medium=referral&keep=1', 'https://signorwalk.com'), 'https://signorwalk.com/credit-unions/demo/preapproval?keep=1');
+
+  const termRow = report('fin-term-72').breakdown.find(row => row.label === 'Term');
+  assert.ok(termRow);
+  assert.equal(detailExplanation(termRow), `Term is 72 months, at or above this tool's ${discovered.termLong}-month line.`);
+  const veryLong = report('fin-term-84').breakdown.find(row => row.label === 'Term');
+  assert.ok(veryLong);
+  assert.equal(detailExplanation(veryLong), `Term is 84 months, at or above this tool's ${discovered.termVeryLong}-month line.`);
+  const over = report('fin-above-msrp').breakdown.find(row => row.label === 'Price versus MSRP');
+  assert.ok(over);
+  assert.equal(detailExplanation(over), 'Price is $2,000 over the MSRP of $30,000.');
+  const under = report('fin-average').breakdown.find(row => row.label === 'Price versus MSRP');
+  assert.ok(under);
+  assert.equal(detailExplanation(under), 'Price is $1,500 under the MSRP of $35,000.');
+  const mid = report('fin-average').breakdown.find(row => row.label === 'APR');
+  assert.ok(mid);
+  assert.equal(detailExplanation(mid), `APR is 6.9%, between ${formatCut(discovered.strong)}% and ${formatCut(discovered.high)}% and is not flagged (not a market rate or an offer).`);
+  const stackedVerdict = verdictSentence(report('fin-apr-and-84'), false);
+  assert.match(stackedVerdict, /\bAPR\b/);
+  assert.equal(/\bapr\b/.test(stackedVerdict), false);
 });

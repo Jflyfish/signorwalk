@@ -2,15 +2,13 @@
 
 Draft only. These sentences are on the member grade screen or on a printed copy of it. A credit union and its counsel still have to review them before a member sees a production page. This note does not say that any regulator has approved the wording.
 
-Shown once, under the grade and the verdict, above the rows:
+Shown once, under the grade and the verdict, above the rows. Three lines:
 
-- `This is not a loan offer.`
-- `{credit union short name} does not endorse the dealer.`
-- `This grade is educational.`
-- `Confirm every figure on the dealer's written worksheet before you agree to anything. Benchmarks are labeled assumptions and can differ from a lender's actual pricing.`
-- `The grade does not estimate credit standing, does not use demographic information, and does not predict whether an application will be approved.`
+- `This grade is educational. This is not a loan offer.`
+- `{credit union short name} does not endorse the dealer. The grade does not estimate credit standing or use demographic data. It uses fixed grading cutoffs.`
+- `Confirm every figure on the dealer's written worksheet before you agree to anything.`
 
-The last two sentences are the eaf6b52 template lines. They appear only in this block.
+The confirm sentence and the credit-standing sentence stay in this block. The block does not say "benchmarks" or "labeled assumptions". An incomplete grade, before any verdict, shows only the shortest of these lines.
 
 Shown under the inline pre-approval button, and not in the pinned bar:
 
@@ -37,7 +35,7 @@ else if (input.apr > 0 && input.apr <= 6) APR_STRONG (+10)
 else if (input.apr <= 8) APR_TYPICAL (+3)
 ```
 
-What the 6–8 band does: an APR above 6 and up to 8 does not get `APR_STRONG`. It gets `APR_TYPICAL`, a smaller positive adjustment (`delta: 3`). It is not flagged. It is not listed as something to ask about. The readout says it does not earn the strong-rate credit, with a neutral marker rather than a helped check.
+What the 6–8 band does: an APR above 6 and up to 8 does not get `APR_STRONG`. It gets `APR_TYPICAL`, a smaller positive adjustment (`delta: 3`). It is not flagged. It is not listed as something to ask about. The readout why line says `between 6.0% and 8.0%: not flagged`, using the cutoffs read from the engine, with a neutral marker rather than a helped check. The qualifier `(not a market rate or an offer)` stays on that line.
 
 - An APR at or under 6 gets the stronger score (`APR_STRONG`).
 - An APR above 8 and up to 10 is flagged (`FLAG_APR_HIGH`).
@@ -47,7 +45,7 @@ What the 6–8 band does: an APR above 6 and up to 8 does not get `APR_STRONG`. 
 
 Those numbers are literals inside the functions. The engine does not export them. The readout discovers the boundaries by running `evaluateDeal` and states them with one decimal (`6.0%`, `8.0%`, `10.0%`). It does not describe them as a market rate or an offer of credit.
 
-See details uses that same cutoff line for the APR row. Sentences about a typical band, an often-cited range, a rough 6–8% range, or a benchmark are removed from the details text on screen and in print.
+See details writes a full sentence from the engine figure and the cutoff, for example `Term is 72 months, at or above this tool's 72-month line.` and `Price is $1,500 over the MSRP of $35,000.` An APR in the middle band reads `between 6.0% and 8.0% and is not flagged`. Sentences about a typical band, an often-cited range, a rough 6–8% range, or a benchmark are removed from the details text on screen and in print.
 
 ## Open item
 
