@@ -1,4 +1,5 @@
 import { DOCUMENT_VERSION_LABEL, TALK_TO_US_EMAIL } from '../../app/(cu)/credit-unions/pricing';
+import { aprGradeExplanation } from '../grade-readout';
 import { OWNER_BLANK, OWNER_OPEN_ITEMS } from '../owner-open-items';
 
 export interface DueDiligenceDoc {
@@ -231,7 +232,9 @@ The Harborlight page linked from the marketing demo hides upload. The Harborligh
 
 ## 6. Member-facing claim
 
-The grade compares a quote with labeled benchmark ranges. It is not the credit union's rate, not an offer of credit, and not a guarantee of savings.
+The grade compares a quote with fixed grading cutoffs. It is not the credit union's rate, not an offer of credit, and not a guarantee of savings.
+
+${aprGradeExplanation()}
 
 ## 7. Still open
 
