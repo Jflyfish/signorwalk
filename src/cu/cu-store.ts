@@ -269,33 +269,6 @@ export function recordLoanClick(tenantId: string): Promise<void> {
   return incrInteger(counterKey(tenantId, 'loanClicks'));
 }
 
-const HARBORLIGHT_PREVIEW_RESET = 'cu:preview-reset:harborlight-cu';
-
-/**
- * Zeros Harborlight's preview counters once.
- * Runs only when VERCEL_ENV is preview. Production KV is never written.
- */
-export async function resetHarborlightPreviewCounters(): Promise<void> {
-  if (process.env.VERCEL_ENV !== 'preview') return;
-  try {
-    const marker = await readRaw(HARBORLIGHT_PREVIEW_RESET);
-    if (marker === 'qa-r9') return;
-    const id = 'harborlight-cu';
-    for (const field of ['gradesRun', 'loanClicks'] as const) {
-      const key = counterKey(id, field);
-      memory.set(key, '0');
-      if (restConfig()) await restCommand(['SET', key, '0']);
-    }
-    memory.delete(keyFor(id, 'counters'));
-    if (restConfig()) await restCommand(['DEL', keyFor(id, 'counters')]);
-    await writeRaw(keyFor(id, 'aggregates'), JSON.stringify(emptyAggregates()));
-    memory.set(HARBORLIGHT_PREVIEW_RESET, 'qa-r9');
-    if (restConfig()) await restCommand(['SET', HARBORLIGHT_PREVIEW_RESET, 'qa-r9']);
-  } catch {
-    /* A failed preview reset must not block the page. */
-  }
-}
-
 export async function recordUpload(tenantId: string): Promise<void> {
   const current = await getAggregates(tenantId);
   current.uploads += 1;

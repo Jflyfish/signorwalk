@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
-import { getBranding, getSettings, getTenantCounters, resetHarborlightPreviewCounters } from '@/cu/cu-store';
+import { getBranding, getSettings, getTenantCounters } from '@/cu/cu-store';
 import { TALK_TO_US_EMAIL } from '@/app/(cu)/credit-unions/pricing';
 import { deepLink, iframeSnippet, memberOrigin } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
@@ -99,7 +99,6 @@ export default async function DashboardPage({
   const session = verifySession(jar.get(CU_SESSION_COOKIE)?.value);
   if (!canOpenTenant(session, tenant.id)) redirect(`/cu/${tenant.id}/sign-in`);
   const brand = await resolveBrand(tenant);
-  await resetHarborlightPreviewCounters();
   const counters = await getTenantCounters(tenant.id);
   const settings = await getSettings(tenant.id);
   const stored = await getBranding(tenant.id);
