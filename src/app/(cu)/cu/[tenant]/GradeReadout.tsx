@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { GRADE_FILL } from '@/cu/grades';
 import {
   LOAN_CTA_HELPER,
+  PINNED_BAR_BODY_PX,
   PINNED_BAR_HEIGHT,
   PRINT_NOT_ADVICE,
   QUESTIONS_ON_SCREEN,
@@ -82,6 +83,7 @@ export function GradeReadout({
   const detailsRef = useRef<HTMLDivElement>(null);
   const inlineButtonRef = useRef<HTMLAnchorElement>(null);
   const rowsRef = useRef<HTMLUListElement>(null);
+  const questionsRef = useRef<HTMLElement>(null);
   const howButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -124,18 +126,22 @@ export function GradeReadout({
       setPinCta(false);
       return;
     }
-    const barZone = 120;
+    const safeProbe = document.createElement('div');
+    safeProbe.style.cssText = 'position:fixed;padding-bottom:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none';
+    document.body.appendChild(safeProbe);
+    const safe = parseFloat(getComputedStyle(safeProbe).paddingBottom) || 0;
+    safeProbe.remove();
+    const barPx = PINNED_BAR_BODY_PX + safe;
     const place = () => {
       const rect = button.getBoundingClientRect();
-      const topInView = rect.top >= 0 && rect.top < window.innerHeight;
-      const rows = rowsRef.current;
-      let coversRows = false;
-      if (rows) {
-        const rowsRect = rows.getBoundingClientRect();
-        const zoneTop = window.innerHeight - barZone;
-        coversRows = rowsRect.top < window.innerHeight && rowsRect.bottom > zoneTop;
-      }
-      setPinCta(!topInView && !coversRows);
+      const scrolledAbove = rect.bottom <= 0;
+      const barTop = window.innerHeight - barPx;
+      const overlaps = (el: Element | null) => {
+        if (!el) return false;
+        const box = el.getBoundingClientRect();
+        return box.top < window.innerHeight && box.bottom > barTop;
+      };
+      setPinCta(scrolledAbove && !overlaps(rowsRef.current) && !overlaps(questionsRef.current));
     };
     place();
     window.addEventListener('scroll', place, { passive: true });
@@ -282,8 +288,8 @@ export function GradeReadout({
       <DisclaimerList lines={disclaimers} />
 
       {entered > 0 ? (
-        <p className="mt-4">
-          <button type="button" className={`${textLink} cu-figures`} onClick={openDetails}>
+        <p className="cu-no-print mt-4">
+          <button type="button" className={textLink} onClick={openDetails}>
             Based on {entered} {entered === 1 ? 'figure' : 'figures'} you entered
           </button>
         </p>
@@ -294,10 +300,14 @@ export function GradeReadout({
           {rows.map(row => (
             <li key={row.label} className="border-t cu-line py-4">
               <div className="flex items-baseline gap-3">
-                <span aria-hidden="true" className="w-4 shrink-0 text-[16px] font-semibold" style={{ color: row.tone === 'helped' ? '#14532d' : '#92400e' }}>
-                  {row.tone === 'helped' ? '✓' : '!'}
+                <span
+                  aria-hidden="true"
+                  className="w-4 shrink-0 text-[16px] font-semibold"
+                  style={{ color: row.tone === 'helped' ? '#14532d' : row.tone === 'hurt' ? '#92400e' : '#555' }}
+                >
+                  {row.tone === 'helped' ? '✓' : row.tone === 'hurt' ? '!' : '–'}
                 </span>
-                <span className="sr-only">{row.tone === 'helped' ? 'Helped. ' : 'Ask about this. '}</span>
+                <span className="sr-only">{row.tone === 'helped' ? 'Helped. ' : row.tone === 'hurt' ? 'Ask about this. ' : 'Not flagged. '}</span>
                 <span className="min-w-0 flex-1 text-[16px] leading-[24px]">{row.label}</span>
                 <span className="shrink-0 text-[16px] font-semibold leading-[24px] tabular-nums">{row.figure}</span>
               </div>
@@ -308,7 +318,7 @@ export function GradeReadout({
       ) : null}
 
       {questions.length > 0 ? (
-        <section className="mt-10" aria-labelledby="ask-heading">
+        <section ref={questionsRef} className="mt-10" aria-labelledby="ask-heading">
           <h2 id="ask-heading" className="text-[24px] font-bold leading-[30px]">What to ask the dealer</h2>
           <ol className="mt-4 list-decimal space-y-4 pl-5 text-[16px] leading-[24px]">
             {shownQuestions.map(question => <li key={question}>{question}</li>)}
@@ -428,15 +438,15 @@ export function GradeReadout({
 
       {showPreapproval && pinCta && !embedded ? (
         <div
-          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 border-t bg-white px-3 md:hidden"
+          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 flex items-center border-t bg-white px-3 md:hidden"
           style={{
             borderColor: '#E5E5E5',
-            paddingTop: 12,
-            paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
+            boxSizing: 'border-box',
+            height: PINNED_BAR_HEIGHT,
+            paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
           {loanButton(true)}
-          <p className="mt-1 text-center text-[12px] leading-[16px] text-[#555]">{LOAN_CTA_HELPER}</p>
         </div>
       ) : null}
 

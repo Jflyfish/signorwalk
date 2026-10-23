@@ -20,17 +20,23 @@ export type OfferQuality = (typeof OFFER_QUALITY)[keyof typeof OFFER_QUALITY];
  */
 export const GRADE_DISCLAIMER_NOT_AN_OFFER = 'This is not a loan offer.';
 export const GRADE_DISCLAIMER_EDUCATIONAL = 'This grade is educational.';
+export const GRADE_DISCLAIMER_VERIFY = 'Confirm every figure on the dealer\'s written worksheet before you agree to anything. Benchmarks are labeled assumptions and can differ from a lender\'s actual pricing.';
+export const GRADE_DISCLAIMER_NO_TIER = 'The grade does not estimate credit standing, does not use demographic information, and does not predict whether an application will be approved.';
 export const LOAN_CTA_HELPER = 'Not an offer of credit.';
 export const PRINT_NOT_ADVICE = 'Not financial advice.';
+export const APR_NOT_A_MARKET_RATE = '(not a market rate or an offer)';
 
-/** Height of the pinned pre-approval bar, including its 12px helper line. */
-export const PINNED_BAR_HEIGHT = 'calc(12px + 44px + 4px + 16px + 12px + env(safe-area-inset-bottom))';
+/** Pinned pre-approval bar body, before the safe area. */
+export const PINNED_BAR_BODY_PX = 64;
+export const PINNED_BAR_HEIGHT = `calc(${PINNED_BAR_BODY_PX}px + env(safe-area-inset-bottom))`;
 
 export function gradeDisclaimerLines(shortName: string): readonly string[] {
   return [
     GRADE_DISCLAIMER_NOT_AN_OFFER,
     `${shortName} does not endorse the dealer.`,
     GRADE_DISCLAIMER_EDUCATIONAL,
+    GRADE_DISCLAIMER_VERIFY,
+    GRADE_DISCLAIMER_NO_TIER,
   ];
 }
 
@@ -302,7 +308,7 @@ const HURT_QUESTION: Record<string, string> = {
 export interface ReadoutRow {
   label: string;
   figure: string;
-  tone: 'helped' | 'hurt';
+  tone: 'helped' | 'hurt' | 'neutral';
   /** Concrete reference only, such as MSRP. */
   versus?: string;
   /** Second line. Numbers come from the engine, read at runtime. */
@@ -312,7 +318,7 @@ export interface ReadoutRow {
 }
 
 interface Classified {
-  tone: 'helped' | 'hurt';
+  tone: 'helped' | 'hurt' | 'neutral';
   why: string;
   versus?: string;
   rank: number;
@@ -347,6 +353,10 @@ function helped(why: string, versus?: string): Classified {
   return { tone: 'helped', why, versus, rank: 2 };
 }
 
+function neutral(why: string): Classified {
+  return { tone: 'neutral', why, rank: 2 };
+}
+
 function classifyPrice(row: ReportRow, cuts: GradeCutoffs): Classified | null {
   const over = row.value.match(/(\d+(?:\.\d+)?)%\s+over MSRP/);
   const under = row.value.match(/(\d+(?:\.\d+)?)%\s+under MSRP/);
@@ -368,10 +378,10 @@ function classifyApr(row: ReportRow, cuts: GradeCutoffs): Classified | null {
   const match = row.value.match(/(\d+(?:\.\d+)?)%/);
   if (!match) return null;
   const apr = Number(match[1]);
-  if (apr > cuts.veryHigh) return hurt(`above this tool's ${formatCut(cuts.veryHigh)}% cutoff`, undefined, 0);
-  if (apr > cuts.high) return hurt(`above this tool's ${formatCut(cuts.high)}% cutoff`, undefined, 0);
-  if (apr > 0 && apr <= cuts.strong) return helped(`at or under this tool's ${formatCut(cuts.strong)}% cutoff`);
-  if (apr <= cuts.high) return helped('does not earn the strong-rate credit');
+  if (apr > cuts.veryHigh) return hurt(`above this tool's ${formatCut(cuts.veryHigh)}% cutoff ${APR_NOT_A_MARKET_RATE}`, undefined, 0);
+  if (apr > cuts.high) return hurt(`above this tool's ${formatCut(cuts.high)}% cutoff ${APR_NOT_A_MARKET_RATE}`, undefined, 0);
+  if (apr > 0 && apr <= cuts.strong) return helped(`at or under this tool's ${formatCut(cuts.strong)}% cutoff ${APR_NOT_A_MARKET_RATE}`);
+  if (apr <= cuts.high) return neutral(`does not earn the strong-rate credit ${APR_NOT_A_MARKET_RATE}`);
   return null;
 }
 
@@ -398,8 +408,8 @@ function classify(row: ReportRow): Classified | null {
       {
         const months = Number(row.value.match(/(\d+)/)?.[1]);
         if (!Number.isFinite(months)) return null;
-        if (months >= cuts.termVeryLong) return hurt(`longer than ${cuts.termVeryLong} months`, undefined, 0);
-        if (months >= cuts.termLong) return hurt(`longer than ${cuts.termLong} months`, undefined, 1);
+        if (months >= cuts.termVeryLong) return hurt(`${cuts.termVeryLong} months or longer`, undefined, 0);
+        if (months >= cuts.termLong) return hurt(`${cuts.termLong} months or longer`, undefined, 1);
         return null;
       }
     case 'Documentation fee':
@@ -466,10 +476,13 @@ export function filterDetailSentences(text: string): string {
     .join(' ');
 }
 
-/** What See details shows for one row. APR uses the same line as the readout row. */
+/** What See details shows for one row: a full sentence that includes the reason. */
 export function detailExplanation(row: ReportRow): string {
-  if (row.label === 'APR') return classify(row)?.why ?? '';
-  return filterDetailSentences(row.explanation);
+  const reason = classify(row)?.why;
+  if (reason) return `${row.label} is ${figureOf(row.value)}, ${reason}.`;
+  const filtered = filterDetailSentences(row.explanation).trim();
+  if (!filtered) return '';
+  return /[.!?]$/.test(filtered) ? filtered : `${filtered}.`;
 }
 
 /** Full details copy, on screen and in print. Engine disclaimers are not included. */
@@ -532,11 +545,15 @@ export function readoutRows(report: Pick<TenantReport, 'breakdown'>): ReadoutRow
   return scoredRows(report).slice(0, 5);
 }
 
+function verdictName(label: string): string {
+  return label.toLowerCase();
+}
+
 function hurtPhrase(row: ReadoutRow): string {
   if (row.label === 'Price') return row.why;
   if (row.label === 'APR') return `${row.figure} APR`;
-  if (row.figure.startsWith('$')) return `${row.figure} ${row.label}`;
-  return row.label;
+  if (row.figure.startsWith('$')) return `${row.figure} ${verdictName(row.label)}`;
+  return verdictName(row.label);
 }
 
 /** One sentence, 16 words or fewer, from the scored rows. A blank APR still suppresses sign. */
@@ -549,7 +566,7 @@ export function verdictSentence(
     return sentence(ADD_APR_RECOMMENDATION);
   }
   const quality = offerQuality(report.grade) ?? 'Fair';
-  const hurts = scoredRows(report).filter(row => row.tone === 'hurt');
+  const hurts = readoutRows(report).filter(row => row.tone === 'hurt');
   if (hurts.length === 0) return sentence(`${quality} deal on the figures you entered`);
   if (hurts.length === 1) {
     const item = hurtPhrase(hurts[0]);
@@ -557,9 +574,9 @@ export function verdictSentence(
       ? `Weak deal: ask about the ${item}`
       : `${quality} deal overall, but ask about the ${item}`;
     if (words(line).length <= 16) return sentence(line);
-    return sentence(quality === 'Weak' ? `Weak deal: ask about the ${hurts[0].label}` : `${quality} deal with 1 thing to ask about`);
+    return sentence(quality === 'Weak' ? `Weak deal: ask about the ${verdictName(hurts[0].label)}` : `${quality} deal with 1 thing to ask about`);
   }
-  const top = hurts[0].label;
+  const top = verdictName(hurts[0].label);
   const more = hurts.length - 1;
   const extra = more === 1 ? '1 more thing' : `${more} more things`;
   if (quality === 'Weak') return sentence(`Weak deal: ask about the ${top} and ${extra}`);

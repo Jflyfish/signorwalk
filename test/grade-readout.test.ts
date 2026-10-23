@@ -68,8 +68,8 @@ test('readout rows stay within five scored lines and never invent a market compa
   assert.ok(rows.length > 0 && rows.length <= 5);
   const apr = rows.find(row => row.label === 'APR');
   assert.ok(apr);
-  assert.equal(apr.tone, 'helped');
-  assert.equal(apr.why, 'does not earn the strong-rate credit');
+  assert.equal(apr.tone, 'neutral');
+  assert.equal(apr.why, 'does not earn the strong-rate credit (not a market rate or an offer)');
   const price = rows.find(row => row.label === 'Price');
   assert.equal(price?.versus, 'MSRP');
   assert.equal(price?.tone, 'helped');
@@ -80,13 +80,16 @@ test('readout rows stay within five scored lines and never invent a market compa
     assert.equal(/\bvs\b/i.test(row.figure), false);
     assert.equal(row.versus === 'market' || row.versus === 'average' || row.versus === 'typical', false);
     assert.equal(/point/i.test(row.figure), false);
-    assert.equal(/\b(typical|average|market|worksheet)\b/i.test(row.why), false);
+    assert.equal(/\b(typical|average|market|worksheet)\b/i.test(row.why.replace(/\(not a market rate or an offer\)/g, '')), false);
   }
   const missingApr = report('fin-missing-apr');
   assert.equal(readoutRows(missingApr).some(row => row.label === 'APR'), false);
   const clean = readoutRows(report('fin-clean-strong'));
   assert.equal(clean.every(row => row.tone === 'helped'), true);
   assert.equal(dealerQuestions(report('fin-clean-strong')).length, 0);
+  const term = readoutRows(report('fin-term-84')).find(row => row.label === 'Term');
+  assert.equal(term?.why, `${gradeCutoffs().termVeryLong} months or longer`);
+  assert.equal(/longer than/.test(term?.why ?? ''), false);
   const atMsrp = readoutRows(report('fin-at-msrp')).find(row => row.label === 'Price');
   assert.equal(atMsrp?.tone, 'hurt');
   assert.equal(atMsrp?.why, `discount under ${formatCut(gradeCutoffs().priceAtMsrp)}% of MSRP`);
@@ -129,6 +132,8 @@ test('questions come from hurt rows and the summary is plain text', () => {
     'This is not a loan offer.',
     'Harborlight CU does not endorse the dealer.',
     'This grade is educational.',
+    'Confirm every figure on the dealer\'s written worksheet before you agree to anything. Benchmarks are labeled assumptions and can differ from a lender\'s actual pricing.',
+    'The grade does not estimate credit standing, does not use demographic information, and does not predict whether an application will be approved.',
   ]);
 });
 
@@ -174,7 +179,7 @@ test('vs and why strings are built from engine fields', () => {
       const spoken = `${row.versus ?? ''} ${row.why}`.replace(/\(not a market rate or an offer\)/g, '');
       assert.equal(/\b(typical|average|market)\b/i.test(spoken), false, spoken);
       assert.equal(row.why.includes('·'), false);
-      assert.ok(wordCount(row.why) <= 10, row.why);
+      assert.ok(wordCount(row.why.replace(/\(not a market rate or an offer\)/g, '')) <= 10, row.why);
       assert.equal(/worksheet|figures entered|grading threshold/.test(row.why), false, row.why);
       for (const match of spoken.matchAll(/\d[\d,]*(?:\.\d+)?/g)) {
         const number = Number(match[0].replace(/,/g, ''));
@@ -183,7 +188,8 @@ test('vs and why strings are built from engine fields', () => {
       }
     }
     const details = renderedDetailsText(built);
-    assert.equal(/\b(typical|average|benchmarks?|assumptions?|market)\b|often[-\s]cited|6\s*[–-]\s*8\s*%/i.test(details), false, `${item.name}\n${details}`);
+    const screened = details.replace(/\(not a market rate or an offer\)/g, '');
+    assert.equal(/\b(typical|average|benchmarks?|assumptions?|market)\b|often[-\s]cited|6\s*[–-]\s*8\s*%/i.test(screened), false, `${item.name}\n${details}`);
     for (const line of built.disclaimers) assert.equal(details.includes(line), false, item.name);
     const aprRow = built.breakdown.find(row => row.label === 'APR');
     if (aprRow) {
@@ -193,12 +199,14 @@ test('vs and why strings are built from engine fields', () => {
     }
     const verdict = verdictSentence(built, false);
     assert.ok(wordCount(verdict) <= 16, `${item.name} ${verdict}`);
+    assert.equal(/\bInterest\b/.test(verdict), false, verdict);
     const hurts = readoutRows(built).filter(row => row.tone === 'hurt');
+    const top = hurts[0]?.label.toLowerCase();
     if (hurts.length >= 2 && (offerQuality(built.grade) === 'Weak')) {
-      assert.match(verdict, new RegExp(`^Weak deal: ask about the ${hurts[0].label} and `));
+      assert.match(verdict, new RegExp(`^Weak deal: ask about the ${top} and `));
     }
     if (hurts.length >= 2 && offerQuality(built.grade) === 'Fair') {
-      assert.match(verdict, new RegExp(`ask about the ${hurts[0].label} and `));
+      assert.match(verdict, new RegExp(`ask about the ${top} and `));
     }
   }
   assert.equal(loanUrlForPrint('/credit-unions/demo/preapproval?utm_source=signorwalk&utm_medium=referral&keep=1', 'https://signorwalk.com'), 'https://signorwalk.com/credit-unions/demo/preapproval?keep=1');

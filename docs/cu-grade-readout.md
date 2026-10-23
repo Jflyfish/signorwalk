@@ -7,18 +7,22 @@ Shown once, under the grade and the verdict, above the rows:
 - `This is not a loan offer.`
 - `{credit union short name} does not endorse the dealer.`
 - `This grade is educational.`
+- `Confirm every figure on the dealer's written worksheet before you agree to anything. Benchmarks are labeled assumptions and can differ from a lender's actual pricing.`
+- `The grade does not estimate credit standing, does not use demographic information, and does not predict whether an application will be approved.`
 
-Shown under the pre-approval button, and as a 12px line in the pinned mobile bar:
+The last two sentences are the eaf6b52 template lines. They appear only in this block.
+
+Shown under the inline pre-approval button, and not in the pinned bar:
 
 - `Not an offer of credit.`
 
-Those are the only disclaimer lines. See details does not repeat the engine disclaimer block. How we grade does not say "It is not a loan offer."
+The pinned bar is 64px plus the safe area. It appears only after that button has scrolled above the viewport, and it stays hidden while it would cover the rows or the questions. See details does not repeat the disclaimer block. How we grade does not say "It is not a loan offer."
 
 Shown on a printed copy, and not as a claim about a statute:
 
 - `Not financial advice.`
 
-The printed loan link is the absolute pre-approval URL with `utm_*` parameters removed. "Based on N figures" prints in `#555`. "See auto rates" and its Demo pill do not print.
+The printed loan link is the absolute pre-approval URL with `utm_*` parameters removed. "Based on N figures you entered" does not print. "See auto rates" and its Demo pill do not print.
 
 The letter and the words Strong, Fair, and Weak describe the offer. They do not describe the member's credit.
 
@@ -33,7 +37,7 @@ else if (input.apr > 0 && input.apr <= 6) APR_STRONG (+10)
 else if (input.apr <= 8) APR_TYPICAL (+3)
 ```
 
-What the 6–8 band does: an APR above 6 and up to 8 does not get `APR_STRONG`. It gets `APR_TYPICAL`, a smaller positive adjustment (`delta: 3`). It is not flagged. It is not listed as something to ask about. The readout says it does not earn the strong-rate credit.
+What the 6–8 band does: an APR above 6 and up to 8 does not get `APR_STRONG`. It gets `APR_TYPICAL`, a smaller positive adjustment (`delta: 3`). It is not flagged. It is not listed as something to ask about. The readout says it does not earn the strong-rate credit, with a neutral marker rather than a helped check.
 
 - An APR at or under 6 gets the stronger score (`APR_STRONG`).
 - An APR above 8 and up to 10 is flagged (`FLAG_APR_HIGH`).
