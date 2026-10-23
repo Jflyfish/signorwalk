@@ -27,7 +27,7 @@ export default async function CuPage({ params }: { params: Promise<{ tenant: str
   }
   return (
     <>
-      <header className="mx-auto flex min-h-16 w-full max-w-[560px] items-center px-4 py-4">
+      <header className="cu-no-print mx-auto flex min-h-16 w-full max-w-[560px] items-center px-4 py-4">
         <BrandLockup
           name={tenant.name}
           shortName={brand.shortName}

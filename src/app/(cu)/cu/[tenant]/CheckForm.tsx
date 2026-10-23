@@ -5,13 +5,12 @@ import { track } from '@vercel/analytics';
 import { FILE_READ_ERROR } from '@/cu/copy';
 import { UploadDisclosure } from '@/cu/UploadDisclosure';
 import type { DerivedBrand } from '@/cu/contrast';
-import { financeGradeIsProvisional, memberRecommendationLine } from '@/cu/recommendation-display';
 import { DEMO_FINANCE_SAMPLE, DEMO_GRADE_C, DEMO_GRADE_D } from '@/cu/demo-sample';
-import { GRADE_FILL } from '@/cu/grades';
+import { gradeDisclaimerLines } from '@/cu/grade-readout';
 import type { TenantReport } from '@/cu/engine/types';
 import type { CuPublic } from '@/cu/tenants';
-import { memberLink } from '@/cu/utm';
 import { US_STATES } from '@/lib/states';
+import { GradeReadout } from './GradeReadout';
 
 const FINANCE_TERMS = ['24', '36', '48', '60', '72', '84'];
 const LEASE_TERMS = ['24', '36', '39', '42', '48'];
@@ -88,20 +87,6 @@ function Field({
   );
 }
 
-function statusText(status: 'good' | 'warn' | 'bad'): string {
-  if (status === 'good') return 'Within typical range';
-  if (status === 'warn') return 'Review';
-  return 'Outside typical range';
-}
-
-function gradeTint(hex: string): string {
-  const raw = hex.replace('#', '');
-  const r = Number.parseInt(raw.slice(0, 2), 16);
-  const g = Number.parseInt(raw.slice(2, 4), 16);
-  const b = Number.parseInt(raw.slice(4, 6), 16);
-  return `rgb(${r} ${g} ${b} / 0.1)`;
-}
-
 function trackSafe(name: 'analysis_completed' | 'cta_clicked', props: Record<string, string>) {
   try {
     track(name, props);
@@ -155,7 +140,6 @@ export function CheckForm({
   const [fields, setFields] = useState(() => (demoSample ? sampleFields(DEMO_FINANCE_SAMPLE) : EMPTY));
   const [showTrade, setShowTrade] = useState(false);
   const [showAddons, setShowAddons] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<TenantReport | null>(null);
@@ -278,7 +262,6 @@ export function CheckForm({
         return;
       }
       setReport(null);
-      setShowDetails(false);
       setNeedsApr(true);
       return;
     }
@@ -299,7 +282,6 @@ export function CheckForm({
         setError(typeof data.error === 'string' ? data.error : 'Check the numbers and try again.');
         return;
       }
-      setShowDetails(false);
       setReport(data.analysis as TenantReport);
       const grade = String(data.analysis.grade);
       const archetype = String(data.analysis.archetype);
@@ -307,7 +289,6 @@ export function CheckForm({
       if (['A', 'B', 'C', 'D', 'F'].includes(grade) && /^(LEASE|FIN)_[A-Z_]+$/.test(archetype)) {
         trackSafe('analysis_completed', { tenant: tenant.id, grade, dealType: snapshot.dealType, archetype });
       }
-      requestAnimationFrame(() => headingRef.current?.focus());
     } catch {
       setError('Check the numbers and try again.');
     } finally {
@@ -329,13 +310,18 @@ export function CheckForm({
     return (
       <div className={embedded
         ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
-        : 'mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pt-24'}>
-        <h1 ref={headingRef} tabIndex={-1} className="text-[24px] font-bold leading-[30px] outline-none">
+        : 'mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pt-24'} aria-label="Incomplete">
+        <p className="text-[14px] font-semibold leading-[20px]">Incomplete</p>
+        <p className="mt-2 text-[14px] leading-[20px] cu-muted">Graded by {brand.shortName} · with Sign or Walk</p>
+        <h1 ref={headingRef} tabIndex={-1} className="mt-6 text-[24px] font-bold leading-[30px] outline-none">
           Incomplete: add your APR for a full grade.
         </h1>
         <p className="mt-4 text-[18px] leading-[28px]">
           This finance offer has no APR from the worksheet, so there is no grade yet. A grade from this tool is a comparison, not a credit decision.
         </p>
+        <ul className="mt-4 space-y-1 text-[13px] leading-[18px] cu-muted">
+          {gradeDisclaimerLines(brand.shortName).map(line => <li key={line}>{line}</li>)}
+        </ul>
         <p className="mt-10">
           <button
             type="button"
@@ -353,186 +339,29 @@ export function CheckForm({
   }
 
   if (report) {
-    const usingFlags = report.itemsToReview.length > 0;
-    const shown = (usingFlags ? report.itemsToReview : report.notes).slice(0, 2);
-    const rest = usingFlags ? report.itemsToReview.slice(2) : [];
     const aprBlank = dealType === 'finance' && !(Number(fields.apr.replace(/[$,]/g, '')) > 0);
-    const caption = memberRecommendationLine({
-      recommendation: report.recommendation,
-      recommendationLabel: report.recommendationLabel,
-      grade: report.grade,
-      aprBlank,
-      provisional: dealType === 'finance' && financeGradeIsProvisional(report, aprBlank),
-    });
-    const gradeColor = GRADE_FILL[report.grade] ?? '#111111';
-    const showRatesWithGrade = report.grade === 'A' && Boolean(tenant.ratesUrl);
-    const demoRates = tenant.ratesUrl.includes('/credit-unions/demo/');
-    const demoPreapproval = tenant.preApprovalUrl.includes('/credit-unions/demo/');
+    const limitedPill = aprBlank
+      ? 'Partial grade — add APR'
+      : report.limitedData
+        ? 'Partial grade — add more figures'
+        : null;
     return (
-      <div className={embedded
-        ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
-        : `mx-auto w-full max-w-[560px] px-4 ${showRatesWithGrade ? 'pb-[calc(200px+env(safe-area-inset-bottom))]' : 'pb-[calc(120px+env(safe-area-inset-bottom))]'} pt-16 md:pb-16 md:pt-24`}>
-        <div className="flex flex-col md:flex-row md:items-center md:gap-4">
-          <p className="text-[14px] leading-[20px] cu-muted md:hidden">Grade</p>
-          <p
-            aria-hidden="true"
-            className="mt-4 flex h-24 w-24 shrink-0 items-center justify-center rounded-[16px] text-[64px] font-extrabold leading-none md:mt-0"
-            style={{ color: gradeColor, backgroundColor: gradeTint(gradeColor) }}
-          >
-            {report.grade}
-          </p>
-          <div className="mt-4 md:mt-0">
-            <p className="hidden text-[14px] leading-[20px] cu-muted md:block">Grade</p>
-            <h1 ref={headingRef} tabIndex={-1} className="text-[24px] font-bold leading-[30px] outline-none md:mt-4">
-              <span className="sr-only">{report.grade}. </span>{report.headline}
-            </h1>
-            {aprBlank || report.limitedData ? (
-              <p className="mt-4 inline-flex rounded-full border cu-line px-3 py-1 text-[13px] font-semibold leading-[18px]">{aprBlank ? 'Partial grade — add APR' : 'Partial grade — add more figures'}</p>
-            ) : null}
-            <p className="mt-4 text-[18px] leading-[28px]">{report.gradeExplanation}</p>
-            {caption ? <p className="mt-4 text-[15px] font-semibold leading-[24px]">{caption}</p> : null}
-          </div>
-        </div>
-
-        {shown.length > 0 && (
-          <section className="mt-10" aria-labelledby="review-heading">
-            <h2 id="review-heading" className="text-[24px] font-bold leading-[30px]">Items to review</h2>
-            <ul className="mt-4 list-disc space-y-4 pl-4 text-[18px] leading-[28px]">
-              {shown.map(item => (
-                <li key={item.id}>
-                  {item.issue}
-                  <span className="mt-2 block text-[14px] leading-[20px] cu-muted">{item.action}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {tenant.preApprovalUrl ? (
-          <div className={embedded
-            ? 'static mt-10 w-full'
-            : 'fixed inset-x-0 bottom-0 z-10 border-t cu-line bg-white px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
-            <p className="mb-3 text-[14px] font-semibold leading-[20px]">Next step</p>
-            <div className="flex flex-col items-start gap-3">
-              <Primary
-                wide={embedded}
-                href={memberLink(tenant.preApprovalUrl)}
-                onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'preapproval' })}
-              >
-                <span>Get pre-approved</span>
-                {demoPreapproval ? (
-                  <span className="inline-flex items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
-                ) : null}
-              </Primary>
-              {showRatesWithGrade ? (
-                <a
-                  href={memberLink(tenant.ratesUrl)}
-                  target="_top"
-                  className={`${textLink} inline-flex items-center gap-2`}
-                  onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'rates' })}
-                >
-                  <span>{demoRates ? 'See auto rates' : tenant.ratesLabel}</span>
-                  {demoRates ? (
-                    <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
-                  ) : null}
-                </a>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-
-        <div className="mt-10 border-t cu-line pt-6">
-          <button
-            type="button"
-            className={`${textLink} inline-flex items-center gap-1`}
-            aria-expanded={showDetails}
-            onClick={() => setShowDetails(open => !open)}
-          >
-            <span aria-hidden="true">{showDetails ? '▾' : '▸'}</span>
-            See details
-          </button>
-          {showDetails && (
-            <div className="mt-6">
-              {report.breakdown.length > 0 && (
-                <section aria-labelledby="breakdown-heading">
-                  <h2 id="breakdown-heading" className="text-[24px] font-bold leading-[30px]">Figures you entered</h2>
-                  <ul className="mt-4">
-                    {report.breakdown.map(row => (
-                      <li key={row.label} className="border-t cu-line py-4">
-                        <div className="flex items-baseline justify-between gap-4">
-                          <p className="text-[18px] leading-[28px]">{row.label}</p>
-                          <p className="text-[18px] font-semibold leading-[28px] tabular-nums">{row.value}</p>
-                        </div>
-                        <p className="text-[14px] leading-[20px] cu-muted">{statusText(row.status)}</p>
-                        <p className="mt-2 text-[14px] leading-[20px] cu-muted">{row.explanation}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-
-              {rest.length > 0 && (
-                <section className="mt-10" aria-labelledby="more-review-heading">
-                  <h2 id="more-review-heading" className="text-[24px] font-bold leading-[30px]">More items</h2>
-                  <ul className="mt-4 list-disc space-y-4 pl-4 text-[18px] leading-[28px]">
-                    {rest.map(item => (
-                      <li key={item.id}>
-                        {item.issue}
-                        <span className="mt-2 block text-[14px] leading-[20px] cu-muted">{item.action}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-
-              <section className="mt-10 border-t cu-line pt-6" aria-labelledby="questions-heading">
-                <h2 id="questions-heading" className="text-[24px] font-bold leading-[30px]">Questions you can ask</h2>
-                <p className="mt-4 text-[18px] leading-[28px]">{report.questionsToAsk}</p>
-                <p className="mt-4 text-[14px] leading-[20px] cu-muted">{report.structureNote}</p>
-              </section>
-
-              {report.tradeIn && (
-                <section className="mt-10 border-t cu-line pt-6" aria-labelledby="trade-heading">
-                  <h2 id="trade-heading" className="text-[24px] font-bold leading-[30px]">{report.tradeIn.headline}</h2>
-                  <p className="mt-4 text-[18px] leading-[28px]">{report.tradeIn.details}</p>
-                </section>
-              )}
-
-              {report.stateTaxNote && (
-                <section className="mt-10 border-t cu-line pt-6" aria-labelledby="tax-heading">
-                  <h2 id="tax-heading" className="text-[24px] font-bold leading-[30px]">Trade-in and tax</h2>
-                  <p className="mt-4 text-[18px] leading-[28px]">{report.stateTaxNote}</p>
-                </section>
-              )}
-
-              <ul className="mt-10 space-y-4 border-t cu-line pt-6 text-[14px] leading-[20px] cu-muted">
-                {report.disclaimers.map(line => <li key={line}>{line}</li>)}
-              </ul>
-
-              {tenant.ratesUrl && !showRatesWithGrade ? (
-              <p className="mt-6">
-                <a
-                  href={memberLink(tenant.ratesUrl)}
-                  target="_top"
-                  className={`${textLink} inline-flex items-center gap-2`}
-                  onClick={() => trackSafe('cta_clicked', { tenant: tenant.id, target: 'rates' })}
-                >
-                  <span>{demoRates ? 'See auto rates' : tenant.ratesLabel}</span>
-                  {demoRates ? (
-                    <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
-                  ) : null}
-                </a>
-              </p>
-              ) : null}
-            </div>
-          )}
-          <p className="mt-6">
-            <button type="button" className={textLink} onClick={() => { setReport(null); setError(''); }}>
-              Check another offer
-            </button>
-          </p>
-        </div>
-      </div>
+      <GradeReadout
+        report={report}
+        shortName={brand.shortName}
+        creditUnionName={tenant.name}
+        logoMark={tenant.logo}
+        logoLight={brand.logoLight}
+        logoAspect={brand.logoAspect}
+        logoColor={brand.brandText}
+        preApprovalUrl={tenant.preApprovalUrl}
+        ratesUrl={tenant.ratesUrl}
+        embedded={embedded}
+        aprBlank={aprBlank}
+        limitedPill={limitedPill}
+        onCta={target => trackSafe('cta_clicked', { tenant: tenant.id, target })}
+        onCheckAnother={() => { setReport(null); setError(''); }}
+      />
     );
   }
 
@@ -547,7 +376,7 @@ export function CheckForm({
           <p className="mt-4 text-[15px] leading-[24px]">
             Sample finance offer for this demo, with a {DEMO_FINANCE_SAMPLE.apr}% APR. Replace any number with the worksheet.
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="cu-no-print mt-4 flex flex-wrap items-center gap-3">
             <button type="button" className={`${textLink} cu-ring`} onClick={() => applySample('a')}>Try a sample deal</button>
             <button type="button" className="cu-ring inline-flex h-8 items-center rounded-full border cu-line px-3 text-[14px] font-semibold" onClick={() => applySample('c')}>Sample C</button>
             <button type="button" className="cu-ring inline-flex h-8 items-center rounded-full border cu-line px-3 text-[14px] font-semibold" onClick={() => applySample('d')}>Sample D</button>
@@ -657,7 +486,7 @@ export function CheckForm({
           )}
         </div>
 
-        <div className="mt-6 border-t cu-line pt-6">
+        <div className="cu-no-print mt-6 border-t cu-line pt-6">
           <label className="flex items-center gap-2 text-[15px] font-semibold">
             <input type="checkbox" checked={showTrade} onChange={e => setShowTrade(e.target.checked)} />
             Include a trade-in
@@ -670,7 +499,7 @@ export function CheckForm({
           )}
         </div>
 
-        <div className="mt-6 border-t cu-line pt-6">
+        <div className="cu-no-print mt-6 border-t cu-line pt-6">
           <label className="flex items-center gap-2 text-[15px] font-semibold">
             <input type="checkbox" checked={showAddons} onChange={e => setShowAddons(e.target.checked)} />
             Include optional products

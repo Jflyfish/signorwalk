@@ -34,6 +34,19 @@ export function ChromeStyle() {
       .cu-card { border: 1px solid var(--cu-line); transition: border-color 150ms, box-shadow 150ms; }
       .cu-card:hover { border-color: var(--cu-ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); }
       .cu-card-marked { border-width: 2px; border-color: var(--cu-ink); }
+      .cu-print-only { display: none; }
+      .cu-details-collapsed { display: none; }
+      .cu-more-collapsed { display: none; }
+      @media print {
+        .cu-no-print, .cu-embed-attribution { display: none !important; }
+        .cu-print-only, .cu-details-collapsed, .cu-more-collapsed { display: block !important; }
+        .cu-pinned {
+          position: static !important;
+          border: 0 !important;
+          padding: 0 !important;
+          background: transparent !important;
+        }
+      }
     `}</style>
   );
 }

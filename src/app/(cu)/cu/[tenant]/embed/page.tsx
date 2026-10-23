@@ -58,7 +58,7 @@ export default async function EmbedPage({
   }
   return (
     <div id="sow-embed-root">
-      <header className="mx-auto flex min-h-14 w-full max-w-[560px] items-center px-4 py-3">
+      <header className="cu-no-print mx-auto flex min-h-14 w-full max-w-[560px] items-center px-4 py-3">
         <BrandLockup
           name={tenant.name}
           shortName={brand.shortName}
@@ -66,6 +66,7 @@ export default async function EmbedPage({
           mark={tenant.logo}
           logoLight={brand.logoLight}
           logoAspect={brand.logoAspect}
+          productLineClassName="cu-embed-attribution"
         />
       </header>
       <EmbedFrame
