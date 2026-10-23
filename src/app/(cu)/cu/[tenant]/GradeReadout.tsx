@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { GRADE_FILL } from '@/cu/grades';
 import {
+  LOAN_CTA_HELPER,
   PRINT_NOT_ADVICE,
   QUESTIONS_ON_SCREEN,
+  aprGradeExplanation,
   copySummary,
   dealerQuestions,
   figuresEntered,
@@ -34,6 +36,11 @@ function DisclaimerList({ lines }: { lines: readonly string[] }) {
       {lines.map(line => <li key={line}>{line}</li>)}
     </ul>
   );
+}
+
+function focusableIn(root: HTMLElement): HTMLElement[] {
+  return [...root.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+    .filter(node => !node.hasAttribute('disabled'));
 }
 
 export function GradeReadout({
@@ -67,12 +74,16 @@ export function GradeReadout({
   onCta: (target: 'preapproval' | 'rates') => void;
   onCheckAnother: () => void;
 }) {
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
   const detailsRef = useRef<HTMLDivElement>(null);
+  const inlineCtaRef = useRef<HTMLDivElement>(null);
+  const howButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [moreQuestions, setMoreQuestions] = useState(false);
   const [howOpen, setHowOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [pinCta, setPinCta] = useState(false);
   const quality = offerQuality(report.grade) ?? 'Fair';
   const verdict = verdictSentence(report, aprBlank);
   const rows = readoutRows(report);
@@ -86,12 +97,67 @@ export function GradeReadout({
   const demoRates = ratesUrl.includes('/credit-unions/demo/');
   const showPreapproval = Boolean(preApprovalUrl);
   const showRates = Boolean(ratesUrl);
-  const showCta = showPreapproval || showRates;
   const summary = copySummary({ grade: report.grade, quality, verdict, questions });
+  const grading = aprGradeExplanation();
 
   useEffect(() => {
-    headingRef.current?.focus();
-  }, []);
+    const hero = heroRef.current;
+    if (!hero) return;
+    hero.focus({ preventScroll: true });
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    hero.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+  }, [report]);
+
+  useEffect(() => {
+    const node = inlineCtaRef.current;
+    if (!node || embedded) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setPinCta(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [embedded, report]);
+
+  function closeHow() {
+    setHowOpen(false);
+    howButtonRef.current?.focus();
+  }
+
+  useEffect(() => {
+    if (!howOpen) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    dialog.focus();
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setHowOpen(false);
+        howButtonRef.current?.focus();
+        return;
+      }
+      if (event.key !== 'Tab' || !dialog) return;
+      const items = focusableIn(dialog);
+      if (items.length === 0) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey) {
+        if (active === first || active === dialog || !dialog.contains(active)) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !dialog.contains(active)) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [howOpen]);
 
   function openDetails() {
     setShowDetails(true);
@@ -118,10 +184,24 @@ export function GradeReadout({
     setCopied(ok);
   }
 
+  const loanButton = (pinned: boolean) => (
+    <a
+      href={memberLink(preApprovalUrl)}
+      target="_top"
+      className={`cu-primary cu-ring flex h-11 w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? '' : 'md:w-auto'}`}
+      onClick={() => onCta('preapproval')}
+    >
+      <span className="truncate">Get pre-approved with {shortName}</span>
+      {demoPreapproval ? (
+        <span className="inline-flex shrink-0 items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+      ) : null}
+    </a>
+  );
+
   return (
     <div className={embedded
       ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
-      : `mx-auto w-full max-w-[560px] px-4 ${showCta ? 'pb-[calc(240px+env(safe-area-inset-bottom))] md:pb-16' : 'pb-16'} pt-16 md:pt-24`}>
+      : `mx-auto w-full max-w-[560px] px-4 ${showPreapproval ? 'pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-16' : 'pb-16'} pt-16 md:pt-24`}>
       <div className="cu-print-only mb-6">
         <BrandLockup
           name={creditUnionName}
@@ -136,9 +216,17 @@ export function GradeReadout({
           {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
         </p>
         <p className="mt-1 text-[14px] font-semibold leading-[20px]">{PRINT_NOT_ADVICE}</p>
+        {preApprovalUrl ? <p className="mt-2 break-all text-[14px] leading-[20px]">{preApprovalUrl}</p> : null}
       </div>
 
-      <div className="flex h-24 w-24 items-center justify-center rounded-[16px]" role="img" aria-label={`Grade ${report.grade}, ${quality}`} style={{ backgroundColor: gradeTint(gradeColor) }}>
+      <div
+        ref={heroRef}
+        tabIndex={-1}
+        className="cu-hero cu-ring flex h-24 w-24 items-center justify-center rounded-[16px] outline-none"
+        role="img"
+        aria-label={`Grade ${report.grade}, ${quality}`}
+        style={{ backgroundColor: gradeTint(gradeColor), scrollMarginTop: 'calc(4rem + 24px)' }}
+      >
         <p aria-hidden="true" className="text-[64px] font-extrabold leading-none" style={{ color: gradeColor }}>
           {report.grade}
         </p>
@@ -148,11 +236,11 @@ export function GradeReadout({
       {limitedPill ? (
         <p className="mt-4 inline-flex rounded-full border cu-line px-3 py-1 text-[13px] font-semibold leading-[18px]">{limitedPill}</p>
       ) : null}
-      <DisclaimerList lines={disclaimers} />
 
-      <h1 ref={headingRef} tabIndex={-1} className="mt-6 text-[24px] font-bold leading-[30px] outline-none">
+      <h1 className="mt-6 text-[24px] font-bold leading-[30px] outline-none">
         {verdict}
       </h1>
+      <DisclaimerList lines={disclaimers} />
 
       {entered > 0 ? (
         <p className="mt-4">
@@ -165,16 +253,16 @@ export function GradeReadout({
       {rows.length > 0 ? (
         <ul className="mt-8" aria-label="What helped and what hurt">
           {rows.map(row => (
-            <li key={row.label} className="flex items-baseline gap-3 border-t cu-line py-4">
-              <span aria-hidden="true" className="w-4 shrink-0 text-[16px] font-semibold" style={{ color: row.tone === 'helped' ? '#14532d' : '#92400e' }}>
-                {row.tone === 'helped' ? '✓' : '!'}
-              </span>
-              <span className="sr-only">{row.tone === 'helped' ? 'Helped. ' : 'Ask about this. '}</span>
-              <span className="min-w-0 flex-1">
-                <span className="text-[16px] leading-[24px]">{row.label}</span>
-                {row.versus ? <span className="mt-1 block text-[13px] leading-[18px] cu-muted">vs {row.versus}</span> : null}
-              </span>
-              <span className="shrink-0 text-[16px] font-semibold leading-[24px] tabular-nums">{row.figure}</span>
+            <li key={row.label} className="border-t cu-line py-4">
+              <div className="flex items-baseline gap-3">
+                <span aria-hidden="true" className="w-4 shrink-0 text-[16px] font-semibold" style={{ color: row.tone === 'helped' ? '#14532d' : '#92400e' }}>
+                  {row.tone === 'helped' ? '✓' : '!'}
+                </span>
+                <span className="sr-only">{row.tone === 'helped' ? 'Helped. ' : 'Ask about this. '}</span>
+                <span className="min-w-0 flex-1 text-[16px] leading-[24px]">{row.label}</span>
+                <span className="shrink-0 text-[16px] font-semibold leading-[24px] tabular-nums">{row.figure}</span>
+              </div>
+              <p className="mt-1 pl-7 text-[14px] leading-[20px] text-[#555]">{row.why}</p>
             </li>
           ))}
         </ul>
@@ -207,39 +295,31 @@ export function GradeReadout({
         </section>
       ) : null}
 
-      {showCta ? (
-        <div className={embedded
-          ? 'static mt-10 w-full'
-          : 'cu-pinned fixed inset-x-0 bottom-0 z-10 border-t cu-line bg-white px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:static md:mt-10 md:border-0 md:bg-transparent md:p-0'}>
-          <div className="mx-auto flex w-full max-w-[560px] flex-col items-start gap-3">
-            {showPreapproval ? (
-              <a
-                href={memberLink(preApprovalUrl)}
-                target="_top"
-                className="cu-primary cu-ring inline-flex items-center justify-center gap-2 text-center min-h-12 w-full px-4 rounded-lg text-[15px] font-semibold leading-[20px] md:w-auto"
-                onClick={() => onCta('preapproval')}
-              >
-                <span>Get pre-approved with {shortName}</span>
-                {demoPreapproval ? (
-                  <span className="inline-flex items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
-                ) : null}
-              </a>
+      {showRates ? (
+        <p className="mt-8">
+          <a
+            href={memberLink(ratesUrl)}
+            target="_top"
+            className={`${textLink} inline-flex items-center gap-2`}
+            onClick={() => onCta('rates')}
+          >
+            <span>See auto rates</span>
+            {demoRates ? (
+              <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
             ) : null}
-            {showRates ? (
-              <a
-                href={memberLink(ratesUrl)}
-                target="_top"
-                className={`${textLink} inline-flex items-center gap-2`}
-                onClick={() => onCta('rates')}
-              >
-                <span>See auto rates</span>
-                {demoRates ? (
-                  <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
-                ) : null}
-              </a>
+          </a>
+        </p>
+      ) : null}
+
+      {showPreapproval ? (
+        <div ref={inlineCtaRef} className="cu-no-print mt-4">
+          {loanButton(false)}
+          <p className="mt-2 flex items-center gap-2 text-[13px] leading-[18px] cu-muted">
+            <span>{LOAN_CTA_HELPER}</span>
+            {demoPreapproval ? (
+              <span className="inline-flex items-center rounded-full border cu-line px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
             ) : null}
-            <DisclaimerList lines={disclaimers} />
-          </div>
+          </p>
         </div>
       ) : null}
 
@@ -295,8 +375,8 @@ export function GradeReadout({
             {report.disclaimers.map(line => <li key={line}>{line}</li>)}
           </ul>
 
-          <p className="mt-6">
-            <button type="button" className={textLink} onClick={() => setHowOpen(true)}>How we grade</button>
+          <p className="cu-no-print mt-6">
+            <button ref={howButtonRef} type="button" className={textLink} onClick={() => setHowOpen(true)}>How we grade</button>
           </p>
         </div>
         <p className="cu-no-print mt-6">
@@ -306,12 +386,27 @@ export function GradeReadout({
         </p>
       </div>
 
+      {showPreapproval && pinCta && !embedded ? (
+        <div
+          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 flex items-center border-t bg-white px-3 md:hidden"
+          style={{
+            borderColor: '#E5E5E5',
+            height: 'calc(64px + env(safe-area-inset-bottom))',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          {loanButton(true)}
+        </div>
+      ) : null}
+
       {howOpen ? (
-        <div className="cu-no-print fixed inset-0 z-20 flex items-end justify-center bg-black/40 px-4 py-6 sm:items-center" role="presentation" onClick={() => setHowOpen(false)}>
+        <div className="cu-no-print fixed inset-0 z-30 flex items-end justify-center bg-black/40 px-4 py-6 sm:items-center" role="presentation" onClick={closeHow}>
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="how-heading"
+            tabIndex={-1}
             className="w-full max-w-[480px] rounded-lg bg-white p-6"
             onClick={event => event.stopPropagation()}
           >
@@ -319,9 +414,10 @@ export function GradeReadout({
             <p className="mt-4 text-[16px] leading-[24px]">
               The letter compares this offer with the numbers you entered. Strong, Fair, and Weak describe the offer. They do not describe your credit.
             </p>
+            <p className="mt-4 text-[16px] leading-[24px]">{grading}</p>
             <p className="mt-4 text-[16px] leading-[24px]">This grade is educational. It is not a loan offer.</p>
             <p className="mt-6">
-              <button type="button" className={textLink} onClick={() => setHowOpen(false)}>Close</button>
+              <button type="button" className={textLink} onClick={closeHow}>Close</button>
             </p>
           </div>
         </div>

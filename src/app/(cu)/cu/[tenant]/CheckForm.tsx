@@ -312,7 +312,6 @@ export function CheckForm({
         ? 'mx-auto w-full max-w-[560px] px-4 pt-16 md:pt-24'
         : 'mx-auto w-full max-w-[560px] px-4 pb-16 pt-16 md:pt-24'} aria-label="Incomplete">
         <p className="text-[14px] font-semibold leading-[20px]">Incomplete</p>
-        <p className="mt-2 text-[14px] leading-[20px] cu-muted">Graded by {brand.shortName} · with Sign or Walk</p>
         <h1 ref={headingRef} tabIndex={-1} className="mt-6 text-[24px] font-bold leading-[30px] outline-none">
           Incomplete: add your APR for a full grade.
         </h1>

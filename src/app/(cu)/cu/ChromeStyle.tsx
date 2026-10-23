@@ -38,14 +38,8 @@ export function ChromeStyle() {
       .cu-details-collapsed { display: none; }
       .cu-more-collapsed { display: none; }
       @media print {
-        .cu-no-print, .cu-embed-attribution { display: none !important; }
+        .cu-no-print, .cu-embed-attribution, .cu-pinned { display: none !important; }
         .cu-print-only, .cu-details-collapsed, .cu-more-collapsed { display: block !important; }
-        .cu-pinned {
-          position: static !important;
-          border: 0 !important;
-          padding: 0 !important;
-          background: transparent !important;
-        }
       }
     `}</style>
   );
