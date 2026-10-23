@@ -7,6 +7,7 @@ import { missingTenantResponse } from '@/cu/missing-page';
 import { marketingDemoReferer, MARKETING_DEMO_TENANT } from '@/cu/demo-upload';
 import { clientAddress, takeDemoExtractSlot, takeExtractSlot } from '@/cu/rate-limit';
 import { staffCanPreview } from '@/cu/preview-access';
+import { sampleCountsExcluded } from '@/cu/sample-grant';
 import { loadCuTenant, TENANT_UNAVAILABLE, tenantUnavailable } from '@/cu/tenant-directory';
 
 const MAX_FILE = 5 * 1024 * 1024;
@@ -127,7 +128,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
     const referer = req.headers.get('referer');
     let sample = false;
     try {
-      sample = Boolean(referer && new URL(referer).searchParams.get('sample') === '1');
+      if (referer) {
+        const from = new URL(referer);
+        sample = sampleCountsExcluded(tenant.id, from.searchParams.get('sample') === '1', from.searchParams.get('grant'));
+      }
     } catch {
       sample = false;
     }

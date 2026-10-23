@@ -2,9 +2,13 @@
  * Credit-union records only: profile, branding, settings, staff labels, and aggregate counts.
  * Member worksheets, images, extracted text, and deal numbers are not accepted.
  *
- * Vercel KV and Upstash Redis share a REST shape. With neither configured, the
- * process keeps an in-memory copy so `next build` still runs with no env vars.
- * Isolates do not share that copy.
+ * Vercel KV and Upstash Redis share a REST shape. Local development
+ * (NODE_ENV=development) and the Node test runner (NODE_TEST_CONTEXT) keep an
+ * in-memory copy when neither REST URL is set. Outside that, signup,
+ * onboarding saves, admin writes, and counters are refused.
+ * A configured store that fails a call still serves the in-memory copy for
+ * this isolate. Isolates do not share that copy. Keys are not prefixed by
+ * environment. KV_URL and REDIS_URL are not read.
  */
 
 export interface StoredBranding {
@@ -121,6 +125,55 @@ function restConfig(): { url: string; token: string } | null {
   return { url: url.replace(/\/$/, ''), token };
 }
 
+export const CU_SERVICE_UNCONFIGURED = 'Credit union service not configured';
+
+export class CuStoreUnconfigured extends Error {
+  constructor() {
+    super(CU_SERVICE_UNCONFIGURED);
+    this.name = 'CuStoreUnconfigured';
+  }
+}
+
+/** True when the Upstash or Vercel KV REST URL and token are both set. */
+export function cuKvConfigured(): boolean {
+  return restConfig() !== null;
+}
+
+/**
+ * In-memory writes are only for local development and the test runner.
+ * Vercel sets NODE_ENV=production for Preview and Production. Preview has the
+ * REST variables, so it uses KV. Production does not, so writes are refused.
+ */
+export function memoryStoreAllowed(): boolean {
+  // node:test workers set this. They do not put --test on process.argv, and
+  // this suite leaves NODE_ENV unset. Production next start does neither.
+  if (process.env.NODE_TEST_CONTEXT) return true;
+  const env = process.env.NODE_ENV;
+  return env === 'development' || env === 'test';
+}
+
+export function cuServiceConfigured(): boolean {
+  return cuKvConfigured() || memoryStoreAllowed();
+}
+
+let notedUnconfigured = false;
+
+function noteCuUnconfigured(): void {
+  if (notedUnconfigured) return;
+  notedUnconfigured = true;
+  console.error(CU_SERVICE_UNCONFIGURED);
+}
+
+/** One server log per process. Middleware calls this when signup or admin is refused. */
+export function logCuServiceUnconfigured(): void {
+  noteCuUnconfigured();
+}
+
+function refuseMemoryWrite(): never {
+  noteCuUnconfigured();
+  throw new CuStoreUnconfigured();
+}
+
 async function restCommand(command: string[]): Promise<unknown> {
   const config = restConfig();
   if (!config) return undefined;
@@ -139,7 +192,10 @@ async function restCommand(command: string[]): Promise<unknown> {
 }
 
 async function readRaw(key: string): Promise<string | null> {
-  if (!restConfig()) return memory.get(key) ?? null;
+  if (!restConfig()) {
+    if (!memoryStoreAllowed()) return null;
+    return memory.get(key) ?? null;
+  }
   try {
     const result = await restCommand(['GET', key]);
     storeUnavailable = false;
@@ -152,12 +208,16 @@ async function readRaw(key: string): Promise<string | null> {
 
 async function writeRaw(key: string, value: string): Promise<void> {
   assertCuRecord(JSON.parse(value));
+  if (!restConfig()) {
+    if (!memoryStoreAllowed()) refuseMemoryWrite();
+    memory.set(key, value);
+    return;
+  }
   memory.set(key, value);
-  if (!restConfig()) return;
   try {
     await restCommand(['SET', key, value]);
   } catch {
-    /* The in-memory copy still serves this isolate. */
+    /* A configured store that fails still serves this isolate from memory. */
   }
 }
 
@@ -225,7 +285,10 @@ function whole(value: unknown): number {
 }
 
 async function readInteger(key: string): Promise<number> {
-  if (!restConfig()) return whole(memory.get(key) ?? 0);
+  if (!restConfig()) {
+    if (!memoryStoreAllowed()) return 0;
+    return whole(memory.get(key) ?? 0);
+  }
   try {
     const result = await restCommand(['GET', key]);
     storeUnavailable = false;
@@ -245,6 +308,10 @@ async function incrInteger(key: string): Promise<void> {
     const n = Number(result);
     if (!Number.isInteger(n) || n < 1) throw new Error('store-unavailable');
     memory.set(key, String(n));
+    return;
+  }
+  if (!memoryStoreAllowed()) {
+    noteCuUnconfigured();
     return;
   }
   const current = whole(memory.get(key) ?? 0);
@@ -299,8 +366,12 @@ export async function writeStoreJson(key: string, value: unknown): Promise<void>
 }
 
 export async function deleteStoreKey(key: string): Promise<void> {
+  if (!restConfig()) {
+    if (!memoryStoreAllowed()) refuseMemoryWrite();
+    memory.delete(key);
+    return;
+  }
   memory.delete(key);
-  if (!restConfig()) return;
   try {
     await restCommand(['DEL', key]);
   } catch {
@@ -380,6 +451,7 @@ export function resetCuStore(): void {
   memory.clear();
   frameCache.clear();
   storeUnavailable = false;
+  notedUnconfigured = false;
 }
 
 /**

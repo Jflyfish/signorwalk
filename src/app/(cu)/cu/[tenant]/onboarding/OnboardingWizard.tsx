@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MemberPreview } from '../MemberPreview';
 import { CopyLink } from '../dashboard/CopyLink';
-import { HTTPS_LINK } from '@/cu/form-copy';
+import { HTTPS_LINK, LOAN_LINK_REQUIRED } from '@/cu/form-copy';
 import { saveOnboardingBrand, saveOnboardingLoan, saveOnboardingStep } from './actions';
 
 const field = 'cu-ring mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal';
@@ -13,7 +13,7 @@ const HTTPS = HTTPS_LINK;
 
 function httpsProblem(value: string, required: boolean): string {
   const trimmed = value.trim();
-  if (!trimmed) return required ? HTTPS : '';
+  if (!trimmed) return required ? LOAN_LINK_REQUIRED : '';
   if (/^http:\/\//i.test(trimmed)) return HTTPS;
   try {
     const url = new URL(trimmed);
@@ -32,6 +32,7 @@ export function OnboardingWizard({
   tenantId,
   initialStep,
   initialLogo,
+  initialShort,
   initialColor,
   initialLoan,
   initialRates,
@@ -44,6 +45,7 @@ export function OnboardingWizard({
   tenantId: string;
   initialStep: 1 | 2 | 3;
   initialLogo: string;
+  initialShort: string;
   initialColor: string;
   initialLoan: string;
   initialRates: string;
@@ -56,6 +58,7 @@ export function OnboardingWizard({
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(initialStep);
   const [logo, setLogo] = useState(initialLogo);
+  const [shortName, setShortName] = useState(initialShort);
   const [color, setColor] = useState(initialColor);
   const [loan, setLoan] = useState(initialLoan);
   const [rates, setRates] = useState(initialRates);
@@ -88,7 +91,7 @@ export function OnboardingWizard({
     if (problems.logo) return Promise.resolve('logo');
     if (problems.color) return Promise.resolve('color');
     const run = (async () => {
-      const saved = await saveOnboardingBrand(tenantId, logo, color);
+      const saved = await saveOnboardingBrand(tenantId, logo, color, shortName);
       if (!saved.ok) {
         if (saved.error === HTTPS) {
           setLogoError(saved.error);
@@ -175,9 +178,9 @@ export function OnboardingWizard({
     }
     if (next === 3) {
       const saved = await saveOnboardingStep(tenantId, 3, true);
-      if (!saved) {
+      if (!saved.ok) {
         setStep(2);
-        setLoanError(HTTPS);
+        setLoanError(saved.error);
         loanRef.current?.focus();
         return;
       }
@@ -218,6 +221,18 @@ export function OnboardingWizard({
               />
             </label>
             {logoError ? <InlineError id="logo-error">{logoError}</InlineError> : null}
+            <label className="mt-4 block text-[14px] font-semibold leading-[20px]" htmlFor="short-name">Short name (optional)
+              <span id="short-name-hint" className="mt-2 block font-normal cu-muted">Shown on buttons, e.g. Harborlight</span>
+              <input
+                id="short-name"
+                value={shortName}
+                maxLength={24}
+                autoComplete="off"
+                aria-describedby="short-name-hint"
+                onChange={event => setShortName(event.target.value)}
+                className={field}
+              />
+            </label>
             <label className="mt-4 block text-[14px] font-semibold leading-[20px]" htmlFor="brand-color">Brand color
               <span id="color-hint" className="mt-2 block font-normal cu-muted">Example: #075985. A light color is darkened until text and buttons reach 4.5:1 on white.</span>
               <input
@@ -318,11 +333,11 @@ export function OnboardingWizard({
                 type="button"
                 className={button}
                 onClick={() => {
-                  void saveOnboardingStep(tenantId, 3, true).then(ok => {
-                    if (ok) router.push(`/cu/${tenantId}/dashboard`);
+                  void saveOnboardingStep(tenantId, 3, true).then(saved => {
+                    if (saved.ok) router.push(`/cu/${tenantId}/dashboard`);
                     else {
                       setStep(2);
-                      setLoanError(HTTPS);
+                      setLoanError(saved.error);
                     }
                   });
                 }}

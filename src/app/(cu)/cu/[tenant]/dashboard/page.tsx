@@ -7,6 +7,7 @@ import { getBranding, getSettings, getTenantCounters } from '@/cu/cu-store';
 import { TALK_TO_US_EMAIL } from '@/app/(cu)/credit-unions/pricing';
 import { deepLink, iframeSnippet, memberOrigin } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
+import { getCuTenant } from '@/cu/tenants';
 import { resendConfirmAction, saveEmbedOriginsAction, saveSettingsAction, sendSummaryAction } from '../../actions';
 import { BrandLockup } from '../../BrandLockup';
 import { StaffHeader } from '../../StaffHeader';
@@ -41,6 +42,38 @@ function httpsOrEmpty(value: string): string {
   } catch {
     return '';
   }
+}
+
+function dashboardShortName(name: string, stored: string | undefined, brandShort: string): string {
+  const legal = name.trim().replace(/\s+/g, ' ');
+  const fromStore = (stored ?? '').trim().replace(/\s+/g, ' ');
+  if ([...fromStore].length >= 1 && [...fromStore].length <= 24) return fromStore;
+  const fromBrand = brandShort.trim().replace(/\s+/g, ' ');
+  if ([...fromBrand].length >= 1 && [...fromBrand].length <= 24 && fromBrand !== legal) return fromBrand;
+  if ([...legal].length <= 24) return legal;
+  return '';
+}
+
+function loanIsDefault(tenant: { id: string; loanLinksSet?: boolean }): boolean {
+  return Boolean(getCuTenant(tenant.id)) && tenant.loanLinksSet !== true;
+}
+
+function ratesIsDefault(tenant: { id: string; ratesLinkSet?: boolean }): boolean {
+  return Boolean(getCuTenant(tenant.id)) && tenant.ratesLinkSet !== true;
+}
+
+function loanField(tenant: { id: string; preApprovalUrl: string; loanLinksSet?: boolean }): string {
+  const seed = getCuTenant(tenant.id);
+  if (seed && tenant.loanLinksSet !== true) return seed.preApprovalUrl;
+  if (tenant.loanLinksSet === false) return '';
+  return httpsOrEmpty(tenant.preApprovalUrl);
+}
+
+function ratesField(tenant: { id: string; ratesUrl: string; ratesLinkSet?: boolean }): string {
+  const seed = getCuTenant(tenant.id);
+  if (seed && tenant.ratesLinkSet !== true) return seed.ratesUrl;
+  if (tenant.ratesLinkSet === false) return '';
+  return httpsOrEmpty(tenant.ratesUrl);
 }
 
 function trialDaysLeft(iso: string, now = Date.now()): number | null {
@@ -81,6 +114,7 @@ const NOTICES: Record<string, string> = {
   confirmed: 'Trial confirmed.',
   origins: 'Website saved.',
   links: 'Links saved.',
+  defaults: 'Default links restored.',
   disabled: 'Email is off for this credit union.',
   'not-configured': 'Email is on, but sending is not configured.',
   'missing-tenant': 'This credit union was not found.',
@@ -104,7 +138,9 @@ export default async function DashboardPage({
   const stored = await getBranding(tenant.id);
   const query = await searchParams;
   const section = sectionFrom(query);
-  const error = query.error === 'branding'
+  const error = query.error === 'service'
+    ? 'Credit union service not configured'
+    : query.error === 'branding'
     ? 'Check the short name and colors.'
     : query.error === 'email'
       ? 'Check the credit-union email address.'
@@ -157,7 +193,7 @@ export default async function DashboardPage({
           ))}
         </div>
       </nav>
-      {query.saved === 'confirmed' && tenant.loanLinksSet === false ? (
+      {query.saved === 'confirmed' && tenant.loanLinksSet === false && !getCuTenant(tenant.id) ? (
         <div className="sticky top-0 z-20 border-b cu-line bg-white px-4 py-3">
           <p className="mx-auto w-full max-w-[1120px] text-[15px] font-semibold leading-[24px]">
             Set the loan application URL before you share the member link.
@@ -197,9 +233,15 @@ export default async function DashboardPage({
         {section === 'usage' ? (
           <LoanLinksForm
             tenantId={tenant.id}
-            initialLoan={tenant.loanLinksSet === false ? '' : httpsOrEmpty(tenant.preApprovalUrl)}
-            initialRates={tenant.ratesLinkSet === false ? '' : httpsOrEmpty(tenant.ratesUrl)}
+            initialLoan={loanField(tenant)}
+            initialRates={ratesField(tenant)}
+            loanIsDefault={loanIsDefault(tenant)}
+            ratesIsDefault={ratesIsDefault(tenant)}
+            defaultLoan={getCuTenant(tenant.id)?.preApprovalUrl ?? ''}
+            defaultRates={getCuTenant(tenant.id)?.ratesUrl ?? ''}
+            canRestore={Boolean(getCuTenant(tenant.id))}
             serverRejected={query.error === 'links'}
+            serverError={query.error === 'service' ? 'Credit union service not configured' : ''}
           />
         ) : null}
         {tenant.verified && tenant.embedOrigins.length === 0 ? (
@@ -236,7 +278,7 @@ export default async function DashboardPage({
           <h1 id="branding-heading" className="text-[32px] font-bold leading-[38px]">Branding</h1>
           <BrandingForm
             tenantId={tenant.id}
-            shortName={brand.shortName}
+            shortName={dashboardShortName(tenant.name, stored?.shortName, brand.shortName)}
             primary={sourcePrimary}
             secondary={brand.secondary ?? ''}
             logoLight={brand.logoLight ?? ''}

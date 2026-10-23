@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import { resolveBrand } from '@/cu/brand';
+import { sampleCountsExcluded, sampleGrant } from '@/cu/sample-grant';
 import { numbersOnlyEmbed } from '@/cu/demo-upload';
 import { allowEmbed, deepLink, requestOriginFrom } from '@/cu/embed';
-import { loadCuTenant, memberRatesUrl, tenantUnavailable } from '@/cu/tenant-directory';
+import { loadCuTenant, publicMemberLinks, tenantUnavailable } from '@/cu/tenant-directory';
 import { getCuTenant, toCuPublic } from '@/cu/tenants';
 import { Unavailable } from '../../Unavailable';
 import { BrandLockup } from '../../BrandLockup';
@@ -23,12 +24,13 @@ export default async function EmbedPage({
   searchParams,
 }: {
   params: Promise<{ tenant: string }>;
-  searchParams: Promise<{ entry?: string }>;
+  searchParams: Promise<{ entry?: string; sample?: string }>;
 }) {
   const tenant = await loadCuTenant((await params).tenant);
   if (!tenant) notFound();
-  if (tenantUnavailable(tenant)) return <Unavailable />;
   const query = await searchParams;
+  if (tenant.id === 'preview-sample-cu' && query.sample !== '1') notFound();
+  if (tenantUnavailable(tenant)) return <Unavailable />;
   const h = await headers();
   const numbersOnly = numbersOnlyEmbed(tenant.id, query.entry, h.get('referer'));
   const decision = allowEmbed({
@@ -52,12 +54,9 @@ export default async function EmbedPage({
   }
   const brand = await resolveBrand(tenant);
   const pub = toCuPublic(tenant);
-  if (tenant.loanLinksSet === false) {
-    pub.preApprovalUrl = '';
-    pub.ratesUrl = '';
-  } else {
-    pub.ratesUrl = memberRatesUrl(tenant);
-  }
+  const links = publicMemberLinks(tenant);
+  pub.preApprovalUrl = links.preApprovalUrl;
+  pub.ratesUrl = links.ratesUrl;
   return (
     <div id="sow-embed-root">
       <header className="cu-no-print sticky top-0 z-20 mx-auto flex min-h-14 w-full max-w-[560px] items-center bg-white px-4 py-3">
@@ -76,9 +75,11 @@ export default async function EmbedPage({
         brand={brand}
         targetOrigin={decision.targetOrigin}
         numbersOnly={numbersOnly}
-        demoSample={query.entry === 'numbers'}
+        demoSample={query.entry === 'numbers' || query.sample === '1'}
         disclosure={tenant.disclosure}
         demoPage={Boolean(getCuTenant(tenant.id))}
+        sampleRun={sampleCountsExcluded(tenant.id, query.sample === '1', query.sample === '1' ? sampleGrant(tenant.id) : null)}
+        sampleGrant={query.sample === '1' ? sampleGrant(tenant.id) : null}
       />
     </div>
   );

@@ -17,16 +17,17 @@ const outline = 'inline-flex h-12 w-full items-center justify-center rounded-lg 
 const textButton = 'cu-link text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline';
 
 function TextField({
-  name, title, defaultValue, required,
+  name, title, defaultValue, required, maxLength,
 }: {
   name: string;
   title: string;
   defaultValue?: string;
   required?: boolean;
+  maxLength?: number;
 }) {
   return (
     <label className={label}>{title}
-      <input name={name} defaultValue={defaultValue ?? ''} required={required} className={field} />
+      <input name={name} defaultValue={defaultValue ?? ''} required={required} maxLength={maxLength} className={field} />
     </label>
   );
 }
@@ -104,7 +105,7 @@ export function OwnerEditor({
           <h1 id="add-heading" className="text-[32px] font-bold leading-[38px]">Add credit union</h1>
           <form action={createOwnerTenantAction} className="mt-6 grid gap-4">
             <TextField name="id" title="Slug" required />
-            <TextField name="name" title="Name" required />
+            <TextField name="name" title="Name" required maxLength={60} />
             <TextField name="legalName" title="Legal name" />
             <TextField name="shortName" title="Short name" required />
             <TextField name="primary" title="Primary" required />
@@ -127,7 +128,7 @@ export function OwnerEditor({
             <p className="mt-2 text-[14px] leading-[20px] cu-muted">{profile.status === 'paused' ? STATUS_PAUSED : STATUS_ACTIVE} {profile.id}</p>
             <form action={saveOwnerProfileAction} className="mt-6 grid gap-4">
               <input type="hidden" name="tenant" value={profile.id} />
-              <TextField name="name" title="Name" defaultValue={profile.name} required />
+              <TextField name="name" title="Name" defaultValue={profile.name} required maxLength={60} />
               <TextField name="legalName" title="Legal name" defaultValue={profile.legalName} required />
               <TextField name="tagline" title="Tagline" defaultValue={profile.tagline} required />
               <TextField name="preApprovalUrl" title="Pre-approval URL" defaultValue={profile.preApprovalUrl} required />

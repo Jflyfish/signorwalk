@@ -14,6 +14,8 @@ export function EmbedFrame({
   demoSample = false,
   disclosure,
   demoPage = false,
+  sampleRun = false,
+  sampleGrant = null,
 }: {
   tenant: CuPublic;
   brand: DerivedBrand;
@@ -22,6 +24,8 @@ export function EmbedFrame({
   demoSample?: boolean;
   disclosure?: string;
   demoPage?: boolean;
+  sampleRun?: boolean;
+  sampleGrant?: string | null;
 }) {
   useEffect(() => {
     if (!targetOrigin || !isEmbedOrigin(targetOrigin)) return;
@@ -66,6 +70,8 @@ export function EmbedFrame({
       demoSample={demoSample}
       disclosure={disclosure}
       demoPage={demoPage}
+      sampleRun={sampleRun}
+      sampleGrant={sampleGrant}
       onGrade={grade => {
         if (!targetOrigin || !isEmbedOrigin(targetOrigin) || window.parent === window) return;
         try {

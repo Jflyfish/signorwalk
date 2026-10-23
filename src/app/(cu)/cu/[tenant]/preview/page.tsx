@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
-import { loadCuTenant, memberRatesUrl } from '@/cu/tenant-directory';
+import { loadCuTenant, publicMemberLinks } from '@/cu/tenant-directory';
 import { getCuTenant, toCuPublic } from '@/cu/tenants';
 import { BrandLockup } from '../../BrandLockup';
 import { CheckForm } from '../CheckForm';
@@ -49,12 +49,9 @@ export default async function PreviewPage({
   }
   const brand = await resolveBrand(tenant);
   const pub = toCuPublic(tenant);
-  if (tenant.loanLinksSet === false) {
-    pub.preApprovalUrl = '';
-    pub.ratesUrl = '';
-  } else {
-    pub.ratesUrl = memberRatesUrl(tenant);
-  }
+  const links = publicMemberLinks(tenant);
+  pub.preApprovalUrl = links.preApprovalUrl;
+  pub.ratesUrl = links.ratesUrl;
   const demoPage = Boolean(getCuTenant(tenant.id));
   return (
     <>

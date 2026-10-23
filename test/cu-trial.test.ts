@@ -9,7 +9,7 @@ import { FRAME_ANCESTORS_HEADER, frameAncestorsToken } from '../src/cu/embed';
 import { missingCreditUnionResponse } from '../src/middleware';
 import { resetSignupRateLimit, SIGNUP_LIMIT, takeSignupSlot } from '../src/cu/rate-limit';
 import { deleteStaffLogin, staffLoginMatches } from '../src/cu/staff-login';
-import { getTenantProfile, loadCuTenant, removeTenant, tenantUnavailable } from '../src/cu/tenant-directory';
+import { ensureTenantDirectory, getTenantProfile, loadCuTenant, publicMemberLinks, removeTenant, saveTenantProfile, tenantUnavailable } from '../src/cu/tenant-directory';
 import { signupNotifyAddress } from '../src/cu/notify';
 import { confirmTrialToken } from '../src/cu/trial-confirm';
 import { createTrial, TRIAL_MS } from '../src/cu/trial';
@@ -167,6 +167,63 @@ test('signup is limited to five an hour and an ended trial is unavailable', asyn
   const middleware = readFileSync('src/middleware.ts', 'utf8');
   assert.equal(middleware.includes(`return "'self'"`), false);
   assert.match(middleware, /missingCreditUnionResponse/);
+  assert.match(middleware, /Credit union service not configured/);
+  assert.match(middleware, /statusResponse\(pathname, 401/);
+  assert.match(middleware, /statusResponse\(pathname, 403/);
+});
+
+test('a legal name longer than 24 characters is stored whole', async () => {
+  resetCuStore();
+  const name = 'Northwestern Pacific Teachers Federal Credit Union';
+  assert.equal([...name].length, 50);
+  const secret = ephemeralSecret();
+  const created = await createTrial({
+    name,
+    contactName: 'Avery Chen',
+    email: `long-${randomBytes(3).toString('hex')}@example.com`,
+    secret,
+    website: '',
+    honeypot: '',
+  });
+  assert.equal(created.ok, true);
+  if (!created.ok) return;
+  const tenant = await loadCuTenant(created.id);
+  assert.equal(tenant?.name, name);
+  assert.equal(tenant?.legalName, name);
+  assert.equal(tenant?.brand.shortName, name);
+  const profile = await getTenantProfile(created.id);
+  assert.equal(profile?.preApprovalLabel, 'Get pre-approved');
+  assert.equal(profile?.name.includes(name.slice(0, 24)) && profile.name !== name, false);
+  const tooLong = await createTrial({
+    name: 'N'.repeat(61),
+    contactName: 'Avery Chen',
+    email: `long2-${randomBytes(3).toString('hex')}@example.com`,
+    secret,
+    website: '',
+    honeypot: '',
+  });
+  assert.deepEqual(tooLong, { ok: false, error: 'name' });
+  await removeTenant(created.id);
+});
+
+test('a seeded loan override returns to the demo path when loanLinksSet is false', async () => {
+  resetCuStore();
+  await ensureTenantDirectory();
+  const profile = await getTenantProfile('preview-sample-cu');
+  assert.ok(profile);
+  profile.preApprovalUrl = 'https://cu-preview.vercel.app/apply';
+  profile.loanLinksSet = true;
+  await saveTenantProfile(profile);
+  const overridden = await loadCuTenant('preview-sample-cu');
+  assert.equal(overridden?.preApprovalUrl, 'https://cu-preview.vercel.app/apply');
+  assert.match(publicMemberLinks(overridden!).preApprovalUrl, /cu-preview\.vercel\.app\/apply/);
+  profile.loanLinksSet = false;
+  profile.ratesLinkSet = false;
+  await saveTenantProfile(profile);
+  const restored = await loadCuTenant('preview-sample-cu');
+  assert.equal(restored?.loanLinksSet, false);
+  assert.match(publicMemberLinks(restored!).preApprovalUrl, /^\/credit-unions\/demo\/preapproval\?utm_source=signorwalk/);
+  assert.match(publicMemberLinks(restored!).ratesUrl, /^\/credit-unions\/demo\/rates\?/);
 });
 
 test('two isolates share the signup counter when the store is used', async () => {

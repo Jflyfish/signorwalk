@@ -26,6 +26,7 @@ const ERRORS: Record<string, string> = {
   rate: 'Too many signups from this network. Try again later.',
   start: "We couldn't start the trial. Check the form and try again.",
   unconfigured: 'Sign-in is not configured on this server.',
+  service: 'Credit union service not configured',
 };
 
 export default async function GetStartedPage({
@@ -53,7 +54,7 @@ export default async function GetStartedPage({
             </label>
           </p>
           <label className="text-[14px] font-semibold leading-[20px]">Credit union name
-            <input name="name" required autoComplete="organization" className={field} />
+            <input name="name" required maxLength={60} autoComplete="organization" className={field} />
           </label>
           <label className="text-[14px] font-semibold leading-[20px]">Contact name
             <input name="contact" required autoComplete="name" className={field} />

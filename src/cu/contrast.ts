@@ -200,8 +200,8 @@ function safeAspect(aspect: number): number {
 
 function safeShortName(name: string, shortName: string): string {
   const trimmed = shortName.trim().replace(/\s+/g, ' ');
-  const value = trimmed || name.trim();
-  return [...value].slice(0, 24).join('');
+  if (trimmed && [...trimmed].length <= 24) return trimmed;
+  return name.trim();
 }
 
 /**

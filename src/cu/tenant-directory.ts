@@ -1,6 +1,7 @@
 import { deriveBrand, parseHex } from './contrast';
 import {
   clearFrameAncestorCache,
+  cuServiceConfigured,
   deleteTenantData,
   getBranding,
   readStoreJson,
@@ -12,6 +13,7 @@ import {
 import { deleteStaffLogin } from './staff-login';
 import { isEmbedOrigin } from './embed';
 import { CU_TENANTS, getCuTenant, type CuTenant } from './tenants';
+import { withUtm } from './utm';
 
 /** Runtime credit-union profile. Demo records are copied from config seeds once per empty store. */
 export interface StoredTenantProfile {
@@ -142,6 +144,21 @@ function clip(value: string, max: number): string {
   return value.trim().replace(/\s+/g, ' ').slice(0, max);
 }
 
+/** Whole string, or null when it is longer than max. Does not slice a legal name. */
+function bounded(value: string, max: number): string | null {
+  const trimmed = value.trim().replace(/\s+/g, ' ');
+  if ([...trimmed].length > max) return null;
+  return trimmed;
+}
+
+/** A short name of at most 24 characters, or the legal name when it already fits. */
+function labelShort(name: string, shortName: string | undefined): string | null {
+  const short = (shortName || '').trim().replace(/\s+/g, ' ');
+  if (short && [...short].length <= 24) return short;
+  if ([...name].length <= 24) return name;
+  return null;
+}
+
 export function normalizeProfile(input: {
   id: string;
   name: string;
@@ -169,9 +186,10 @@ export function normalizeProfile(input: {
 }): StoredTenantProfile | null {
   const id = input.id.trim().toLowerCase();
   if (!SLUG.test(id) || id.length > 48 || RESERVED.has(id)) return null;
-  const name = clip(input.name, 80);
-  if ([...name].length < 2) return null;
-  const legalName = clip(input.legalName || name, 120);
+  const name = bounded(input.name, 60);
+  if (!name || [...name].length < 2) return null;
+  const legalName = bounded(input.legalName || name, 60);
+  if (!legalName) return null;
   const tagline = clip(input.tagline || 'Check a vehicle offer', 80);
   const preApprovalUrl = input.preApprovalUrl.trim();
   const ratesUrl = input.ratesUrl.trim();
@@ -180,9 +198,9 @@ export function normalizeProfile(input: {
   const supportUrl = (input.supportUrl || preApprovalUrl).trim();
   const privacyUrl = (input.privacyUrl || preApprovalUrl).trim();
   if (!httpsUrl(supportUrl) || !httpsUrl(privacyUrl)) return null;
-  const short = clip(input.shortName || name, 24);
-  const preApprovalLabel = clip(input.preApprovalLabel || `Get pre-approved at ${short}`, 80);
-  const ratesLabel = clip(input.ratesLabel || `See ${short} auto rates`, 80);
+  const labelName = labelShort(name, input.shortName);
+  const preApprovalLabel = clip(input.preApprovalLabel || (labelName ? `Get pre-approved at ${labelName}` : 'Get pre-approved'), 80);
+  const ratesLabel = clip(input.ratesLabel || (labelName ? `See ${labelName} auto rates` : 'See auto rates'), 80);
   if (!preApprovalLabel || !ratesLabel || !tagline || !legalName) return null;
   if (input.status !== 'active' && input.status !== 'paused') return null;
   return {
@@ -232,6 +250,33 @@ function fromSeed(seed: CuTenant): StoredTenantProfile {
     profile.verified = true;
   }
   return profile;
+}
+
+/**
+ * Links a member actually opens.
+ * A seeded demo with no override uses the demo paths, including after Restore default
+ * sets loanLinksSet to false. A trial that has not saved a link stays blank.
+ */
+export function publicMemberLinks(tenant: {
+  id: string;
+  preApprovalUrl: string;
+  ratesUrl: string;
+  loanLinksSet?: boolean;
+  ratesLinkSet?: boolean;
+  embedOrigins?: readonly string[];
+}): { preApprovalUrl: string; ratesUrl: string } {
+  const seed = getCuTenant(tenant.id);
+  if (seed && tenant.loanLinksSet !== true) {
+    return {
+      preApprovalUrl: withUtm(seed.preApprovalUrl, seed.id, 'preapproval'),
+      ratesUrl: withUtm(seed.ratesUrl, seed.id, 'rates'),
+    };
+  }
+  if (tenant.loanLinksSet === false) return { preApprovalUrl: '', ratesUrl: '' };
+  return {
+    preApprovalUrl: withUtm(tenant.preApprovalUrl, tenant.id, 'preapproval'),
+    ratesUrl: memberRatesUrl(tenant),
+  };
 }
 
 /** Hide a rates link the credit union did not enter. Demo paths on the seeds stay. */
@@ -292,6 +337,7 @@ async function insertMissingSeeds(): Promise<void> {
 }
 
 export async function ensureTenantDirectory(): Promise<void> {
+  if (!cuServiceConfigured()) return;
   if (!(await readStoreJson(SEEDED_KEY))) {
     const index = await readIndex();
     if (!index || index.length === 0) {
@@ -324,6 +370,12 @@ function placeholderHost(url: string): boolean {
 function sandboxLink(profileUrl: string, seedUrl: string | undefined): string {
   if (!seedUrl || !placeholderHost(profileUrl)) return profileUrl;
   return seedUrl;
+}
+
+function seedTenant(id: string): ResolvedTenant | undefined {
+  const seed = getCuTenant(id);
+  if (!seed) return undefined;
+  return materialize(fromSeed(seed), null, seed);
 }
 
 function materialize(profile: StoredTenantProfile, branding: StoredBranding | null, seed?: CuTenant): ResolvedTenant {
@@ -383,6 +435,7 @@ export async function loadCuTenant(slug: string | null | undefined): Promise<Res
   if (!slug) return undefined;
   const id = slug.trim().toLowerCase();
   if (!SLUG.test(id)) return undefined;
+  if (!cuServiceConfigured()) return seedTenant(id);
   await ensureTenantDirectory();
   const index = await readIndex();
   if (!index?.includes(id)) return undefined;
@@ -393,6 +446,9 @@ export async function loadCuTenant(slug: string | null | undefined): Promise<Res
 }
 
 export async function listCuTenants(): Promise<ResolvedTenant[]> {
+  if (!cuServiceConfigured()) {
+    return CU_TENANTS.map(seed => materialize(fromSeed(seed), null, seed));
+  }
   await ensureTenantDirectory();
   const index = (await readIndex()) ?? [];
   const rows: ResolvedTenant[] = [];
@@ -406,6 +462,10 @@ export async function listCuTenants(): Promise<ResolvedTenant[]> {
 export { listCuTenants as listCreditUnions };
 
 export async function getTenantProfile(id: string): Promise<StoredTenantProfile | null> {
+  if (!cuServiceConfigured()) {
+    const seed = getCuTenant(id);
+    return seed ? fromSeed(seed) : null;
+  }
   await ensureTenantDirectory();
   return readStoreJson<StoredTenantProfile>(storeKey(id, 'profile'));
 }

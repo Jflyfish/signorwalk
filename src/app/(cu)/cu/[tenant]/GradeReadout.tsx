@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { GRADE_FILL } from '@/cu/grades';
 import {
   GRADE_DISCLAIMER_NO_CHARACTERISTICS,
@@ -66,6 +66,7 @@ export function GradeReadout({
   limitedPill,
   disclosure,
   samplePage = false,
+  sampleGrant = null,
   previewPage = false,
   demoPage = false,
   onCheckAnother,
@@ -85,6 +86,7 @@ export function GradeReadout({
   limitedPill: string | null;
   disclosure?: string;
   samplePage?: boolean;
+  sampleGrant?: string | null;
   /** Owner /preview. Left out of grades run and loan clicks. Not a sample run. */
   previewPage?: boolean;
   demoPage?: boolean;
@@ -93,6 +95,8 @@ export function GradeReadout({
   const heroRef = useRef<HTMLDivElement>(null);
   const detailsRef = useRef<HTMLDivElement>(null);
   const inlineButtonRef = useRef<HTMLAnchorElement>(null);
+  const labelProbeRef = useRef<HTMLSpanElement>(null);
+  const [labelFits, setLabelFits] = useState(false);
   const rowsRef = useRef<HTMLUListElement>(null);
   const questionsRef = useRef<HTMLElement>(null);
   const howButtonRef = useRef<HTMLButtonElement>(null);
@@ -128,6 +132,26 @@ export function GradeReadout({
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
+
+  const longLabel = `Check your rate with ${shortName}`;
+  useLayoutEffect(() => {
+    const button = inlineButtonRef.current;
+    const probe = labelProbeRef.current;
+    if (!button || !probe) return;
+    const measure = () => {
+      const style = getComputedStyle(button);
+      const pad = (Number.parseFloat(style.paddingLeft) || 0) + (Number.parseFloat(style.paddingRight) || 0);
+      const gap = Number.parseFloat(style.columnGap || style.gap) || 0;
+      const pill = button.querySelector('[data-demo-pill]');
+      const pillWidth = pill instanceof HTMLElement ? pill.offsetWidth : 0;
+      const inner = button.clientWidth - pad - pillWidth - (pillWidth ? gap : 0);
+      const fits = probe.scrollWidth <= inner + 0.5;
+      setLabelFits(current => (current === fits ? current : fits));
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [longLabel, demoPage]);
 
   useEffect(() => {
     const button = inlineButtonRef.current;
@@ -238,20 +262,26 @@ export function GradeReadout({
     setCopied(ok);
   }
 
+  const exclusion = samplePage
+    ? `?sample=1${sampleGrant ? `&grant=${encodeURIComponent(sampleGrant)}` : ''}`
+    : previewPage ? '?preview=1' : '';
   const loanButton = (pinned: boolean) => (
     <a
       ref={pinned ? undefined : inlineButtonRef}
       href={memberLink(preApprovalUrl)}
       target="_top"
-      className={`cu-primary cu-ring flex w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? 'h-8' : 'h-11 md:w-auto'}`}
+      className={`cu-primary cu-ring relative flex w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? 'h-11 min-h-11 shrink-0' : 'h-11 md:w-auto'}`}
       onClick={() => {
-        void fetch(`/api/cu/${tenantId}/loan-click${samplePage ? '?sample=1' : previewPage ? '?preview=1' : ''}`, { method: 'POST', keepalive: true }).catch(() => undefined);
+        void fetch(`/api/cu/${tenantId}/loan-click${exclusion}`, { method: 'POST', keepalive: true }).catch(() => undefined);
       }}
     >
-      <span className={pinned ? 'whitespace-nowrap' : 'truncate'}>{pinned ? 'Check your rate' : `Check your rate with ${shortName}`}</span>
+      <span className="whitespace-nowrap">{pinned ? 'Check your rate' : (labelFits ? longLabel : 'Check your rate')}</span>
       {demoPage ? (
-        <span className="inline-flex shrink-0 items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+        <span data-demo-pill="" className="inline-flex shrink-0 items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
       ) : null}
+      {pinned ? null : (
+        <span ref={labelProbeRef} aria-hidden="true" className="pointer-events-none absolute whitespace-nowrap opacity-0">{longLabel}</span>
+      )}
     </a>
   );
 
@@ -460,7 +490,7 @@ export function GradeReadout({
 
       {showPreapproval && pinCta && !embedded ? (
         <div
-          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 flex flex-col justify-center overflow-hidden border-t bg-white px-3 md:hidden"
+          className="cu-pinned cu-no-print fixed inset-x-0 bottom-0 z-10 flex flex-col justify-center border-t bg-white px-3 md:hidden"
           style={{
             borderColor: '#E5E5E5',
             boxSizing: 'border-box',
@@ -470,7 +500,7 @@ export function GradeReadout({
           }}
         >
           {loanButton(true)}
-          <p className="mt-0.5 text-center text-[12px] leading-[14px] whitespace-nowrap cu-muted">{LOAN_CTA_HELPER}</p>
+          <p className="mt-1 text-center text-[12px] leading-[16px] whitespace-nowrap cu-muted">{LOAN_CTA_HELPER}</p>
         </div>
       ) : null}
 

@@ -28,7 +28,7 @@ export const PRINT_NOT_ADVICE = 'Not financial advice.';
 export const APR_NOT_A_MARKET_RATE = '(not a market rate or an offer)';
 
 /** Pinned pre-approval bar body, before the safe area. */
-export const PINNED_BAR_BODY_PX = 64;
+export const PINNED_BAR_BODY_PX = 76;
 export const PINNED_BAR_HEIGHT = `calc(${PINNED_BAR_BODY_PX}px + env(safe-area-inset-bottom))`;
 
 export function gradeDisclaimerLines(shortName: string): readonly string[] {

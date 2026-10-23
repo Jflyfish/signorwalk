@@ -90,12 +90,14 @@ export function BrandingForm({
         </div>
       ) : null}
       <label className="text-[14px] font-semibold leading-[20px]">Short name
+        {returnTo === 'owner' ? null : <span id="short-name-hint" className="mt-2 block font-normal cu-muted">Shown on buttons, e.g. Harborlight</span>}
         <input
           name="shortName"
           value={name}
           onChange={event => setName(event.target.value)}
           maxLength={24}
-          required
+          required={returnTo === 'owner'}
+          aria-describedby={returnTo === 'owner' ? undefined : 'short-name-hint'}
           className="mt-2 block h-12 w-full rounded-lg border cu-line px-4 text-[16px] font-normal"
         />
       </label>

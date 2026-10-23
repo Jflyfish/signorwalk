@@ -26,7 +26,7 @@ export async function generateMetadata({
     title: `Check a dealer offer — ${tenant.name}`,
     description: `Enter the numbers from a dealer worksheet. Educational comparison for ${tenant.name} members. Not an offer of credit.`,
     robots: { index: false, follow: false },
-    alternates: { canonical: `https://signorwalk.com/cu/${tenant.id}` },
+    ...(tenant.id === 'preview-sample-cu' ? {} : { alternates: { canonical: `https://signorwalk.com/cu/${tenant.id}` } }),
   };
 }
 
@@ -52,15 +52,6 @@ export default async function CuLayout({
         ['--cu-tint' as string]: brand.tint,
       }}
     >
-      <style>{`
-        .cu-shell :focus-visible { outline: 2px solid var(--cu-focus); outline-offset: 2px; }
-        .cu-serif { font-family: Georgia, "Iowan Old Style", Palatino, "Palatino Linotype", serif; }
-        .cu-link { color: var(--cu-text); }
-        .cu-primary { background: var(--cu-fill); color: var(--cu-on); }
-        .cu-primary:hover { background: var(--cu-hover); }
-        .cu-primary:disabled { opacity: 0.6; }
-        .cu-nav-active { color: var(--cu-text); border-bottom: 2px solid var(--cu-text); }
-      `}</style>
       <a href="#cu-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-[14px] focus:font-semibold">
         Skip to content
       </a>

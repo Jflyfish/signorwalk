@@ -88,7 +88,7 @@ test('an unusable primary falls back to #111 and logs the tenant only', () => {
   assert.equal(brand.brandText, '#111111');
   assert.equal(brand.brandFill, '#111111');
   assert.equal(brand.onBrand, '#ffffff');
-  assert.ok([...brand.shortName].length <= 24);
+  assert.equal(brand.shortName, 'Example Credit Union');
   assert.equal(logs.length, 1);
   assert.match(logs[0], /"event":"brand-fallback"/);
   assert.equal(logs[0].includes('not-a-color'), false);
@@ -328,6 +328,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(loanForm, /noValidate/);
   assert.match(loanForm, /aria-invalid/);
   assert.match(loanForm, /HTTPS_LINK/);
+  assert.match(loanForm, /LOAN_LINK_REQUIRED/);
+  assert.match(loanForm, /Restore default/);
+  assert.match(actions, /loanLinksSet = false/);
   assert.match(loanForm, /#B42318/);
   assert.equal(dashboard.includes('defaultValue={tenant.preApprovalUrl}'), false);
   assert.equal(loanForm.includes('defaultValue={tenant.preApprovalUrl}'), false);
@@ -467,6 +470,6 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(readFileSync('src/app/(cu)/credit-unions/embed-demo/EmbedDemo.tsx', 'utf8'), /entry=numbers/);
   const embedPage = readFileSync('src/app/(cu)/cu/[tenant]/embed/page.tsx', 'utf8');
   assert.match(embedPage, /numbersOnlyEmbed/);
-  assert.match(embedPage, /demoSample=\{query\.entry === 'numbers'\}/);
+  assert.match(embedPage, /demoSample=\{query\.entry === 'numbers'/);
   assert.equal(readFileSync('src/app/(cu)/cu/actions.ts', 'utf8').includes('verified = true'), false);
 });

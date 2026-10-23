@@ -3,8 +3,8 @@
 import { cookies } from 'next/headers';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { deriveBrand, parseHex, safeLogo } from '@/cu/contrast';
-import { getBranding, saveBranding, type StoredBranding } from '@/cu/cu-store';
-import { HTTPS_LINK } from '@/cu/form-copy';
+import { CuStoreUnconfigured, getBranding, saveBranding, type StoredBranding } from '@/cu/cu-store';
+import { HTTPS_LINK, LOAN_LINK_REQUIRED } from '@/cu/form-copy';
 import { getTenantProfile, saveTenantProfile } from '@/cu/tenant-directory';
 
 async function staffCanEdit(tenant: string): Promise<boolean> {
@@ -37,6 +37,7 @@ export async function saveOnboardingBrand(
   tenant: string,
   logoUrl: string,
   color: string,
+  shortNameInput = '',
 ): Promise<{ ok: true; primary: string } | { ok: false; error: string }> {
   if (!(await staffCanEdit(tenant))) return { ok: false, error: 'Sign in to continue.' };
   const trimmedLogo = logoUrl.trim();
@@ -51,7 +52,14 @@ export async function saveOnboardingBrand(
   const profile = await getTenantProfile(tenant);
   if (!profile) return { ok: false, error: 'This credit union was not found.' };
   const current = await getBranding(tenant);
-  const shortName = (current?.shortName || profile.name).trim().slice(0, 24);
+  const requested = shortNameInput.trim().replace(/\s+/g, ' ');
+  if ([...requested].length > 24) return { ok: false, error: 'Short name can be at most 24 characters.' };
+  let shortName = requested;
+  if (!shortName) {
+    const currentShort = current?.shortName?.trim() ?? '';
+    if (currentShort && [...currentShort].length <= 24) shortName = currentShort;
+    else if ([...profile.name].length <= 24) shortName = profile.name;
+  }
   const derived = deriveBrand(tenant, {
     name: profile.name,
     shortName,
@@ -62,7 +70,7 @@ export async function saveOnboardingBrand(
   }, () => undefined);
   const branding: StoredBranding = {
     ...current,
-    shortName,
+    shortName: shortName || undefined,
     primary: derived.brandFill,
     logoLight: logo || undefined,
     font: 'inter',
@@ -71,7 +79,8 @@ export async function saveOnboardingBrand(
     await saveBranding(tenant, branding);
     if (!profile.onboardingStep) profile.onboardingStep = 1;
     await saveTenantProfile(profile);
-  } catch {
+  } catch (error) {
+    if (error instanceof CuStoreUnconfigured) return { ok: false, error: error.message };
     return { ok: false, error: 'That logo or color could not be saved.' };
   }
   return { ok: true, primary: derived.brandFill };
@@ -85,6 +94,7 @@ export async function saveOnboardingLoan(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await staffCanEdit(tenant))) return { ok: false, error: 'Sign in to continue.' };
   const loan = loanUrl.trim();
+  if (!loan) return { ok: false, error: LOAN_LINK_REQUIRED };
   if (/^http:\/\//i.test(loan) || !httpsUrl(loan)) return { ok: false, error: HTTPS_LINK };
   const rates = ratesUrl.trim();
   if (rates && (/^http:\/\//i.test(rates) || !httpsUrl(rates))) return { ok: false, error: HTTPS_LINK };
@@ -99,23 +109,25 @@ export async function saveOnboardingLoan(
   if (!profile.onboardingStep || profile.onboardingStep < 2) profile.onboardingStep = 2;
   try {
     await saveTenantProfile(profile);
-  } catch {
+  } catch (error) {
+    if (error instanceof CuStoreUnconfigured) return { ok: false, error: error.message };
     return { ok: false, error: 'That line could not be saved.' };
   }
   return { ok: true };
 }
 
-export async function saveOnboardingStep(tenant: string, step: 1 | 2 | 3, complete = false): Promise<boolean> {
-  if (!(await staffCanEdit(tenant))) return false;
+export async function saveOnboardingStep(tenant: string, step: 1 | 2 | 3, complete = false): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await staffCanEdit(tenant))) return { ok: false, error: 'Sign in to continue.' };
   const profile = await getTenantProfile(tenant);
-  if (!profile) return false;
-  if (!onboardingLoanReady(profile, step, complete)) return false;
+  if (!profile) return { ok: false, error: 'This credit union was not found.' };
+  if (!onboardingLoanReady(profile, step, complete)) return { ok: false, error: LOAN_LINK_REQUIRED };
   profile.onboardingStep = step;
   if (complete) profile.onboardingComplete = true;
   try {
     await saveTenantProfile(profile);
-  } catch {
-    return false;
+  } catch (error) {
+    if (error instanceof CuStoreUnconfigured) return { ok: false, error: error.message };
+    return { ok: false, error: 'That line could not be saved.' };
   }
-  return true;
+  return { ok: true };
 }

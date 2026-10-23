@@ -17,7 +17,7 @@ Shown under the inline pre-approval button and inside the pinned bar:
 
 - `Not an offer of credit.`
 
-The inline button reads `Check your rate with {short name}`. The pinned bar reads `Check your rate`, with no credit-union name, and stays at 64px plus the safe area. It appears only after the inline button has scrolled above the viewport, and it stays hidden while it would cover the rows or the questions. The Demo pill is limited to seeded demo tenants and the sample grade. See details does not repeat the disclaimer block. How we grade does not say "It is not a loan offer." When the price equals MSRP, the price row says `at MSRP`.
+The inline button reads `Check your rate with {short name}` when that label fits on one line, and `Check your rate` when it does not. The pinned bar reads `Check your rate`, with no credit-union name, and stays at 76px plus the safe area. The pinned button is 44px tall. It appears only after the inline button has scrolled above the viewport, and it stays hidden while it would cover the rows or the questions. The Demo pill is limited to seeded demo tenants and the sample grade. See details does not repeat the disclaimer block. How we grade does not say "It is not a loan offer." When the price equals MSRP, the price row says `at MSRP`.
 
 Shown on a printed copy, and not as a claim about a statute:
 

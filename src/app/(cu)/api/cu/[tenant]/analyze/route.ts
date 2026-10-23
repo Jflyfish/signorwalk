@@ -8,6 +8,7 @@ import { applySecurityHeaders } from '@/cu/headers';
 import { clientAddress, takeAnalyzeSlot } from '@/cu/rate-limit';
 import { missingTenantResponse } from '@/cu/missing-page';
 import { staffCanPreview } from '@/cu/preview-access';
+import { sampleCountsExcluded } from '@/cu/sample-grant';
 import { loadCuTenant, TENANT_UNAVAILABLE, tenantUnavailable } from '@/cu/tenant-directory';
 
 const MAX_BODY = 20_000;
@@ -74,8 +75,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ tenant: st
       archetype: analysis.archetype,
     });
     const grade = analysis.grade;
-    const sample = req.nextUrl.searchParams.get('sample') === '1';
-    const ownerPreview = req.nextUrl.searchParams.get('preview') === '1';
+    const sample = sampleCountsExcluded(tenant.id, req.nextUrl.searchParams.get('sample') === '1', req.nextUrl.searchParams.get('grant'));
+    const ownerPreview = req.nextUrl.searchParams.get('preview') === '1' && await staffCanPreview(tenant.id);
     const record = async () => {
       if (!sample && !ownerPreview) {
         try {

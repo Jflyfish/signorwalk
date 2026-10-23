@@ -28,15 +28,19 @@ export function BrandLockup({
       {httpsLogo || mark ? null : <span className="sr-only">{name} </span>}with Sign or Walk
     </p>
   ) : null;
+  const wordmark = httpsLogo ? shortName : name;
+  const wordmarkClass = 'block w-full min-w-0 break-words text-[15px] font-semibold leading-[20px] max-h-10 overflow-hidden';
   return (
-    <div className={`flex min-w-0 items-center gap-2 ${fullNameOnPhone ? 'flex-1' : ''} ${className}`}>
-      {httpsLogo ? (
-        <img src={httpsLogo} alt="" className="h-7 w-auto max-w-[160px] object-contain md:h-8" style={{ aspectRatio: String(logoAspect) }} />
-      ) : null}
-      {fullNameOnPhone ? (
-        <span className="min-w-0 text-[15px] font-semibold leading-[20px] md:hidden" style={{ color }}>{name}</span>
-      ) : null}
-      <span className={`min-w-0 truncate text-[15px] font-semibold leading-[20px] ${fullNameOnPhone ? 'hidden md:inline' : ''}`} style={{ color }}>{httpsLogo ? shortName : name}</span>
+    <div className={`flex min-w-0 flex-col sm:flex-row sm:items-center sm:gap-2 ${fullNameOnPhone ? 'flex-1' : ''} ${className}`}>
+      <div className="flex min-w-0 w-full items-center gap-2">
+        {httpsLogo ? (
+          <img src={httpsLogo} alt="" className="h-7 w-auto max-w-[160px] shrink-0 object-contain md:h-8" style={{ aspectRatio: String(logoAspect) }} />
+        ) : null}
+        {fullNameOnPhone ? (
+          <span className={`${wordmarkClass} md:hidden`} style={{ color }}>{name}</span>
+        ) : null}
+        <span className={`${wordmarkClass} ${fullNameOnPhone ? 'hidden md:block' : ''}`} style={{ color }}>{wordmark}</span>
+      </div>
       {productLine}
     </div>
   );

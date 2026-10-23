@@ -46,11 +46,11 @@ export default async function SignInPage({
           <input type="hidden" name="tenant" value={tenant.id} />
           <div>
             <label htmlFor="email" className="mb-2 block text-[14px] font-semibold leading-[20px]">Email</label>
-            <input id="email" name="email" type="email" autoComplete="username" required className="h-12 w-full rounded-lg border cu-line px-4 text-[16px]" />
+            <input id="email" name="email" type="email" autoComplete="username" required suppressHydrationWarning className="h-12 w-full rounded-lg border cu-line px-4 text-[16px]" />
           </div>
           <div>
             <label htmlFor="password" className="mb-2 block text-[14px] font-semibold leading-[20px]">Password</label>
-            <input id="password" name="password" type="password" autoComplete="current-password" required className="h-12 w-full rounded-lg border cu-line px-4 text-[16px]" />
+            <input id="password" name="password" type="password" autoComplete="current-password" required suppressHydrationWarning className="h-12 w-full rounded-lg border cu-line px-4 text-[16px]" />
           </div>
           <button type="submit" className="cu-primary inline-flex h-12 items-center justify-center rounded-lg px-4 text-[15px] font-semibold">
             Sign in

@@ -3,12 +3,13 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { canOpenTenant, checkCredentials, CU_SESSION_COOKIE, demoTenantId, signSession, verifySession, type CuSession } from '@/cu/auth';
-import { appendAudit, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
+import { appendAudit, CU_SERVICE_UNCONFIGURED, CuStoreUnconfigured, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
 import { requestOriginFrom } from '@/cu/embed';
-import { HTTPS_LINK } from '@/cu/form-copy';
+import { HTTPS_LINK, LOAN_LINK_REQUIRED } from '@/cu/form-copy';
 import { readLogoFile } from '@/cu/logo-file';
 import { sendAggregateSummary, sendTrialConfirm } from '@/cu/notify';
 import { readStaffEmail, staffLoginMatches } from '@/cu/staff-login';
+import { getCuTenant } from '@/cu/tenants';
 import { rotateConfirmToken } from '@/cu/trial';
 import {
   getTenantProfile,
@@ -142,7 +143,11 @@ function httpsUrl(value: string): boolean {
   }
 }
 
-/** Loan URL is required. Rates URL is optional. Both, when present, must be https. */
+function linkSaveError(error: unknown): string {
+  return error instanceof CuStoreUnconfigured ? CU_SERVICE_UNCONFIGURED : HTTPS_LINK;
+}
+
+/** Loan URL is required. Rates URL is optional. Both, when present, must be https. A seeded demo path is the default, not an override. */
 export async function saveDashboardLoanLinks(
   tenant: string,
   preApprovalUrl: string,
@@ -150,9 +155,14 @@ export async function saveDashboardLoanLinks(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   await guardMutable(tenant);
   const current = await getTenantProfile(tenant);
-  if (!current) return { ok: false, error: HTTPS_LINK };
+  if (!current) return { ok: false, error: LOAN_LINK_REQUIRED };
   const loan = preApprovalUrl.trim();
   const rates = ratesUrl.trim();
+  const seed = getCuTenant(tenant);
+  if (seed && loan === seed.preApprovalUrl && (rates === '' || rates === seed.ratesUrl)) {
+    return restoreDemoLoanLinks(current, seed);
+  }
+  if (!loan) return { ok: false, error: LOAN_LINK_REQUIRED };
   if (/^http:\/\//i.test(loan) || !httpsUrl(loan)) return { ok: false, error: HTTPS_LINK };
   if (rates && (/^http:\/\//i.test(rates) || !httpsUrl(rates))) return { ok: false, error: HTTPS_LINK };
   current.preApprovalUrl = loan;
@@ -161,10 +171,38 @@ export async function saveDashboardLoanLinks(
   current.ratesLinkSet = Boolean(rates);
   try {
     await saveTenantProfile(current);
-  } catch {
-    return { ok: false, error: HTTPS_LINK };
+  } catch (error) {
+    return { ok: false, error: linkSaveError(error) };
   }
   return { ok: true };
+}
+
+async function restoreDemoLoanLinks(
+  current: NonNullable<Awaited<ReturnType<typeof getTenantProfile>>>,
+  seed: NonNullable<ReturnType<typeof getCuTenant>>,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  current.preApprovalUrl = seed.preApprovalUrl;
+  current.ratesUrl = seed.ratesUrl;
+  current.preApprovalLabel = seed.preApprovalLabel;
+  current.ratesLabel = seed.ratesLabel;
+  current.loanLinksSet = false;
+  current.ratesLinkSet = false;
+  try {
+    await saveTenantProfile(current);
+  } catch (error) {
+    return { ok: false, error: linkSaveError(error) };
+  }
+  return { ok: true };
+}
+
+/** Clears a stored loan and rates override. Seeded demo tenants return to their demo paths. */
+export async function restoreDefaultLoanLinks(tenant: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  await guardMutable(tenant);
+  const seed = getCuTenant(tenant);
+  if (!seed) return { ok: false, error: 'This credit union has no default link.' };
+  const current = await getTenantProfile(tenant);
+  if (!current) return { ok: false, error: 'This credit union was not found.' };
+  return restoreDemoLoanLinks(current, seed);
 }
 
 export async function saveLoanLinksAction(formData: FormData) {
@@ -174,8 +212,15 @@ export async function saveLoanLinksAction(formData: FormData) {
     String(formData.get('preApprovalUrl') ?? ''),
     String(formData.get('ratesUrl') ?? ''),
   );
-  if (!saved.ok) redirect(`/cu/${tenant}/dashboard?error=links`);
+  if (!saved.ok) redirect(`/cu/${tenant}/dashboard?error=${saved.error === CU_SERVICE_UNCONFIGURED ? 'service' : 'links'}`);
   redirect(`/cu/${tenant}/dashboard?saved=links`);
+}
+
+export async function restoreDefaultLoanLinksAction(formData: FormData) {
+  const tenant = String(formData.get('tenant') ?? '');
+  const saved = await restoreDefaultLoanLinks(tenant);
+  if (!saved.ok) redirect(`/cu/${tenant}/dashboard?error=${saved.error === CU_SERVICE_UNCONFIGURED ? 'service' : 'links'}`);
+  redirect(`/cu/${tenant}/dashboard?saved=defaults`);
 }
 
 export async function saveEmbedOriginsAction(formData: FormData) {
@@ -202,14 +247,16 @@ export async function saveBrandingAction(formData: FormData) {
   const brandingError = owner
     ? `/cu/admin?cu=${tenant}&error=branding`
     : `/cu/${tenant}/dashboard?section=branding&error=branding`;
-  if ([...shortName].length < 1 || [...shortName].length > 24 || !hex.test(primary)) redirect(brandingError);
+  if ((owner ? [...shortName].length < 1 : false) || [...shortName].length > 24 || !hex.test(primary)) redirect(brandingError);
   if (secondary && !hex.test(secondary)) redirect(brandingError);
   const light = await logoFromForm(formData.get('logoLightFile'));
   const dark = await logoFromForm(formData.get('logoDarkFile'));
   if (light === 'invalid' || dark === 'invalid') redirect(brandingError);
   const current = await getBranding(tenant);
+  const profile = await getTenantProfile(tenant);
+  const fitted = !shortName && profile && [...profile.name].length <= 24 ? profile.name : shortName;
   const branding: StoredBranding = {
-    shortName,
+    shortName: fitted || undefined,
     primary,
     secondary: secondary || undefined,
     logoLight: light?.dataUrl ?? current?.logoLight,
@@ -219,7 +266,10 @@ export async function saveBrandingAction(formData: FormData) {
   };
   try {
     await saveBranding(tenant, branding);
-  } catch {
+  } catch (error) {
+    if (error instanceof CuStoreUnconfigured) {
+      redirect(owner ? `/cu/admin?error=service` : `/cu/${tenant}/dashboard?section=branding&error=service`);
+    }
     redirect(brandingError);
   }
   await appendAudit('branding', tenant, owner ? 'owner' : 'tenant');

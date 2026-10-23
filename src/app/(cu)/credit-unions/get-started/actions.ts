@@ -5,7 +5,7 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, signSession } from '@/cu/auth';
-import { appendAudit } from '@/cu/cu-store';
+import { appendAudit, CuStoreUnconfigured } from '@/cu/cu-store';
 import { requestOriginFrom } from '@/cu/embed';
 import { sendSignupNotice, sendTrialConfirm } from '@/cu/notify';
 import { clientAddress, takeSignupSlot } from '@/cu/rate-limit';
@@ -43,6 +43,9 @@ export async function startTrialAction(formData: FormData) {
     website: String(formData.get('website') ?? ''),
     honeypot: String(formData.get('company') ?? ''),
     tier: tier === 'starter' || tier === 'growth' || tier === 'pro' ? tier : undefined,
+  }).catch(error => {
+    if (error instanceof CuStoreUnconfigured) fail('service', tier);
+    throw error;
   });
   if (!result.ok) fail(result.error === 'honeypot' ? 'start' : result.error, tier);
   const token = signSession({ role: 'cu', tenantId: result.id, exp: Date.now() + 60 * 60 * 12 * 1000 });

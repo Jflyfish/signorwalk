@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { isEmbedOrigin } from './embed';
+import { saveBranding } from './cu-store';
 import { saveStaffLogin } from './staff-login';
 import {
   getTenantProfile,
@@ -48,6 +49,8 @@ export async function createTrial(input: {
   now?: number;
 }): Promise<{ ok: true; id: string; confirmToken: string } | { ok: false; error: TrialError }> {
   if (input.honeypot.trim()) return { ok: false, error: 'honeypot' };
+  const legal = input.name.trim().replace(/\s+/g, ' ');
+  if ([...legal].length < 2 || [...legal].length > 60) return { ok: false, error: 'name' };
   const contact = input.contactName.trim().replace(/\s+/g, ' ');
   if ([...contact].length < 1 || [...contact].length > 80) return { ok: false, error: 'contact' };
   const email = input.email.trim().toLowerCase();
@@ -55,16 +58,16 @@ export async function createTrial(input: {
   if (input.secret.length < 12 || input.secret.length > 200) return { ok: false, error: 'secret' };
   const origins = websiteOrigin(input.website);
   if (!origins) return { ok: false, error: 'website' };
-  const base = slugFromName(input.name);
+  const base = slugFromName(legal);
   if (!base) return { ok: false, error: 'name' };
   const id = await uniqueSlug(base);
   if (!id || await loadCuTenant(id)) return { ok: false, error: 'taken' };
-  const short = input.name.trim().replace(/\s+/g, ' ').slice(0, 24).trim();
+  const short = [...legal].length <= 24 ? legal : '';
   const home = origins[0] ?? 'https://signorwalk.com';
   const profile = normalizeProfile({
     id,
-    name: input.name,
-    legalName: input.name,
+    name: legal,
+    legalName: legal,
     tagline: 'Check a vehicle offer',
     supportUrl: home,
     privacyUrl: home,
@@ -73,7 +76,7 @@ export async function createTrial(input: {
     ratesLinkSet: false,
     embedOrigins: origins,
     status: 'active',
-    shortName: short,
+    shortName: short || undefined,
     contactName: contact,
     trialEndsAt: trialEnd(input.now),
     verified: false,
@@ -88,7 +91,12 @@ export async function createTrial(input: {
     ...profile,
     confirmHash: createHash('sha256').update(confirmToken).digest('hex'),
   };
-  await saveTenantProfile(stored, { shortName: short, primary: '#111111' });
+  if (short) {
+    await saveTenantProfile(stored, { shortName: short, primary: '#111111' });
+  } else {
+    await saveTenantProfile(stored);
+    await saveBranding(id, { primary: '#111111', font: 'inter' });
+  }
   await saveStaffLogin(id, email, input.secret);
   return { ok: true, id, confirmToken };
 }

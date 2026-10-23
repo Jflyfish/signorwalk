@@ -44,6 +44,16 @@ export default async function OnboardingPage({
   const shareUrl = `${origin}/cu/${tenant.id}`;
   const previewUrl = `${origin}/cu/${tenant.id}/preview`;
   const logo = stored?.logoLight?.startsWith('https:') ? stored.logoLight : '';
+  const storedShort = (stored?.shortName ?? '').trim().replace(/\s+/g, ' ');
+  const legal = tenant.name.trim().replace(/\s+/g, ' ');
+  const fromBrand = brand.shortName.trim().replace(/\s+/g, ' ');
+  const initialShort = [...storedShort].length >= 1 && [...storedShort].length <= 24
+    ? storedShort
+    : [...fromBrand].length >= 1 && [...fromBrand].length <= 24 && fromBrand !== legal
+      ? fromBrand
+      : [...legal].length <= 24
+        ? legal
+        : '';
   const color = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : brand.brandFill;
   const loanReady = tenant.loanLinksSet === true && tenant.preApprovalUrl.startsWith('https:');
   const loan = loanReady ? tenant.preApprovalUrl : '';
@@ -68,6 +78,7 @@ export default async function OnboardingPage({
           tenantId={tenant.id}
           initialStep={stepFrom(query.step, tenant.onboardingStep, loanReady)}
           initialLogo={logo}
+          initialShort={initialShort}
           initialColor={color}
           initialLoan={loan}
           initialRates={rates}
