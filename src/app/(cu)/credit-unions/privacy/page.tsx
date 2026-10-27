@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { PILOT_MARK } from '@/cu/copy';
 import { TALK_TO_US_EMAIL } from '../pricing';
 
 export const metadata: Metadata = {
   title: 'Privacy',
-  description: 'What this credit-union check stores, and what it does not.',
+  description: 'Draft notes for what this check stores. Pending counsel review.',
   robots: { index: false, follow: false },
 };
 
@@ -13,7 +14,8 @@ const link = 'underline decoration-1 underline-offset-4 cu-ring';
 export default function CreditUnionPrivacyPage() {
   return (
     <main className="mx-auto w-full max-w-[640px] px-4 py-16 text-[#111] md:py-24">
-      <h1 className="text-[32px] font-extrabold leading-[38px]">Privacy</h1>
+      <p className="text-[14px] font-semibold leading-[20px]">{PILOT_MARK}</p>
+      <h1 className="mt-4 text-[32px] font-extrabold leading-[38px]">Privacy</h1>
       <p className="mt-6 text-[16px] leading-[24px] text-[#555]">
         This page is about the Sign or Walk check a credit union offers its members. It is not that credit union’s own privacy notice.
       </p>
@@ -34,6 +36,9 @@ export default function CreditUnionPrivacyPage() {
       <h2 className="mt-10 text-[20px] font-bold leading-[28px]">What we don&apos;t</h2>
       <p className="mt-4 text-[16px] leading-[24px]">
         The check does not ask a member for a name, an email, or an account number. We do not store the worksheet or the numbers from it. We do not store a card number. Checkout is not part of this build.
+      </p>
+      <p className="mt-4 text-[16px] leading-[24px]">
+        If a member uploads a worksheet, the file is sent to an outside AI service to read the numbers. It may show a name or VIN. We don&apos;t store it.
       </p>
 
       <h2 className="mt-10 text-[20px] font-bold leading-[28px]">How long we keep a grade</h2>

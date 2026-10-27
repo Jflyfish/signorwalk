@@ -304,6 +304,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(copy.toLowerCase().includes('zdr'), false);
   assert.equal(copy.includes('AI_FACTS.join'), false);
   assert.equal(copy.includes('then discarded'), false);
+  assert.match(privacy, /\{PILOT_MARK\}/);
+  assert.match(privacy, /Pending counsel review/);
+  assert.match(privacy, /outside AI service to read the numbers/);
   assert.match(privacy, /What we collect/);
   assert.match(privacy, /What we don&apos;t/);
   assert.match(privacy, /How long we keep a grade/);
