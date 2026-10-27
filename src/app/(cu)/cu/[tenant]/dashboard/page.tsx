@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
 import { resolveBrand } from '@/cu/brand';
-import { getBranding, getSettings, getTenantCounters } from '@/cu/cu-store';
+import { formatLinkChange, getBranding, getSettings, getTenantCounters, readLatestLinkChange } from '@/cu/cu-store';
 import { TALK_TO_US_EMAIL } from '@/app/(cu)/credit-unions/pricing';
 import { deepLink, iframeSnippet, memberOrigin } from '@/cu/embed';
 import { loadCuTenant } from '@/cu/tenant-directory';
@@ -134,6 +134,7 @@ export default async function DashboardPage({
   if (!canOpenTenant(session, tenant.id)) redirect(`/cu/${tenant.id}/sign-in`);
   const brand = await resolveBrand(tenant);
   const counters = await getTenantCounters(tenant.id);
+  const linkChange = await readLatestLinkChange(tenant.id);
   const settings = await getSettings(tenant.id);
   const stored = await getBranding(tenant.id);
   const query = await searchParams;
@@ -209,6 +210,11 @@ export default async function DashboardPage({
             <button type="submit" className="cu-link mt-4 text-[15px] font-semibold underline decoration-1 underline-offset-4 cu-linkline">Resend link</button>
           </form>
         ) : null}
+        <p className={`text-[14px] leading-[20px] text-[#555] ${trialDays !== null ? 'mb-2' : 'mb-6'}`}>
+          Review <a href="/credit-unions/privacy" className="underline underline-offset-4">Privacy</a>
+          {' · '}
+          <a href="/credit-unions/packet" className="underline underline-offset-4">Due-diligence packet</a>
+        </p>
         {trialDays !== null ? (
           <p className="mb-6 text-[14px] leading-[20px]">
             Trial: {trialDays} {trialDays === 1 ? 'day' : 'days'} left. <a href={`mailto:${TALK_TO_US_EMAIL}`} className="font-semibold underline underline-offset-4 cu-linkline">Email us</a> to upgrade.
@@ -243,6 +249,7 @@ export default async function DashboardPage({
             canRestore={Boolean(getCuTenant(tenant.id))}
             serverRejected={query.error === 'links'}
             serverError={query.error === 'service' ? 'Credit union service not configured' : ''}
+            changeLine={linkChange ? formatLinkChange(linkChange) : ''}
           />
         ) : null}
         {tenant.verified && tenant.embedOrigins.length === 0 ? (

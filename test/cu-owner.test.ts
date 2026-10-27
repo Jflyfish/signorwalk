@@ -4,7 +4,7 @@ import test from 'node:test';
 import { NextRequest } from 'next/server';
 import { POST as analyze } from '../src/app/(cu)/api/cu/[tenant]/analyze/route';
 import { POST as extract } from '../src/app/(cu)/api/cu/[tenant]/extract/route';
-import { appendAudit, formatAuditLine, readAudit, readFrameAncestorCache, resetCuStore, writeFrameAncestorCache } from '../src/cu/cu-store';
+import { appendAudit, appendLinkChange, formatAuditLine, formatLinkChange, readAudit, readFrameAncestorCache, readLatestLinkChange, resetCuStore, writeFrameAncestorCache } from '../src/cu/cu-store';
 import { getCuTenant } from '../src/cu/tenants';
 import {
   listCuTenants,
@@ -123,6 +123,25 @@ test('the owner can add and remove a credit union without dropping the seeds', a
   assert.equal(
     formatAuditLine({ t: '2026-10-15T14:50:00.000Z', action: 'branding', who: 'tenant' }, 'Larkspur CU'),
     'Oct 15, 14:50 · Branded Larkspur CU · by tenant',
+  );
+  await appendLinkChange('north-pier-cu', {
+    email: 'owner@example.com',
+    field: 'loan application',
+    oldValue: 'https://old.example/auto',
+    newValue: 'https://new.example/auto',
+  });
+  await appendLinkChange('north-pier-cu', {
+    email: 'owner@example.com',
+    field: 'rates',
+    oldValue: '',
+    newValue: 'https://new.example/rates',
+  });
+  const latest = await readLatestLinkChange('north-pier-cu');
+  assert.ok(latest);
+  assert.equal(latest.field, 'rates');
+  assert.equal(
+    formatLinkChange({ ...latest, t: '2026-10-27T18:00:00.000Z' }),
+    'Last changed by owner@example.com · October 27, 2026 · rates:  → https://new.example/rates',
   );
   assert.deepEqual(parseEmbedOrigins('https://www.northpiercu.example\n'), ['https://www.northpiercu.example']);
   assert.equal(parseEmbedOrigins('*'), null);

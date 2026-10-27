@@ -37,6 +37,7 @@ export function LoanLinksForm({
   canRestore = false,
   serverRejected,
   serverError = '',
+  changeLine = '',
 }: {
   tenantId: string;
   initialLoan: string;
@@ -48,6 +49,7 @@ export function LoanLinksForm({
   canRestore?: boolean;
   serverRejected: boolean;
   serverError?: string;
+  changeLine?: string;
 }) {
   const router = useRouter();
   const defaults = [defaultLoan, defaultRates].filter(Boolean);
@@ -97,7 +99,7 @@ export function LoanLinksForm({
         <input type="hidden" name="tenant" value={tenantId} />
       </form>
     ) : null}
-    <form action={saveLoanLinksAction} noValidate onSubmit={onSubmit} className="mb-10 grid max-w-[560px] gap-4">
+    <form action={saveLoanLinksAction} noValidate onSubmit={onSubmit} className={`grid max-w-[560px] gap-4 ${changeLine ? '' : 'mb-10'}`}>
       <h2 className="text-[24px] font-bold leading-[30px]">Loan application</h2>
       {!loanIsDefault && !ratesIsDefault && !initialLoan && !initialRates ? <p className="text-[14px] leading-[20px] cu-muted">These fields start empty.</p> : null}
       <input type="hidden" name="tenant" value={tenantId} />
@@ -146,6 +148,7 @@ export function LoanLinksForm({
         ) : null}
       </div>
     </form>
+    {changeLine ? <p className="mb-10 mt-4 max-w-[560px] text-[14px] leading-[20px] text-[#555]">{changeLine}</p> : null}
     </>
   );
 }

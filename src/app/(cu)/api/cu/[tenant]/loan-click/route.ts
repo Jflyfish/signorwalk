@@ -4,6 +4,7 @@ import { applySecurityHeaders } from '@/cu/headers';
 import { staffCanPreview } from '@/cu/preview-access';
 import { sampleCountsExcluded } from '@/cu/sample-grant';
 import { loadCuTenant } from '@/cu/tenant-directory';
+import { getCuTenant } from '@/cu/tenants';
 
 /** Increments one integer. The response stays successful when the write fails. */
 export async function POST(req: Request, ctx: { params: Promise<{ tenant: string }> }) {
@@ -12,7 +13,10 @@ export async function POST(req: Request, ctx: { params: Promise<{ tenant: string
   const params = new URL(req.url).searchParams;
   try {
     const tenant = await loadCuTenant(slug);
-    const sample = tenant ? sampleCountsExcluded(tenant.id, params.get('sample') === '1', params.get('grant')) : false;
+    const sampleFlag = params.get('sample') === '1';
+    const sample = tenant
+      ? sampleCountsExcluded(tenant.id, sampleFlag, params.get('grant')) || (sampleFlag && Boolean(getCuTenant(tenant.id)))
+      : false;
     const ownerPreview = params.get('preview') === '1' && tenant ? await staffCanPreview(tenant.id) : false;
     if (tenant && !sample && !ownerPreview) await recordLoanClick(tenant.id);
   } catch {

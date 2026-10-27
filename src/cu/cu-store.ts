@@ -380,7 +380,7 @@ export async function deleteStoreKey(key: string): Promise<void> {
 }
 
 export async function deleteTenantData(tenantId: string): Promise<void> {
-  for (const kind of ['profile', 'branding', 'settings', 'aggregates', 'counters', 'gradesRun', 'loanClicks']) {
+  for (const kind of ['profile', 'branding', 'settings', 'aggregates', 'counters', 'gradesRun', 'loanClicks', 'linkChanges']) {
     await deleteStoreKey(keyFor(tenantId, kind));
   }
 }
@@ -428,6 +428,56 @@ export async function appendAudit(action: string, id: string, who: 'owner' | 'te
     await writeStoreJson(AUDIT_KEY, next);
   } catch {
     /* A rejected line is dropped. The owner action still completes. */
+  }
+}
+
+/** Latest loan or rates URL edit. Separate from the directory audit, which does not store an email. */
+export interface LinkChange {
+  t: string;
+  email: string;
+  field: 'loan application' | 'rates';
+  oldValue: string;
+  newValue: string;
+}
+
+const LINK_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+export function formatLinkChange(line: LinkChange): string {
+  const date = new Date(line.t);
+  const when = Number.isNaN(date.getTime())
+    ? line.t
+    : `${LINK_MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+  return `Last changed by ${line.email} · ${when} · ${line.field}: ${line.oldValue} → ${line.newValue}`;
+}
+
+export async function appendLinkChange(tenantId: string, change: Omit<LinkChange, 't'>): Promise<void> {
+  if (!/^[a-z0-9-]+$/.test(tenantId)) return;
+  if (change.field !== 'loan application' && change.field !== 'rates') return;
+  const email = change.email.trim();
+  if (!email || email.length > 120 || email.includes(' ')) return;
+  const row: LinkChange = {
+    t: new Date().toISOString(),
+    email,
+    field: change.field,
+    oldValue: change.oldValue.slice(0, 300),
+    newValue: change.newValue.slice(0, 300),
+  };
+  const current = (await readStoreJson<LinkChange[]>(keyFor(tenantId, 'linkChanges'))) ?? [];
+  const next = [...(Array.isArray(current) ? current : []), row].slice(-20);
+  await writeStoreJson(keyFor(tenantId, 'linkChanges'), next);
+}
+
+export async function readLatestLinkChange(tenantId: string): Promise<LinkChange | null> {
+  try {
+    const parsed = await readStoreJson<LinkChange[]>(keyFor(tenantId, 'linkChanges'));
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    const line = parsed[parsed.length - 1];
+    if (!line || typeof line.t !== 'string' || typeof line.email !== 'string') return null;
+    if (line.field !== 'loan application' && line.field !== 'rates') return null;
+    if (typeof line.oldValue !== 'string' || typeof line.newValue !== 'string') return null;
+    return line;
+  } catch {
+    return null;
   }
 }
 

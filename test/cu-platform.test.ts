@@ -304,11 +304,14 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(copy.toLowerCase().includes('zdr'), false);
   assert.equal(copy.includes('AI_FACTS.join'), false);
   assert.equal(copy.includes('then discarded'), false);
-  assert.match(privacy, /\{PILOT_MARK\}/);
-  assert.match(privacy, /Pending counsel review/);
+  assert.match(privacy, /What we collect/);
+  assert.match(privacy, /What we don&apos;t/);
+  assert.match(privacy, /How long we keep a grade/);
+  assert.match(privacy, /Contact the credit union/);
   assert.match(privacy, /Due-diligence packet/);
-  assert.match(privacy, /Not the worksheet and not the numbers from it/);
-  assert.match(privacy, /AI_FACTS/);
+  assert.equal(privacy.includes('AI_FACTS'), false);
+  assert.equal(privacy.toLowerCase().includes('isolate'), false);
+  assert.equal(privacy.toLowerCase().includes('anthropic'), false);
   assert.match(readFileSync('src/app/(cu)/credit-unions/terms/page.tsx', 'utf8'), /Pending counsel review/);
   assert.match(readFileSync('src/app/(cu)/credit-unions/terms/page.tsx', 'utf8'), /\{PILOT_MARK\}/);
   assert.match(readFileSync('src/app/(cu)/credit-unions/[...slug]/page.tsx', 'utf8'), /creditUnionAlias/);
@@ -374,6 +377,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(dashboard, /Grades run/);
   assert.match(dashboard, /Grades describe offers, not members\./);
   assert.match(dashboard, /Trial: \{trialDays\}/);
+  assert.match(dashboard, /Review <a href="\/credit-unions\/privacy"/);
+  assert.match(dashboard, /href="\/credit-unions\/packet"/);
+  assert.ok(dashboard.indexOf('/credit-unions/privacy') < dashboard.indexOf('Email us'));
   assert.match(dashboard, /Email us/);
   assert.match(dashboard, /\/preview/);
   assert.equal(dashboard.includes('No checks yet'), false);
@@ -480,7 +486,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(readout, /data-cta-measure/);
 });
 
-test('an unsigned sample loan click still counts when the grant is required', async () => {
+test('an unsigned sample loan click does not increment, and a real click does', async () => {
   resetCuStore();
   const saved = process.env.CU_SESSION_SECRET;
   process.env.CU_SESSION_SECRET = 'loan-click-grant-test';
@@ -490,7 +496,7 @@ test('an unsigned sample loan click still counts when the grant is required', as
       { params: Promise.resolve({ tenant: 'harborlight-cu' }) },
     );
     assert.equal(bare.status, 200);
-    assert.equal((await getTenantCounters('harborlight-cu')).loanClicks, 1);
+    assert.equal((await getTenantCounters('harborlight-cu')).loanClicks, 0);
     const grant = sampleGrant('harborlight-cu');
     assert.ok(grant);
     const signed = await loanClickPost(
@@ -498,6 +504,12 @@ test('an unsigned sample loan click still counts when the grant is required', as
       { params: Promise.resolve({ tenant: 'harborlight-cu' }) },
     );
     assert.equal(signed.status, 200);
+    assert.equal((await getTenantCounters('harborlight-cu')).loanClicks, 0);
+    const member = await loanClickPost(
+      new Request('https://signorwalk.com/api/cu/harborlight-cu/loan-click', { method: 'POST' }),
+      { params: Promise.resolve({ tenant: 'harborlight-cu' }) },
+    );
+    assert.equal(member.status, 200);
     assert.equal((await getTenantCounters('harborlight-cu')).loanClicks, 1);
   } finally {
     if (saved === undefined) delete process.env.CU_SESSION_SECRET;

@@ -3,7 +3,7 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { canOpenTenant, checkCredentials, CU_SESSION_COOKIE, demoTenantId, signSession, verifySession, type CuSession } from '@/cu/auth';
-import { appendAudit, CU_SERVICE_UNCONFIGURED, CuStoreUnconfigured, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
+import { appendAudit, appendLinkChange, CU_SERVICE_UNCONFIGURED, CuStoreUnconfigured, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
 import { requestOriginFrom } from '@/cu/embed';
 import { HTTPS_LINK, LOAN_LINK_REQUIRED } from '@/cu/form-copy';
 import { readLogoFile } from '@/cu/logo-file';
@@ -147,20 +147,66 @@ function linkSaveError(error: unknown): string {
   return error instanceof CuStoreUnconfigured ? CU_SERVICE_UNCONFIGURED : HTTPS_LINK;
 }
 
+function shownLoan(tenant: { id: string; preApprovalUrl: string; loanLinksSet?: boolean }): string {
+  const seed = getCuTenant(tenant.id);
+  if (seed && tenant.loanLinksSet !== true) return seed.preApprovalUrl;
+  if (tenant.loanLinksSet === false) return '';
+  return tenant.preApprovalUrl.trim();
+}
+
+function shownRates(tenant: { id: string; ratesUrl: string; ratesLinkSet?: boolean }): string {
+  const seed = getCuTenant(tenant.id);
+  if (seed && tenant.ratesLinkSet !== true) return seed.ratesUrl;
+  if (tenant.ratesLinkSet === false) return '';
+  return tenant.ratesUrl.trim();
+}
+
+async function signedInEmail(session: CuSession, tenant: string): Promise<string> {
+  if (session.role === 'admin') return (process.env.CU_ADMIN_EMAIL ?? '').trim();
+  const staff = await readStaffEmail(tenant);
+  if (staff) return staff;
+  if (tenant === demoTenantId()) return (process.env.CU_DEMO_EMAIL ?? '').trim();
+  return '';
+}
+
+async function recordLinkEdits(
+  session: CuSession,
+  tenantId: string,
+  before: { loan: string; rates: string },
+  after: { loan: string; rates: string },
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const email = await signedInEmail(session, tenantId);
+  if (!email) return { ok: true };
+  try {
+    if (before.loan !== after.loan) {
+      await appendLinkChange(tenantId, { email, field: 'loan application', oldValue: before.loan, newValue: after.loan });
+    }
+    if (before.rates !== after.rates) {
+      await appendLinkChange(tenantId, { email, field: 'rates', oldValue: before.rates, newValue: after.rates });
+    }
+  } catch (error) {
+    return { ok: false, error: linkSaveError(error) };
+  }
+  return { ok: true };
+}
+
 /** Loan URL is required. Rates URL is optional. Both, when present, must be https. A seeded demo path is the default, not an override. */
 export async function saveDashboardLoanLinks(
   tenant: string,
   preApprovalUrl: string,
   ratesUrl: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  await guardMutable(tenant);
+  const session = await guardMutable(tenant);
   const current = await getTenantProfile(tenant);
   if (!current) return { ok: false, error: LOAN_LINK_REQUIRED };
+  const before = { loan: shownLoan(current), rates: shownRates(current) };
   const loan = preApprovalUrl.trim();
   const rates = ratesUrl.trim();
   const seed = getCuTenant(tenant);
   if (seed && loan === seed.preApprovalUrl && (rates === '' || rates === seed.ratesUrl)) {
-    return restoreDemoLoanLinks(current, seed);
+    const restored = await restoreDemoLoanLinks(current, seed);
+    if (!restored.ok) return restored;
+    return recordLinkEdits(session, tenant, before, { loan: shownLoan(current), rates: shownRates(current) });
   }
   if (!loan) return { ok: false, error: LOAN_LINK_REQUIRED };
   if (/^http:\/\//i.test(loan) || !httpsUrl(loan)) return { ok: false, error: HTTPS_LINK };
@@ -174,7 +220,7 @@ export async function saveDashboardLoanLinks(
   } catch (error) {
     return { ok: false, error: linkSaveError(error) };
   }
-  return { ok: true };
+  return recordLinkEdits(session, tenant, before, { loan: shownLoan(current), rates: shownRates(current) });
 }
 
 async function restoreDemoLoanLinks(
@@ -197,12 +243,15 @@ async function restoreDemoLoanLinks(
 
 /** Clears a stored loan and rates override. Seeded demo tenants return to their demo paths. */
 export async function restoreDefaultLoanLinks(tenant: string): Promise<{ ok: true } | { ok: false; error: string }> {
-  await guardMutable(tenant);
+  const session = await guardMutable(tenant);
   const seed = getCuTenant(tenant);
   if (!seed) return { ok: false, error: 'This credit union has no default link.' };
   const current = await getTenantProfile(tenant);
   if (!current) return { ok: false, error: 'This credit union was not found.' };
-  return restoreDemoLoanLinks(current, seed);
+  const before = { loan: shownLoan(current), rates: shownRates(current) };
+  const restored = await restoreDemoLoanLinks(current, seed);
+  if (!restored.ok) return restored;
+  return recordLinkEdits(session, tenant, before, { loan: shownLoan(current), rates: shownRates(current) });
 }
 
 export async function saveLoanLinksAction(formData: FormData) {
