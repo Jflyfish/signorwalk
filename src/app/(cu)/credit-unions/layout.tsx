@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { inter } from '@/cu/inter';
 
 export const metadata: Metadata = {
   icons: {
@@ -18,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function CreditUnionsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${inter.className} min-h-screen bg-white cu-ink`}>
+    <div className="min-h-screen bg-white cu-ink">
       {children}
     </div>
   );
