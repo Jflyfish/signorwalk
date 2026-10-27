@@ -62,6 +62,11 @@ export function LoanLinksForm({
   const ratesRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    setLoan(initialLoan);
+    setRates(initialRates);
+  }, [initialLoan, initialRates]);
+
+  useEffect(() => {
     if (serverRejected || serverError) loanRef.current?.focus();
   }, [serverRejected, serverError]);
 
@@ -124,7 +129,7 @@ export function LoanLinksForm({
       {loanError ? <InlineError id="loan-error">{loanError}</InlineError> : null}
       <label className="text-[14px] font-semibold leading-[20px]" htmlFor="rates-url">Rates URL (optional)
         {ratesIsDefault ? <span className="font-normal cu-muted"> — Default</span> : null}
-        <span id="rates-hint" className="mt-2 block font-normal cu-muted">Example: https://www.example.com/auto-rates. Leave this blank to hide See auto rates.</span>
+        <span id="rates-hint" className="mt-2 block font-normal cu-muted">{defaultRates ? 'Example: https://www.example.com/auto-rates. Leave this blank to use the default.' : 'Example: https://www.example.com/auto-rates. Leave this blank to hide See auto rates.'}</span>
         <input
           ref={ratesRef}
           id="rates-url"

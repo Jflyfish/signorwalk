@@ -140,7 +140,7 @@ test('the owner can add and remove a credit union without dropping the seeds', a
   assert.ok(latest);
   assert.equal(latest.field, 'rates');
   assert.equal(
-    formatLinkChange({ ...latest, t: '2026-10-27T18:00:00.000Z' }),
+    formatLinkChange({ ...latest, t: '2026-10-28T03:30:00.000Z' }),
     'Last changed by owner@example.com · October 27, 2026 · rates:  → https://new.example/rates',
   );
   assert.deepEqual(parseEmbedOrigins('https://www.northpiercu.example\n'), ['https://www.northpiercu.example']);

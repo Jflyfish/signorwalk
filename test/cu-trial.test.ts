@@ -9,9 +9,10 @@ import { FRAME_ANCESTORS_HEADER, frameAncestorsToken } from '../src/cu/embed';
 import { missingCreditUnionResponse } from '../src/middleware';
 import { resetSignupRateLimit, SIGNUP_LIMIT, takeSignupSlot } from '../src/cu/rate-limit';
 import { deleteStaffLogin, staffLoginMatches } from '../src/cu/staff-login';
-import { ensureTenantDirectory, getTenantProfile, loadCuTenant, publicMemberLinks, removeTenant, saveTenantProfile, tenantUnavailable } from '../src/cu/tenant-directory';
+import { ensureTenantDirectory, getTenantProfile, loadCuTenant, planDashboardLoanSave, publicMemberLinks, removeTenant, saveTenantProfile, tenantUnavailable } from '../src/cu/tenant-directory';
 import { signupNotifyAddress } from '../src/cu/notify';
 import { confirmTrialToken } from '../src/cu/trial-confirm';
+import { getCuTenant } from '../src/cu/tenants';
 import { createTrial, TRIAL_MS } from '../src/cu/trial';
 
 test('a trial creates a hashed staff login and a 90-day end', async () => {
@@ -225,6 +226,34 @@ test('a seeded loan override returns to the demo path when loanLinksSet is false
   assert.equal(restored?.loanLinksSet, false);
   assert.match(publicMemberLinks(restored!).preApprovalUrl, /^\/credit-unions\/demo\/preapproval\?utm_source=signorwalk/);
   assert.match(publicMemberLinks(restored!).ratesUrl, /^\/credit-unions\/demo\/rates\?/);
+});
+
+test('a loan-only https save keeps the seeded rates default for members', () => {
+  const seed = getCuTenant('preview-sample-cu');
+  assert.ok(seed);
+  const kept = planDashboardLoanSave('preview-sample-cu', 'https://www.example.com/auto', seed.ratesUrl);
+  assert.equal(kept.ok, true);
+  if (!kept.ok) return;
+  assert.equal(kept.restore, false);
+  assert.equal(kept.loanLinksSet, true);
+  assert.equal(kept.ratesLinkSet, false);
+  assert.equal(kept.preApprovalUrl, 'https://www.example.com/auto');
+  assert.equal(kept.ratesUrl, seed.ratesUrl);
+  const cleared = planDashboardLoanSave('preview-sample-cu', 'https://www.example.com/auto', '  ');
+  assert.equal(cleared.ok, true);
+  if (!cleared.ok) return;
+  assert.equal(cleared.ratesLinkSet, false);
+  assert.equal(cleared.ratesUrl, seed.ratesUrl);
+  const links = publicMemberLinks({
+    id: 'preview-sample-cu',
+    preApprovalUrl: cleared.preApprovalUrl,
+    ratesUrl: '',
+    loanLinksSet: true,
+    ratesLinkSet: false,
+  });
+  assert.match(links.preApprovalUrl, /example\.com\/auto/);
+  assert.match(links.ratesUrl, /^\/credit-unions\/demo\/rates\?/);
+  assert.deepEqual(planDashboardLoanSave('preview-sample-cu', 'https://www.example.com/auto', '/not-a-default'), { ok: false, error: 'https' });
 });
 
 test('two isolates share the signup counter when the store is used', async () => {

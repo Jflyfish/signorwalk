@@ -131,13 +131,48 @@ export function removalIdMatches(typed: string, id: string): boolean {
 }
 
 function httpsUrl(value: string): boolean {
-  if (value.length > 300) return false;
+  if (value.length === 0 || value.length > 300) return false;
   try {
     const url = new URL(value);
     return url.protocol === 'https:' && !url.username && !url.password;
   } catch {
     return false;
   }
+}
+
+/**
+ * A seeded demo path is the default, not an https override.
+ * Clearing rates on a seed restores that default. Any other rates value must be https.
+ */
+export function planDashboardLoanSave(tenantId: string, loanRaw: string, ratesRaw: string):
+  | { ok: false; error: 'required' | 'https' }
+  | { ok: true; restore: boolean; preApprovalUrl: string; ratesUrl: string; loanLinksSet: boolean; ratesLinkSet: boolean } {
+  const loan = loanRaw.trim();
+  const rates = ratesRaw.trim();
+  const seed = getCuTenant(tenantId);
+  const loanDefault = Boolean(seed && loan === seed.preApprovalUrl);
+  const ratesDefault = Boolean(seed && (rates === '' || rates === seed.ratesUrl));
+  if (seed && loanDefault && ratesDefault) {
+    return {
+      ok: true,
+      restore: true,
+      preApprovalUrl: seed.preApprovalUrl,
+      ratesUrl: seed.ratesUrl,
+      loanLinksSet: false,
+      ratesLinkSet: false,
+    };
+  }
+  if (!loan) return { ok: false, error: 'required' };
+  if (!loanDefault && (/^http:\/\//i.test(loan) || !httpsUrl(loan))) return { ok: false, error: 'https' };
+  if (!ratesDefault && rates && (/^http:\/\//i.test(rates) || !httpsUrl(rates))) return { ok: false, error: 'https' };
+  return {
+    ok: true,
+    restore: false,
+    preApprovalUrl: loanDefault && seed ? seed.preApprovalUrl : loan,
+    ratesUrl: ratesDefault && seed ? seed.ratesUrl : rates,
+    loanLinksSet: !loanDefault,
+    ratesLinkSet: ratesDefault ? false : Boolean(rates),
+  };
 }
 
 function clip(value: string, max: number): string {
@@ -266,16 +301,22 @@ export function publicMemberLinks(tenant: {
   embedOrigins?: readonly string[];
 }): { preApprovalUrl: string; ratesUrl: string } {
   const seed = getCuTenant(tenant.id);
-  if (seed && tenant.loanLinksSet !== true) {
+  const loanDefault = Boolean(seed && tenant.loanLinksSet !== true);
+  const ratesDefault = Boolean(seed && tenant.ratesLinkSet !== true);
+  if (seed && loanDefault && ratesDefault) {
     return {
       preApprovalUrl: withUtm(seed.preApprovalUrl, seed.id, 'preapproval'),
       ratesUrl: withUtm(seed.ratesUrl, seed.id, 'rates'),
     };
   }
-  if (tenant.loanLinksSet === false) return { preApprovalUrl: '', ratesUrl: '' };
+  if (!seed && tenant.loanLinksSet === false) return { preApprovalUrl: '', ratesUrl: '' };
   return {
-    preApprovalUrl: withUtm(tenant.preApprovalUrl, tenant.id, 'preapproval'),
-    ratesUrl: memberRatesUrl(tenant),
+    preApprovalUrl: loanDefault && seed
+      ? withUtm(seed.preApprovalUrl, seed.id, 'preapproval')
+      : withUtm(tenant.preApprovalUrl, tenant.id, 'preapproval'),
+    ratesUrl: ratesDefault && seed
+      ? withUtm(seed.ratesUrl, seed.id, 'rates')
+      : memberRatesUrl(tenant),
   };
 }
 

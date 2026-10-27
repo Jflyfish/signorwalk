@@ -16,6 +16,7 @@ import {
   loadCuTenant,
   normalizeProfile,
   parseEmbedOrigins,
+  planDashboardLoanSave,
   removalConfirmed,
   removalIdMatches,
   removeTenant,
@@ -133,16 +134,6 @@ export async function saveSettingsAction(formData: FormData) {
   redirect(`/cu/${tenant}/dashboard?section=settings&saved=settings`);
 }
 
-function httpsUrl(value: string): boolean {
-  if (value.length === 0 || value.length > 300) return false;
-  try {
-    const url = new URL(value);
-    return url.protocol === 'https:' && !url.username && !url.password;
-  } catch {
-    return false;
-  }
-}
-
 function linkSaveError(error: unknown): string {
   return error instanceof CuStoreUnconfigured ? CU_SERVICE_UNCONFIGURED : HTTPS_LINK;
 }
@@ -200,21 +191,18 @@ export async function saveDashboardLoanLinks(
   const current = await getTenantProfile(tenant);
   if (!current) return { ok: false, error: LOAN_LINK_REQUIRED };
   const before = { loan: shownLoan(current), rates: shownRates(current) };
-  const loan = preApprovalUrl.trim();
-  const rates = ratesUrl.trim();
+  const planned = planDashboardLoanSave(tenant, preApprovalUrl, ratesUrl);
+  if (!planned.ok) return { ok: false, error: planned.error === 'required' ? LOAN_LINK_REQUIRED : HTTPS_LINK };
   const seed = getCuTenant(tenant);
-  if (seed && loan === seed.preApprovalUrl && (rates === '' || rates === seed.ratesUrl)) {
+  if (planned.restore && seed) {
     const restored = await restoreDemoLoanLinks(current, seed);
     if (!restored.ok) return restored;
     return recordLinkEdits(session, tenant, before, { loan: shownLoan(current), rates: shownRates(current) });
   }
-  if (!loan) return { ok: false, error: LOAN_LINK_REQUIRED };
-  if (/^http:\/\//i.test(loan) || !httpsUrl(loan)) return { ok: false, error: HTTPS_LINK };
-  if (rates && (/^http:\/\//i.test(rates) || !httpsUrl(rates))) return { ok: false, error: HTTPS_LINK };
-  current.preApprovalUrl = loan;
-  current.loanLinksSet = true;
-  current.ratesUrl = rates;
-  current.ratesLinkSet = Boolean(rates);
+  current.preApprovalUrl = planned.preApprovalUrl;
+  current.loanLinksSet = planned.loanLinksSet;
+  current.ratesUrl = planned.ratesUrl;
+  current.ratesLinkSet = planned.ratesLinkSet;
   try {
     await saveTenantProfile(current);
   } catch (error) {

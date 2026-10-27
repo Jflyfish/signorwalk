@@ -440,13 +440,16 @@ export interface LinkChange {
   newValue: string;
 }
 
-const LINK_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 export function formatLinkChange(line: LinkChange): string {
   const date = new Date(line.t);
   const when = Number.isNaN(date.getTime())
     ? line.t
-    : `${LINK_MONTHS[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+    : new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
   return `Last changed by ${line.email} · ${when} · ${line.field}: ${line.oldValue} → ${line.newValue}`;
 }
 

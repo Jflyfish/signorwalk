@@ -25,7 +25,7 @@ export default function CreditUnionPrivacyPage() {
         Vercel hosts the application. Credit-union records sit in a Redis/KV store when that store is connected.
       </p>
       <ul className="mt-4 list-disc space-y-2 pl-5 text-[16px] leading-[24px]">
-        <li>Staff login: the work email and a hash of the login. The password is not stored.</li>
+        <li>Staff login: the work email and a one-way hashed version of the password; the password itself is not stored.</li>
         <li>Branding: the short name, colors, and an optional logo.</li>
         <li>Counters: how many grades were run, and how many times the loan button was clicked. Those are numbers only.</li>
       </ul>

@@ -307,6 +307,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(privacy, /\{PILOT_MARK\}/);
   assert.match(privacy, /Pending counsel review/);
   assert.match(privacy, /outside AI service to read the numbers/);
+  assert.match(privacy, /a one-way hashed version of the password; the password itself is not stored/);
   assert.match(privacy, /What we collect/);
   assert.match(privacy, /What we don&apos;t/);
   assert.match(privacy, /How long we keep a grade/);
