@@ -144,6 +144,9 @@ test('due diligence packet is one zip containing every draft', () => {
   const fees = packet.match(/\bfees?\b/gi) ?? [];
   assert.deepEqual(fees, ['fee', 'fee']);
   assert.equal(packet.split('There is no setup fee.').length - 1, 2);
+  assert.equal(packet.includes('$6,000'), false);
+  assert.equal(packet.includes('$12,000'), false);
+  assert.equal(packet.includes('$24,000'), false);
   assert.match(packet, /subdomain only/);
   assert.match(packet, /source of truth/);
   assert.match(packet, /owner approval before merge/);

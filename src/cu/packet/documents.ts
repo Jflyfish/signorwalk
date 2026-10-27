@@ -274,14 +274,14 @@ Out of scope for this draft, and not claimed here:
 ## What this marketing page aims for
 
 - Headings in order, with one page heading on each page
-- Three annual price cards, with the same figures at every width
+- Three plan cards, with the same content at every width
 - Visible labels on the trial form at /credit-unions/get-started (credit union name, contact name, work email, password, optional website). The form does not ask for a card.
 - Keyboard access for links and the numbers form at /cu/{slug}
 - Contrast intended to meet 4.5:1 for body text and link text on the new pages
 - Link text that says where the link goes
 - Grades and flags that include words, not color alone
 - The due-diligence packet is one zip download, with no email gate
-- A mailto link, "Over $5B? Email us.", for institutions that do not have a list price
+- A mailto link, "Over $5B? Email us.", for institutions above $5 billion in assets
 
 A statement of aim is not a finding that every criterion passes.
 
@@ -306,7 +306,7 @@ const sampleContract = draftMarkdown(
   'Sample contract',
   `
 NOT FOR EXECUTION.
-This is a plain-language sample for discussion with counsel. It is missing terms a real agreement needs (liability, indemnity, governing law, and others, each marked below). Do not sign it. Do not treat the prices as an offer that can be accepted by email unless a later, signed order form says so.
+This is a plain-language sample for discussion with counsel. It is missing terms a real agreement needs (liability, indemnity, governing law, and others, each marked below). Do not sign it. Do not treat this sample as an offer that can be accepted by email unless a later, signed order form says so.
 
 Parties
 - Provider legal entity — ${OWNER_BLANK}
@@ -340,29 +340,29 @@ The Customer supplies:
 
 The Customer is responsible for the accuracy of those URLs and for the rates and disclosures on the Customer's own pages. Provider does not publish the Customer's annual percentage rate and does not add Reg Z trigger terms of its own. [Counsel to confirm this allocation.]
 
-## 4. Prices
+## 4. Plans
 
-List prices, in United States dollars, billed annually. Every priced tier is the same product. The tier follows total assets. There is no monthly price. There is no setup fee.
+The public page names three plans. Every plan is the same product. The plan follows total assets. This draft does not state a price. There is no monthly price. There is no setup fee.
 
-| Tier | Total assets | Annual |
-| --- | --- | --- |
-| Starter | Under $250 million | $6,000 |
-| Growth | $250 million–$1 billion | $12,000 |
-| Pro | $1 billion–$5 billion | $24,000 |
+| Plan | Total assets |
+| --- | --- |
+| Starter | Under $250 million |
+| Growth | $250 million–$1 billion |
+| Pro | $1 billion–$5 billion |
 
-Institutions over $5 billion have no published price. The public page says "Over $5B? Email us." That link is a mailto to ${TALK_TO_US_EMAIL}. This sample does not create a price for them.
+Institutions over $5 billion are not on that list. The public page says "Over $5B? Email us." That link is a mailto to ${TALK_TO_US_EMAIL}.
 
-The public website's consumer footer says the consumer grader is free. That sentence is about the consumer site. It is not the price of this agreement. Members are not charged to use the branded page.
+The public website's consumer footer says the consumer grader is free. That sentence is about the consumer site. Members are not charged to use the branded page.
 
 ## 5. Billing
 
-Prices in section 4 are annual. There is no monthly price. There is no setup fee. Online checkout is not built. This sample does not authorize Provider to charge a card. An invoice process for a term after the pilot is [To be completed].
+There is no monthly price. There is no setup fee. Online checkout is not built. This sample does not authorize Provider to charge a card. An invoice process for a term after the pilot is [To be completed].
 
 ## 6. 90-day free pilot
 
 The Customer may start a 90-day free pilot. There is no charge for 90 days. Whether the Customer can end that pilot early, and on what notice, is ${OWNER_BLANK}.
 
-The annual prices in section 4 are the prices after the pilot, if the Customer continues. [Counsel to confirm how a later term is written, including what is charged after the 90 days.]
+What is charged after the 90 days, if the Customer continues, is not stated in this draft. [Counsel to confirm how a later term is written.]
 
 The pilot is not a promise of funded loans, member savings, or a later term. Conversion from the pilot to a paid term is not automatic in this draft.
 
@@ -529,7 +529,7 @@ export const dueDiligenceDocs: readonly DueDiligenceDoc[] = [
   {
     slug: 'sample-contract',
     title: 'Sample contract',
-    description: 'Draft agreement, including list prices and the 90-day pilot. Not for signature.',
+    description: 'Draft agreement, including the three plans and the 90-day pilot. Not for signature.',
     filename: 'sign-or-walk-sample-contract-draft-v0.9.md',
     contentType: 'text/markdown',
     fileKind: 'Markdown',
