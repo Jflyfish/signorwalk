@@ -1,3 +1,4 @@
+import { TALK_TO_US_EMAIL } from '../app/(cu)/credit-unions/pricing';
 import { getSettings, getTenantCounters } from './cu-store';
 import { loadCuTenant } from './tenant-directory';
 
@@ -15,14 +16,9 @@ export function summaryText(name: string, counters: { gradesRun: number; loanCli
   ].join('\n');
 }
 
-/**
- * Inbox for a new trial. Only `CU_SIGNUP_NOTIFY_EMAIL`.
- * A missing or invalid value does not fall back to a hardcoded address.
- */
-export function signupNotifyAddress(): string | null {
-  const configured = process.env.CU_SIGNUP_NOTIFY_EMAIL?.trim() ?? '';
-  if (configured.length > 0 && configured.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(configured)) return configured;
-  return null;
+/** Inbox for a new trial. The notice goes to team@signorwalk.com. */
+export function signupNotifyAddress(): string {
+  return TALK_TO_US_EMAIL;
 }
 
 /** Tells the team a trial started. Returns false when Resend is unset. Does not log addresses. */

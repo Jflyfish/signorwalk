@@ -278,10 +278,9 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(page, /Free for 90 days\. No card\./);
   assert.equal(page.includes('Cancel anytime'), false);
   assert.equal(page.includes('DemoFrame'), false);
-  assert.match(page, /STARTER_IS_LOWEST \? 'From ' : ''/);
-  assert.match(page, /\$\{formatUsd\(STARTER\.annualUsd\)\}\/yr\./);
-  assert.match(page, /'No setup fee\. '/);
-  assert.match(page, /No card to start\./);
+  assert.equal(page.includes('formatUsd'), false);
+  assert.equal(page.includes('/yr'), false);
+  assert.match(page, /No setup fee\. No card to start\./);
   assert.match(page, /text-\[14px\] leading-\[20px\] text-\[#555\]/);
   assert.equal(page.split('Get contract + DD packet').length - 1, 1);
   const iframe = readFileSync('src/app/(cu)/credit-unions/LiveEmbed.tsx', 'utf8');

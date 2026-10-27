@@ -1,14 +1,11 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { AiDisclosure } from './AiDisclosure';
-import { DOCUMENT_VERSION_LABEL, formatUsd, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
+import { DOCUMENT_VERSION_LABEL, TALK_TO_US_EMAIL, pricedTiers, type PricedTierId } from './pricing';
 
 const PAGE_URL = 'https://signorwalk.com/credit-unions';
 const HEADLINE = 'Help your members spot a bad car deal before they sign.';
 const VALUE_LINE = 'Members enter or upload a dealer quote, get a grade in 30 seconds, and are sent to your auto loan, all under your brand.';
-
-const STARTER = pricedTiers.find(tier => tier.id === 'starter') ?? pricedTiers[0];
-const STARTER_IS_LOWEST = pricedTiers.every(tier => tier.annualUsd >= STARTER.annualUsd);
 
 const ASSETS: Record<PricedTierId, string> = {
   starter: 'Under $250M in assets',
@@ -64,7 +61,7 @@ export default function CreditUnionsPage() {
           <Link href="/cu/harborlight-cu?sample=1" className={textLink}>See a sample grade</Link>
         </div>
         <p className="mt-6 text-[14px] leading-[20px] text-[#555]">
-          {`${STARTER_IS_LOWEST ? 'From ' : ''}${formatUsd(STARTER.annualUsd)}/yr. ${STARTER.setupUsd === 0 ? 'No setup fee. ' : ''}No card to start.`}
+          No setup fee. No card to start.
         </p>
       </div>
 
@@ -79,7 +76,6 @@ export default function CreditUnionsPage() {
                 >
                   <h2 className="text-[24px] font-bold leading-[30px]">{tier.name}</h2>
                   <p className="mt-4 text-[14px] leading-[20px] cu-muted">{ASSETS[tier.id]}</p>
-                  <p className="mt-4 text-[32px] font-bold leading-[32px] tabular-nums">{formatUsd(tier.annualUsd)}/yr</p>
                   <Link href={`/credit-unions/get-started?tier=${tier.id}`} className={`${outlineButton} mt-4`}>
                     Start 90-day free trial
                   </Link>
