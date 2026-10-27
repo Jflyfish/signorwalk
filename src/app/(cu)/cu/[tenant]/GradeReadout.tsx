@@ -265,25 +265,31 @@ export function GradeReadout({
   const exclusion = samplePage
     ? `?sample=1${sampleGrant ? `&grant=${encodeURIComponent(sampleGrant)}` : ''}`
     : previewPage ? '?preview=1' : '';
-  const loanButton = (pinned: boolean) => (
-    <a
-      ref={pinned ? undefined : inlineButtonRef}
-      href={memberLink(preApprovalUrl)}
-      target="_top"
-      className={`cu-primary cu-ring relative flex w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? 'h-11 min-h-11 shrink-0' : 'h-11 md:w-auto'}`}
-      onClick={() => {
-        void fetch(`/api/cu/${tenantId}/loan-click${exclusion}`, { method: 'POST', keepalive: true }).catch(() => undefined);
-      }}
-    >
-      <span className="whitespace-nowrap">{pinned ? 'Check your rate' : (labelFits ? longLabel : 'Check your rate')}</span>
-      {demoPage ? (
-        <span data-demo-pill="" className="inline-flex shrink-0 items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
-      ) : null}
-      {pinned ? null : (
-        <span ref={labelProbeRef} aria-hidden="true" className="pointer-events-none absolute whitespace-nowrap opacity-0">{longLabel}</span>
-      )}
-    </a>
-  );
+  const loanButton = (pinned: boolean) => {
+    const link = (
+      <a
+        ref={pinned ? undefined : inlineButtonRef}
+        href={memberLink(preApprovalUrl)}
+        target="_top"
+        className={`cu-primary cu-ring relative flex w-full items-center justify-center gap-2 rounded-lg px-3 text-[15px] font-semibold leading-[20px] ${pinned ? 'h-11 min-h-11 shrink-0' : 'h-11 md:w-auto'}`}
+        onClick={() => {
+          void fetch(`/api/cu/${tenantId}/loan-click${exclusion}`, { method: 'POST', keepalive: true }).catch(() => undefined);
+        }}
+      >
+        <span className="whitespace-nowrap">{pinned ? 'Check your rate' : (labelFits ? longLabel : 'Check your rate')}</span>
+        {demoPage ? (
+          <span data-demo-pill="" className="inline-flex shrink-0 items-center rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-semibold leading-[16px]">Demo</span>
+        ) : null}
+      </a>
+    );
+    if (pinned) return link;
+    return (
+      <span className="relative block w-full md:w-auto">
+        <span ref={labelProbeRef} data-cta-measure="" aria-hidden="true" className="pointer-events-none absolute left-0 top-0 -z-10 whitespace-nowrap text-[15px] font-semibold leading-[20px] opacity-0">{longLabel}</span>
+        {link}
+      </span>
+    );
+  };
 
   return (
     <div className={embedded

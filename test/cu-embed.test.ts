@@ -169,6 +169,9 @@ test('disallowed and unknown parents fail, and targetOrigin is never a wildcard'
   assert.equal(local.includes(deepLink('harborlight-cu', 'http://127.0.0.1:3456')), true);
   assert.equal(local.includes('https://signorwalk.com'), false);
   assert.throws(() => iframeSnippet('../secret'), /tenant/);
+  const sampled = iframeSnippet('preview-sample-cu', 'https://signorwalk.com', '?sample=1');
+  assert.equal(sampled.includes('/cu/preview-sample-cu/embed?sample=1'), true);
+  assert.equal(deepLink('harborlight-cu').includes('?'), false);
 });
 
 test('a console-added tenant and an origin edit change the embed header', async () => {

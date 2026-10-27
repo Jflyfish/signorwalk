@@ -86,6 +86,12 @@ async function statusResponse(pathname: string, status: number, heading: string)
   return res;
 }
 
+/** Vercel’s preview toolbar injects markup that breaks hydration. CU routes only. */
+function skipPreviewToolbar(res: NextResponse): NextResponse {
+  res.headers.set('x-vercel-skip-toolbar', '1');
+  return res;
+}
+
 function serviceClosed(pathname: string): boolean {
   if (cuServiceConfigured()) return false;
   if (pathname === '/credit-unions/get-started' || pathname.startsWith('/credit-unions/get-started/')) return true;
@@ -105,21 +111,21 @@ export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   if (serviceClosed(pathname)) {
     logCuServiceUnconfigured();
-    return statusResponse(pathname, 503, 'Credit union service not configured');
+    return skipPreviewToolbar(await statusResponse(pathname, 503, 'Credit union service not configured'));
   }
-  if (previewSampleClosed(req)) return missingTenantResponse(pathname);
+  if (previewSampleClosed(req)) return skipPreviewToolbar(await missingTenantResponse(pathname));
   const [blocked, stored] = await Promise.all([
     missingCreditUnionResponse(pathname, id => tenantIsPresent(req, id)),
     ancestorsForEmbed(pathname),
   ]);
-  if (blocked) return blocked;
+  if (blocked) return skipPreviewToolbar(blocked);
   const preview = /^\/cu\/([a-z0-9-]+)\/preview\/?$/.exec(pathname);
   if (preview) {
     const tenant = await loadCuTenant(preview[1]);
-    if (!tenant) return missingTenantResponse(pathname);
+    if (!tenant) return skipPreviewToolbar(await missingTenantResponse(pathname));
     const session = verifySession(req.cookies.get(CU_SESSION_COOKIE)?.value);
-    if (!session) return statusResponse(pathname, 401, 'Sign in to preview this page.');
-    if (!canOpenTenant(session, tenant.id)) return statusResponse(pathname, 403, 'You can’t preview this page.');
+    if (!session) return skipPreviewToolbar(await statusResponse(pathname, 401, 'Sign in to preview this page.'));
+    if (!canOpenTenant(session, tenant.id)) return skipPreviewToolbar(await statusResponse(pathname, 403, 'You can’t preview this page.'));
   }
   const res = NextResponse.next();
   for (const header of await securityHeaderList(pathname, stored ?? undefined)) {
@@ -131,7 +137,7 @@ export async function middleware(req: NextRequest) {
   if (req.nextUrl.pathname.startsWith('/cu/')) {
     res.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }
-  return res;
+  return skipPreviewToolbar(res);
 }
 
 export const config = {

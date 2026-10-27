@@ -10,6 +10,8 @@ import { readLogoFile } from '../src/cu/logo-file';
 import { formatOcrLog, pickOcrFields } from '../src/cu/ocr';
 import { sendAggregateSummary, summaryText } from '../src/cu/notify';
 import { POST } from '../src/app/(cu)/api/cu/[tenant]/extract/route';
+import { POST as loanClickPost } from '../src/app/(cu)/api/cu/[tenant]/loan-click/route';
+import { sampleGrant } from '../src/cu/sample-grant';
 
 const ENV_KEYS = ['CU_DEMO_EMAIL', 'CU_DEMO_PASSWORD', 'CU_DEMO_TENANT', 'CU_ADMIN_EMAIL', 'CU_ADMIN_PASSWORD', 'CU_SESSION_SECRET', 'ANTHROPIC_API_KEY'] as const;
 
@@ -472,4 +474,34 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(embedPage, /numbersOnlyEmbed/);
   assert.match(embedPage, /demoSample=\{query\.entry === 'numbers'/);
   assert.equal(readFileSync('src/app/(cu)/cu/actions.ts', 'utf8').includes('verified = true'), false);
+  assert.match(dashboard, /const sampleSearch = getCuTenant\(tenant\.id\) \? '\?sample=1' : ''/);
+  const linkBlock = readout.slice(readout.indexOf('const link = ('), readout.indexOf('if (pinned) return link'));
+  assert.equal(linkBlock.includes('data-cta-measure'), false);
+  assert.match(readout, /data-cta-measure/);
+});
+
+test('an unsigned sample loan click still counts when the grant is required', async () => {
+  resetCuStore();
+  const saved = process.env.CU_SESSION_SECRET;
+  process.env.CU_SESSION_SECRET = 'loan-click-grant-test';
+  try {
+    const bare = await loanClickPost(
+      new Request('https://signorwalk.com/api/cu/harborlight-cu/loan-click?sample=1', { method: 'POST' }),
+      { params: Promise.resolve({ tenant: 'harborlight-cu' }) },
+    );
+    assert.equal(bare.status, 200);
+    assert.equal((await getTenantCounters('harborlight-cu')).loanClicks, 1);
+    const grant = sampleGrant('harborlight-cu');
+    assert.ok(grant);
+    const signed = await loanClickPost(
+      new Request(`https://signorwalk.com/api/cu/harborlight-cu/loan-click?sample=1&grant=${encodeURIComponent(grant)}`, { method: 'POST' }),
+      { params: Promise.resolve({ tenant: 'harborlight-cu' }) },
+    );
+    assert.equal(signed.status, 200);
+    assert.equal((await getTenantCounters('harborlight-cu')).loanClicks, 1);
+  } finally {
+    if (saved === undefined) delete process.env.CU_SESSION_SECRET;
+    else process.env.CU_SESSION_SECRET = saved;
+    resetCuStore();
+  }
 });

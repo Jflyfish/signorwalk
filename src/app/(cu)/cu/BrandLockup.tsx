@@ -24,15 +24,18 @@ export function BrandLockup({
 }) {
   const httpsLogo = logoLight?.startsWith('https://') || logoLight?.startsWith('data:image/') ? logoLight : undefined;
   const productLine = beside ? (
-    <p className={`min-w-0 text-[14px] leading-[20px] cu-muted ${fullNameOnPhone ? 'hidden md:block' : ''} ${productLineClassName}`}>
-      {httpsLogo || mark ? null : <span className="sr-only">{name} </span>}with Sign or Walk
+    <p className={`shrink-0 whitespace-nowrap text-[14px] leading-[20px] cu-muted ${fullNameOnPhone ? 'hidden md:block' : ''} ${productLineClassName}`}>
+      {httpsLogo || mark ? null : <span className="sr-only">{name} </span>}
+      <span className="whitespace-nowrap">with Sign or Walk</span>
     </p>
   ) : null;
   const wordmark = httpsLogo ? shortName : name;
-  const wordmarkClass = 'block w-full min-w-0 break-words text-[15px] font-semibold leading-[20px] max-h-10 overflow-hidden';
+  const wordmarkClass = 'block w-full min-w-0 max-w-full break-words text-[15px] font-semibold leading-[20px] max-h-10 overflow-hidden';
+  // The row stays left-grouped. The name may shrink and wrap; the product line does not.
+  const width = fullNameOnPhone ? 'w-full min-w-0 flex-1' : 'w-full min-w-0';
   return (
-    <div className={`flex min-w-0 flex-col sm:flex-row sm:items-center sm:gap-2 ${fullNameOnPhone ? 'flex-1' : ''} ${className}`}>
-      <div className="flex min-w-0 w-full items-center gap-2">
+    <div className={`flex max-w-full flex-col items-start sm:flex-row sm:items-center sm:justify-start sm:gap-2 ${width} ${className}`}>
+      <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto">
         {httpsLogo ? (
           <img src={httpsLogo} alt="" className="h-7 w-auto max-w-[160px] shrink-0 object-contain md:h-8" style={{ aspectRatio: String(logoAspect) }} />
         ) : null}

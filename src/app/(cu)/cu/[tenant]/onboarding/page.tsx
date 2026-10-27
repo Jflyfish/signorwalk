@@ -6,6 +6,7 @@ import { resolveBrand } from '@/cu/brand';
 import { getBranding } from '@/cu/cu-store';
 import { iframeSnippet, memberOrigin } from '@/cu/embed';
 import { loadCuTenant, memberRatesUrl } from '@/cu/tenant-directory';
+import { getCuTenant } from '@/cu/tenants';
 import { BrandLockup } from '../../BrandLockup';
 import { StaffHeader } from '../../StaffHeader';
 import { OnboardingWizard } from './OnboardingWizard';
@@ -41,7 +42,8 @@ export default async function OnboardingPage({
   const query = await searchParams;
   const requestHeaders = await headers();
   const origin = memberOrigin(name => requestHeaders.get(name), process.env.VERCEL_URL);
-  const shareUrl = `${origin}/cu/${tenant.id}`;
+  const sampleSearch = getCuTenant(tenant.id) ? '?sample=1' : '';
+  const shareUrl = `${origin}/cu/${tenant.id}${sampleSearch}`;
   const previewUrl = `${origin}/cu/${tenant.id}/preview`;
   const logo = stored?.logoLight?.startsWith('https:') ? stored.logoLight : '';
   const storedShort = (stored?.shortName ?? '').trim().replace(/\s+/g, ' ');
@@ -84,7 +86,7 @@ export default async function OnboardingPage({
           initialRates={rates}
           initialDisclosure={tenant.disclosure ?? ''}
           shareUrl={shareUrl}
-          snippet={iframeSnippet(tenant.id, origin)}
+          snippet={iframeSnippet(tenant.id, origin, sampleSearch)}
           pageUrl={shareUrl}
           previewUrl={previewUrl}
         />

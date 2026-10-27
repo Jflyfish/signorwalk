@@ -155,10 +155,11 @@ export default async function DashboardPage({
   const sourcePrimary = stored?.primary && /^#[0-9a-fA-F]{6}$/.test(stored.primary) ? stored.primary : tenant.brand.primary;
   const requestHeaders = await headers();
   const origin = memberOrigin(name => requestHeaders.get(name), process.env.VERCEL_URL);
-  const shareUrl = `${origin}/cu/${tenant.id}`;
+  const sampleSearch = getCuTenant(tenant.id) ? '?sample=1' : '';
+  const shareUrl = `${origin}/cu/${tenant.id}${sampleSearch}`;
   const previewUrl = `${origin}/cu/${tenant.id}/preview`;
-  const embedUrl = deepLink(tenant.id, origin);
-  const snippet = iframeSnippet(tenant.id, origin);
+  const embedUrl = deepLink(tenant.id, origin, sampleSearch);
+  const snippet = iframeSnippet(tenant.id, origin, sampleSearch);
   const tabs: { id: Section; label: string }[] = [
     { id: 'usage', label: 'Usage' },
     { id: 'branding', label: 'Branding' },

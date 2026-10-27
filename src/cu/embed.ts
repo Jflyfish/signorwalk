@@ -169,15 +169,15 @@ export function allowEmbed(input: {
   return { ok: true, targetOrigin: null };
 }
 
-export function deepLink(tenantId: string, origin = EMBED_SITE): string {
+export function deepLink(tenantId: string, origin = EMBED_SITE, search = ''): string {
   if (!/^[a-z0-9-]+$/.test(tenantId)) throw new Error('tenant');
   const base = isEmbedOrigin(origin) ? origin : EMBED_SITE;
-  return `${base}/cu/${tenantId}/embed`;
+  return `${base}/cu/${tenantId}/embed${search}`;
 }
 
-export function iframeSnippet(tenantId: string, origin = EMBED_SITE): string {
+export function iframeSnippet(tenantId: string, origin = EMBED_SITE, search = ''): string {
   const base = isEmbedOrigin(origin) ? origin : EMBED_SITE;
-  const src = deepLink(tenantId, base);
+  const src = deepLink(tenantId, base, search);
   return `<iframe id="sow-cu" src="${src}" style="width:100%;border:0" title="Check a dealer offer"></iframe>
 <script>
 window.addEventListener('message', function (event) {

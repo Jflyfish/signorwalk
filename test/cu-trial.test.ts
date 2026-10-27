@@ -170,6 +170,7 @@ test('signup is limited to five an hour and an ended trial is unavailable', asyn
   assert.match(middleware, /Credit union service not configured/);
   assert.match(middleware, /statusResponse\(pathname, 401/);
   assert.match(middleware, /statusResponse\(pathname, 403/);
+  assert.match(middleware, /x-vercel-skip-toolbar/);
 });
 
 test('a legal name longer than 24 characters is stored whole', async () => {
