@@ -146,7 +146,11 @@ export async function saveOnboardingStep(tenant: string, step: 1 | 2 | 3, comple
   if (complete && !reviewed) return { ok: false, error: 'Review the Privacy page and Due-diligence packet.' };
   if (!onboardingLoanReady(profile, step, complete)) return { ok: false, error: LOAN_LINK_REQUIRED };
   profile.onboardingStep = step;
-  if (complete) profile.onboardingComplete = true;
+  if (complete) {
+    profile.onboardingComplete = true;
+    profile.packetReviewedAt = new Date().toISOString();
+    profile.packetReviewedBy = await linkActor(tenant);
+  }
   try {
     await saveTenantProfile(profile);
   } catch (error) {

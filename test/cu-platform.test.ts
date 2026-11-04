@@ -314,6 +314,13 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(privacy, /What we collect/);
   assert.match(privacy, /What we don&apos;t/);
   assert.match(privacy, /How long we keep a grade/);
+  assert.match(privacy, /short change log for those links/);
+  assert.match(privacy, /Letter counts: how many A, B, C, D, and F/);
+  assert.match(privacy, /Upload count:/);
+  assert.match(privacy, /whether those notices are on or off/);
+  assert.match(privacy, /directory log of credit-union account actions/);
+  assert.match(privacy, /The offer is not saved\. Only the counts above go up\./);
+  assert.equal(privacy.includes('the letter on that offer'), false);
   assert.match(privacy, /Contact the credit union/);
   assert.match(privacy, /Due-diligence packet/);
   assert.equal(privacy.includes('AI_FACTS'), false);
@@ -330,6 +337,7 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(dashboard, /href=\{shareUrl\}/);
   assert.match(dashboard, /memberOrigin/);
   assert.equal(dashboard.includes('https://signorwalk.com/cu/${'), false);
+  assert.match(dashboard, /onboardingComplete === false/);
   assert.match(dashboard, /Your member link/);
   const memberAt = dashboard.indexOf('Your member link');
   const loanAt = dashboard.indexOf('<LoanLinksForm');

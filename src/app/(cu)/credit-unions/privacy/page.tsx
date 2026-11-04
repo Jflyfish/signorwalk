@@ -28,9 +28,14 @@ export default function CreditUnionPrivacyPage() {
         <li>Staff login: the work email and a hash of the password. The password itself is not stored.</li>
         <li>Branding: the short name, colors, and an optional logo.</li>
         <li>Counters: how many grades were run, and how many times the loan button was clicked. Those are numbers only.</li>
+        <li>Loan and rates links, plus a short change log for those links (who changed them, the date, and the old and new values). We keep the latest changes only.</li>
+        <li>Letter counts: how many A, B, C, D, and F results were shown. Counts only — not the offers themselves.</li>
+        <li>Upload count: how many times a worksheet was sent for reading. The file is not kept.</li>
+        <li>Optional credit-union notice settings: an inbox address the credit union can set, and whether those notices are on or off. That address is a credit-union inbox, never a member address from a worksheet.</li>
+        <li>A short directory log of credit-union account actions for Sign or Walk staff (added, updated, paused, and similar). It does not store member data.</li>
       </ul>
       <p className="mt-4 text-[16px] leading-[24px]">
-        The credit union’s name and the loan and rates links are kept with that record. When a credit union starts a trial, we email {TALK_TO_US_EMAIL} that the trial started. That note names the credit union, not a member.
+        The credit union’s name is kept with that record. When a credit union starts a trial, we email {TALK_TO_US_EMAIL} that the trial started. That note names the credit union, not a member.
       </p>
 
       <h2 className="mt-10 text-[20px] font-bold leading-[28px]">What we don&apos;t</h2>
@@ -43,7 +48,7 @@ export default function CreditUnionPrivacyPage() {
 
       <h2 className="mt-10 text-[20px] font-bold leading-[28px]">How long we keep a grade</h2>
       <p className="mt-4 text-[16px] leading-[24px]">
-        We do not keep the grade. The result is shown for that visit. A counter can go up by one. The offer, and the letter on that offer, are not saved.
+        We do not keep the grade or the offer. The result is shown for that visit. Counters and letter counts above can go up by one. The offer is not saved. Only the counts above go up.
       </p>
 
       <h2 className="mt-10 text-[20px] font-bold leading-[28px]">Contact the credit union</h2>

@@ -44,6 +44,10 @@ export interface StoredTenantProfile {
   onboardingStep?: 1 | 2 | 3;
   /** False until the three setup steps are done. Absent on a seeded credit union. */
   onboardingComplete?: boolean;
+  /** When staff checked the privacy and packet box. Absent until then. */
+  packetReviewedAt?: string;
+  /** Signed-in email, or onboarding when no email was available. */
+  packetReviewedBy?: string;
   /** Optional line the credit union wrote. Not a member record. */
   disclosure?: string;
 }
@@ -217,6 +221,8 @@ export function normalizeProfile(input: {
   ratesLinkSet?: boolean;
   onboardingStep?: 1 | 2 | 3;
   onboardingComplete?: boolean;
+  packetReviewedAt?: string;
+  packetReviewedBy?: string;
   disclosure?: string;
 }): StoredTenantProfile | null {
   const id = input.id.trim().toLowerCase();
@@ -260,6 +266,8 @@ export function normalizeProfile(input: {
     ratesLinkSet: input.ratesLinkSet === true ? true : input.ratesLinkSet === false ? false : undefined,
     onboardingStep: input.onboardingStep === 1 || input.onboardingStep === 2 || input.onboardingStep === 3 ? input.onboardingStep : undefined,
     onboardingComplete: input.onboardingComplete === true ? true : input.onboardingComplete === false ? false : undefined,
+    packetReviewedAt: input.packetReviewedAt && Number.isFinite(Date.parse(input.packetReviewedAt)) ? input.packetReviewedAt : undefined,
+    packetReviewedBy: input.packetReviewedBy && input.packetReviewedBy.trim().length <= 120 && !input.packetReviewedBy.includes(' ') ? input.packetReviewedBy.trim() : undefined,
     disclosure: input.disclosure?.trim() ? clip(input.disclosure, 180) : undefined,
   };
 }

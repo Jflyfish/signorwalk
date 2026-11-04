@@ -132,6 +132,7 @@ export default async function DashboardPage({
   const jar = await cookies();
   const session = verifySession(jar.get(CU_SESSION_COOKIE)?.value);
   if (!canOpenTenant(session, tenant.id)) redirect(`/cu/${tenant.id}/sign-in`);
+  if (session?.role !== 'admin' && tenant.verified && tenant.onboardingComplete === false) redirect(`/cu/${tenant.id}/onboarding`);
   const brand = await resolveBrand(tenant);
   const counters = await getTenantCounters(tenant.id);
   const linkChange = await readLatestLinkChange(tenant.id);
