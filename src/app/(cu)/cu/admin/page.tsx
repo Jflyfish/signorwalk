@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { CU_SESSION_COOKIE, demoTenantId, verifySession } from '@/cu/auth';
-import { formatAuditLine, getBranding, getSettings, getTenantCounters, readAudit, type AuditLine } from '@/cu/cu-store';
+import { formatAuditLine, formatLinkChange, getBranding, getSettings, getTenantCounters, readAudit, readLatestLinkChange, type AuditLine, type LinkChange } from '@/cu/cu-store';
 import { resolveBrand } from '@/cu/brand';
 import { getTenantProfile, listCreditUnions, STATUS_ACTIVE, STATUS_PAUSED, type ResolvedTenant } from '@/cu/tenant-directory';
 import { StaffHeader } from '../StaffHeader';
@@ -73,7 +73,7 @@ export default async function AdminPage({
         ) : null}
         {selected && query.confirm !== 'remove' && query.confirm !== 'pause' ? <EditTenant tenant={selected} notice={notice} askForSite={query.need === 'site'} /> : null}
         {!query.cu && usage ? <Usage tenants={tenants} /> : null}
-        {!query.cu && !usage ? <Directory tenants={tenants} notice={notice} audit={await readAudit()} /> : null}
+        {!query.cu && !usage ? <Directory tenants={tenants} notice={notice} audit={await readAudit()} linkLine={await latestLoanLine(tenants.map(tenant => tenant.id))} /> : null}
       </main>
     </>
   );
@@ -111,14 +111,26 @@ async function EditTenant({
   );
 }
 
+async function latestLoanLine(ids: string[]): Promise<string> {
+  const rows = await Promise.all(ids.map(id => readLatestLinkChange(id)));
+  let latest: LinkChange | null = null;
+  for (const row of rows) {
+    if (!row) continue;
+    if (!latest || row.t > latest.t) latest = row;
+  }
+  return latest ? formatLinkChange(latest) : '';
+}
+
 function Directory({
   tenants,
   notice,
   audit,
+  linkLine,
 }: {
   tenants: ResolvedTenant[];
   notice: { tone: 'ok' | 'err'; text: string } | null;
   audit: AuditLine[];
+  linkLine: string;
 }) {
   return (
     <>
@@ -127,6 +139,7 @@ function Directory({
         <h1 className="text-[32px] font-bold leading-[38px]">Credit unions</h1>
         <a href="/cu/admin?cu=new" className="cu-primary inline-flex h-12 w-full items-center justify-center rounded-lg px-4 text-[15px] font-semibold md:h-11 md:w-auto">Add credit union</a>
       </div>
+      {linkLine ? <p className="mt-4 max-w-[720px] text-[14px] leading-[20px] text-[#555]">{linkLine}</p> : null}
       <DirectoryTable tenants={tenants} />
       {audit.length > 0 ? (
         <section className="mt-10" aria-labelledby="audit-heading">

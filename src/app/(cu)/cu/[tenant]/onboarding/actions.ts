@@ -1,11 +1,28 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { canOpenTenant, CU_SESSION_COOKIE, verifySession } from '@/cu/auth';
+import { canOpenTenant, CU_SESSION_COOKIE, demoTenantId, verifySession } from '@/cu/auth';
 import { deriveBrand, parseHex, safeLogo } from '@/cu/contrast';
-import { CuStoreUnconfigured, getBranding, saveBranding, type StoredBranding } from '@/cu/cu-store';
+import { appendLinkEdits, CuStoreUnconfigured, getBranding, saveBranding, type StoredBranding } from '@/cu/cu-store';
 import { HTTPS_LINK, LOAN_LINK_REQUIRED } from '@/cu/form-copy';
+import { readStaffEmail } from '@/cu/staff-login';
 import { getTenantProfile, saveTenantProfile } from '@/cu/tenant-directory';
+
+async function linkActor(tenant: string): Promise<string> {
+  const jar = await cookies();
+  const session = verifySession(jar.get(CU_SESSION_COOKIE)?.value);
+  if (session?.role === 'admin') {
+    const admin = (process.env.CU_ADMIN_EMAIL ?? '').trim();
+    if (admin && !admin.includes(' ')) return admin;
+  }
+  const staff = await readStaffEmail(tenant);
+  if (staff && !staff.includes(' ')) return staff;
+  if (tenant === demoTenantId()) {
+    const demo = (process.env.CU_DEMO_EMAIL ?? '').trim();
+    if (demo && !demo.includes(' ')) return demo;
+  }
+  return 'onboarding';
+}
 
 async function staffCanEdit(tenant: string): Promise<boolean> {
   const jar = await cookies();
@@ -101,6 +118,8 @@ export async function saveOnboardingLoan(
   const line = disclosure.trim().replace(/\s+/g, ' ').slice(0, 180);
   const profile = await getTenantProfile(tenant);
   if (!profile) return { ok: false, error: 'This credit union was not found.' };
+  const beforeLoan = profile.loanLinksSet === true ? profile.preApprovalUrl.trim() : '';
+  const beforeRates = profile.ratesLinkSet === true ? profile.ratesUrl.trim() : '';
   profile.preApprovalUrl = loan;
   profile.loanLinksSet = true;
   profile.ratesUrl = rates;
@@ -113,13 +132,18 @@ export async function saveOnboardingLoan(
     if (error instanceof CuStoreUnconfigured) return { ok: false, error: error.message };
     return { ok: false, error: 'That line could not be saved.' };
   }
+  await appendLinkEdits(tenant, await linkActor(tenant), [
+    { field: 'loan application', oldValue: beforeLoan, newValue: loan },
+    { field: 'rates', oldValue: beforeRates, newValue: rates },
+  ]);
   return { ok: true };
 }
 
-export async function saveOnboardingStep(tenant: string, step: 1 | 2 | 3, complete = false): Promise<{ ok: true } | { ok: false; error: string }> {
+export async function saveOnboardingStep(tenant: string, step: 1 | 2 | 3, complete = false, reviewed = false): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!(await staffCanEdit(tenant))) return { ok: false, error: 'Sign in to continue.' };
   const profile = await getTenantProfile(tenant);
   if (!profile) return { ok: false, error: 'This credit union was not found.' };
+  if (complete && !reviewed) return { ok: false, error: 'Review the Privacy page and Due-diligence packet.' };
   if (!onboardingLoanReady(profile, step, complete)) return { ok: false, error: LOAN_LINK_REQUIRED };
   profile.onboardingStep = step;
   if (complete) profile.onboardingComplete = true;

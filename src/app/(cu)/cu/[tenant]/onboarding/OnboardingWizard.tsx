@@ -73,6 +73,9 @@ export function OnboardingWizard({
   const colorRef = useRef<HTMLInputElement>(null);
   const loanRef = useRef<HTMLInputElement>(null);
   const ratesRef = useRef<HTMLInputElement>(null);
+  const reviewRef = useRef<HTMLInputElement>(null);
+  const [reviewed, setReviewed] = useState(false);
+  const [reviewError, setReviewError] = useState(false);
   const brandFlight = useRef<Promise<'ok' | 'logo' | 'color'> | null>(null);
   const loanFlight = useRef<Promise<'ok' | 'loan' | 'rates'> | null>(null);
 
@@ -177,7 +180,7 @@ export function OnboardingWizard({
       }
     }
     if (next === 3) {
-      const saved = await saveOnboardingStep(tenantId, 3, true);
+      const saved = await saveOnboardingStep(tenantId, 3, false);
       if (!saved.ok) {
         setStep(2);
         setLoanError(saved.error);
@@ -327,17 +330,46 @@ export function OnboardingWizard({
               <CopyLink text={snippet} label="Copy embed" />
             </div>
             <p className="mt-2 max-w-[32rem] text-[14px] leading-[20px] cu-muted">The embed loads only on a domain in this credit union&apos;s allowlist.</p>
+            <div className="mt-6">
+              <label className="flex items-start gap-2 text-[14px] leading-[20px] text-[#555]">
+                <input
+                  ref={reviewRef}
+                  type="checkbox"
+                  checked={reviewed}
+                  aria-invalid={reviewError ? true : undefined}
+                  aria-describedby={reviewError ? 'review-error' : undefined}
+                  onChange={event => {
+                    setReviewed(event.target.checked);
+                    if (event.target.checked) setReviewError(false);
+                  }}
+                  className="mt-0.5"
+                />
+                <span>
+                  I reviewed the <a href="/credit-unions/privacy" className="underline underline-offset-4" onClick={event => event.stopPropagation()}>Privacy page</a> and <a href="/credit-unions/packet" className="underline underline-offset-4" onClick={event => event.stopPropagation()}>Due-diligence packet</a>
+                </span>
+              </label>
+              {reviewError ? <InlineError id="review-error">Review the Privacy page and Due-diligence packet.</InlineError> : null}
+            </div>
             <div className="mt-6 flex flex-wrap gap-4">
               <button type="button" className="text-[15px] font-semibold underline underline-offset-4" onClick={() => void go(2)}>Back</button>
               <button
                 type="button"
                 className={button}
                 onClick={() => {
-                  void saveOnboardingStep(tenantId, 3, true).then(saved => {
+                  if (!reviewed) {
+                    setReviewError(true);
+                    reviewRef.current?.focus();
+                    return;
+                  }
+                  void saveOnboardingStep(tenantId, 3, true, true).then(saved => {
                     if (saved.ok) router.push(`/cu/${tenantId}/dashboard`);
-                    else {
+                    else if (saved.error === LOAN_LINK_REQUIRED) {
                       setStep(2);
                       setLoanError(saved.error);
+                      loanRef.current?.focus();
+                    } else {
+                      setReviewError(true);
+                      reviewRef.current?.focus();
                     }
                   });
                 }}

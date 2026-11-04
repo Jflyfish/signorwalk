@@ -3,7 +3,7 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { canOpenTenant, checkCredentials, CU_SESSION_COOKIE, demoTenantId, signSession, verifySession, type CuSession } from '@/cu/auth';
-import { appendAudit, appendLinkChange, CU_SERVICE_UNCONFIGURED, CuStoreUnconfigured, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
+import { appendAudit, appendLinkEdits, CU_SERVICE_UNCONFIGURED, CuStoreUnconfigured, getBranding, getSettings, saveBranding, saveSettings, type StoredBranding } from '@/cu/cu-store';
 import { requestOriginFrom } from '@/cu/embed';
 import { HTTPS_LINK, LOAN_LINK_REQUIRED } from '@/cu/form-copy';
 import { readLogoFile } from '@/cu/logo-file';
@@ -165,19 +165,12 @@ async function recordLinkEdits(
   tenantId: string,
   before: { loan: string; rates: string },
   after: { loan: string; rates: string },
-): Promise<{ ok: true } | { ok: false; error: string }> {
-  const email = await signedInEmail(session, tenantId);
-  if (!email) return { ok: true };
-  try {
-    if (before.loan !== after.loan) {
-      await appendLinkChange(tenantId, { email, field: 'loan application', oldValue: before.loan, newValue: after.loan });
-    }
-    if (before.rates !== after.rates) {
-      await appendLinkChange(tenantId, { email, field: 'rates', oldValue: before.rates, newValue: after.rates });
-    }
-  } catch (error) {
-    return { ok: false, error: linkSaveError(error) };
-  }
+): Promise<{ ok: true }> {
+  const email = (await signedInEmail(session, tenantId)) || (session.role === 'admin' ? 'owner' : 'staff');
+  await appendLinkEdits(tenantId, email, [
+    { field: 'loan application', oldValue: before.loan, newValue: after.loan },
+    { field: 'rates', oldValue: before.rates, newValue: after.rates },
+  ]);
   return { ok: true };
 }
 

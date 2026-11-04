@@ -306,7 +306,11 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(privacy, /\{PILOT_MARK\}/);
   assert.match(privacy, /Pending counsel review/);
   assert.match(privacy, /outside AI service to read the numbers/);
-  assert.match(privacy, /a one-way hashed version of the password; the password itself is not stored/);
+  assert.match(privacy, /a hash of the password/);
+  assert.match(privacy, /The password itself is not stored/);
+  assert.match(privacy, /a database we run for this product/);
+  assert.match(privacy, /We don&apos;t take payments on this site/);
+  assert.equal(privacy.includes('Redis'), false);
   assert.match(privacy, /What we collect/);
   assert.match(privacy, /What we don&apos;t/);
   assert.match(privacy, /How long we keep a grade/);
@@ -403,7 +407,8 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.match(readout, /previewPage \? '\?preview=1'/);
   const privacyPage = readFileSync('src/app/(cu)/credit-unions/privacy/page.tsx', 'utf8');
   assert.match(privacyPage, /Vercel hosts the application/);
-  assert.match(privacyPage, /Redis\/KV store/);
+  assert.match(privacyPage, /a database we run for this product/);
+  assert.equal(privacyPage.includes('Redis'), false);
   const packet = readFileSync('src/cu/packet/documents.ts', 'utf8');
   assert.match(packet, /Upstash Redis or Vercel KV/);
   assert.match(admin, /Grades describe offers, not members\./);
@@ -417,6 +422,13 @@ test('growth copy and the worksheet route stay on the approved words', () => {
   assert.equal(admin.includes('Tenants'), false);
   assert.equal(admin.includes('Accounts'), false);
   assert.match(admin, /Credit unions/);
+  assert.match(admin, /formatLinkChange/);
+  assert.match(admin, /text-\[14px\] leading-\[20px\] text-\[#555\]/);
+  const wizard = readFileSync('src/app/(cu)/cu/[tenant]/onboarding/OnboardingWizard.tsx', 'utf8');
+  assert.match(wizard, /I reviewed the /);
+  assert.match(wizard, /href="\/credit-unions\/privacy"/);
+  assert.match(wizard, /href="\/credit-unions\/packet"/);
+  assert.match(wizard, /saveOnboardingStep\(tenantId, 3, true, true\)/);
   assert.match(actions, /session\?\.role === 'admin'/);
   assert.match(actions, /redirect\('\/credit-unions'\)/);
   assert.match(page, /DOCUMENT_VERSION_LABEL/);

@@ -440,6 +440,10 @@ export interface LinkChange {
   newValue: string;
 }
 
+function linkValue(value: string): string {
+  return value.trim() ? value : 'none';
+}
+
 export function formatLinkChange(line: LinkChange): string {
   const date = new Date(line.t);
   const when = Number.isNaN(date.getTime())
@@ -450,7 +454,7 @@ export function formatLinkChange(line: LinkChange): string {
       day: 'numeric',
       year: 'numeric',
     }).format(date);
-  return `Last changed by ${line.email} · ${when} · ${line.field}: ${line.oldValue} → ${line.newValue}`;
+  return `Last changed by ${line.email} · ${when} · ${line.field}: ${linkValue(line.oldValue)} → ${linkValue(line.newValue)}`;
 }
 
 export async function appendLinkChange(tenantId: string, change: Omit<LinkChange, 't'>): Promise<void> {
@@ -468,6 +472,28 @@ export async function appendLinkChange(tenantId: string, change: Omit<LinkChange
   const current = (await readStoreJson<LinkChange[]>(keyFor(tenantId, 'linkChanges'))) ?? [];
   const next = [...(Array.isArray(current) ? current : []), row].slice(-20);
   await writeStoreJson(keyFor(tenantId, 'linkChanges'), next);
+}
+
+/** One row per changed field. A failed write is logged and does not undo the URL save. */
+export async function appendLinkEdits(
+  tenantId: string,
+  email: string,
+  edits: { field: LinkChange['field']; oldValue: string; newValue: string }[],
+): Promise<void> {
+  const actor = email.trim() || 'onboarding';
+  try {
+    for (const edit of edits) {
+      if (edit.oldValue === edit.newValue) continue;
+      await appendLinkChange(tenantId, {
+        email: actor,
+        field: edit.field,
+        oldValue: edit.oldValue,
+        newValue: edit.newValue,
+      });
+    }
+  } catch {
+    console.error('Credit union link audit was not saved');
+  }
 }
 
 export async function readLatestLinkChange(tenantId: string): Promise<LinkChange | null> {
