@@ -1,0 +1,464 @@
+[
+  {
+    "name": "fin-clean-strong",
+    "grade": "A",
+    "recommendation": "sign",
+    "archetype": "FIN_CLEAN",
+    "score": 100,
+    "flags": []
+  },
+  {
+    "name": "fin-average",
+    "grade": "B",
+    "recommendation": "sign",
+    "archetype": "FIN_CLEAN",
+    "score": 89,
+    "flags": []
+  },
+  {
+    "name": "fin-at-msrp",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_STANDARD",
+    "score": 79,
+    "flags": [
+      "FLAG_PRICE_AT_MSRP"
+    ]
+  },
+  {
+    "name": "fin-above-msrp",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_STANDARD",
+    "score": 69,
+    "flags": [
+      "FLAG_PRICE_ABOVE_MSRP"
+    ]
+  },
+  {
+    "name": "fin-high-apr",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_APR",
+    "score": 68,
+    "flags": [
+      "FLAG_APR_HIGH",
+      "FLAG_INTEREST_HIGH"
+    ]
+  },
+  {
+    "name": "fin-very-high-apr",
+    "grade": "F",
+    "recommendation": "walk",
+    "archetype": "FIN_HIGH_APR",
+    "score": 40,
+    "flags": [
+      "FLAG_APR_VERY_HIGH",
+      "FLAG_INTEREST_HIGH"
+    ]
+  },
+  {
+    "name": "fin-apr-and-84",
+    "grade": "F",
+    "recommendation": "walk",
+    "archetype": "FIN_HIGH_APR",
+    "score": 12,
+    "flags": [
+      "FLAG_APR_VERY_HIGH",
+      "FLAG_INTEREST_HIGH",
+      "FLAG_TERM_VERY_LONG",
+      "FLAG_PRICE_AT_MSRP"
+    ]
+  },
+  {
+    "name": "fin-84-only",
+    "grade": "D",
+    "recommendation": "negotiate",
+    "archetype": "FIN_LONG_TERM",
+    "score": 59,
+    "flags": [
+      "FLAG_INTEREST_HIGH",
+      "FLAG_TERM_VERY_LONG"
+    ]
+  },
+  {
+    "name": "fin-72",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_LONG_TERM",
+    "score": 69,
+    "flags": [
+      "FLAG_INTEREST_HIGH",
+      "FLAG_TERM_LONG"
+    ]
+  },
+  {
+    "name": "fin-doc-501",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_FEES",
+    "score": 83,
+    "flags": [
+      "FLAG_DOC_FEE_HIGH"
+    ]
+  },
+  {
+    "name": "fin-doc-500",
+    "grade": "B",
+    "recommendation": "sign",
+    "archetype": "FIN_CLEAN",
+    "score": 89,
+    "flags": []
+  },
+  {
+    "name": "fin-doc-995",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_FEES",
+    "score": 79,
+    "flags": [
+      "FLAG_DOC_FEE_VERY_HIGH"
+    ]
+  },
+  {
+    "name": "fin-doc-800",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_FEES",
+    "score": 87,
+    "flags": [
+      "FLAG_DOC_FEE_HIGH"
+    ]
+  },
+  {
+    "name": "fin-doc-801",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_FEES",
+    "score": 79,
+    "flags": [
+      "FLAG_DOC_FEE_VERY_HIGH"
+    ]
+  },
+  {
+    "name": "fin-neg-equity",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_NEG_EQUITY",
+    "score": 69,
+    "flags": [
+      "FLAG_NEGATIVE_EQUITY"
+    ]
+  },
+  {
+    "name": "fin-trade-positive",
+    "grade": "B",
+    "recommendation": "sign",
+    "archetype": "FIN_CLEAN",
+    "score": 93,
+    "flags": []
+  },
+  {
+    "name": "fin-gap-700",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_ADDONS",
+    "score": 85,
+    "flags": [
+      "FLAG_GAP_HIGH"
+    ]
+  },
+  {
+    "name": "fin-gap-1200",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_ADDONS",
+    "score": 79,
+    "flags": [
+      "FLAG_GAP_VERY_HIGH"
+    ]
+  },
+  {
+    "name": "fin-gap-400",
+    "grade": "A",
+    "recommendation": "sign",
+    "archetype": "FIN_CLEAN",
+    "score": 97,
+    "flags": []
+  },
+  {
+    "name": "fin-warranty-3200",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_ADDONS",
+    "score": 89,
+    "flags": [
+      "FLAG_WARRANTY_HIGH"
+    ]
+  },
+  {
+    "name": "fin-tire-600",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_ADDONS",
+    "score": 87,
+    "flags": [
+      "FLAG_TIRE_HIGH"
+    ]
+  },
+  {
+    "name": "fin-paint-200",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_ADDONS",
+    "score": 89,
+    "flags": [
+      "FLAG_PAINT_PRESENT"
+    ]
+  },
+  {
+    "name": "fin-paint-800",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_ADDONS",
+    "score": 81,
+    "flags": [
+      "FLAG_PAINT_HIGH"
+    ]
+  },
+  {
+    "name": "fin-interest-stack",
+    "grade": "D",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_APR",
+    "score": 50,
+    "flags": [
+      "FLAG_APR_HIGH",
+      "FLAG_INTEREST_HIGH",
+      "FLAG_TERM_VERY_LONG"
+    ]
+  },
+  {
+    "name": "fin-payment-mismatch",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_STANDARD",
+    "score": 87,
+    "flags": [
+      "FLAG_PAYMENT_MISMATCH"
+    ]
+  },
+  {
+    "name": "fin-missing-apr",
+    "grade": "B",
+    "recommendation": "sign",
+    "archetype": "FIN_CLEAN",
+    "score": 94,
+    "flags": []
+  },
+  {
+    "name": "fin-sparse",
+    "grade": "B",
+    "recommendation": "sign",
+    "archetype": "FIN_CLEAN",
+    "score": 82,
+    "flags": []
+  },
+  {
+    "name": "fin-apr-8",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_STANDARD",
+    "score": 85,
+    "flags": [
+      "FLAG_INTEREST_HIGH"
+    ]
+  },
+  {
+    "name": "fin-apr-8-01",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_APR",
+    "score": 68,
+    "flags": [
+      "FLAG_APR_HIGH",
+      "FLAG_INTEREST_HIGH"
+    ]
+  },
+  {
+    "name": "fin-apr-10",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_APR",
+    "score": 68,
+    "flags": [
+      "FLAG_APR_HIGH",
+      "FLAG_INTEREST_HIGH"
+    ]
+  },
+  {
+    "name": "fin-apr-10-01",
+    "grade": "D",
+    "recommendation": "negotiate",
+    "archetype": "FIN_HIGH_APR",
+    "score": 48,
+    "flags": [
+      "FLAG_APR_VERY_HIGH",
+      "FLAG_INTEREST_HIGH"
+    ]
+  },
+  {
+    "name": "fin-term-71",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "FIN_STANDARD",
+    "score": 85,
+    "flags": [
+      "FLAG_INTEREST_HIGH"
+    ]
+  },
+  {
+    "name": "fin-term-72",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_LONG_TERM",
+    "score": 77,
+    "flags": [
+      "FLAG_INTEREST_HIGH",
+      "FLAG_TERM_LONG"
+    ]
+  },
+  {
+    "name": "fin-term-83",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_LONG_TERM",
+    "score": 77,
+    "flags": [
+      "FLAG_INTEREST_HIGH",
+      "FLAG_TERM_LONG"
+    ]
+  },
+  {
+    "name": "fin-term-84",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "FIN_LONG_TERM",
+    "score": 67,
+    "flags": [
+      "FLAG_INTEREST_HIGH",
+      "FLAG_TERM_VERY_LONG"
+    ]
+  },
+  {
+    "name": "fin-rebates",
+    "grade": "A",
+    "recommendation": "sign",
+    "archetype": "FIN_CLEAN",
+    "score": 99,
+    "flags": []
+  },
+  {
+    "name": "lease-clean",
+    "grade": "A",
+    "recommendation": "sign",
+    "archetype": "LEASE_CLEAN",
+    "score": 100,
+    "flags": []
+  },
+  {
+    "name": "lease-mf-markup",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "LEASE_MF_MARKUP",
+    "score": 80,
+    "flags": [
+      "FLAG_MF_MARKUP"
+    ]
+  },
+  {
+    "name": "lease-mf-small",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "LEASE_MF_MARKUP",
+    "score": 98,
+    "flags": [
+      "FLAG_MF_MARKUP_SMALL"
+    ]
+  },
+  {
+    "name": "lease-no-buy-rate",
+    "grade": "A",
+    "recommendation": "sign",
+    "archetype": "LEASE_CLEAN",
+    "score": 100,
+    "flags": []
+  },
+  {
+    "name": "lease-low-residual",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "LEASE_LOW_RESIDUAL",
+    "score": 78,
+    "flags": [
+      "FLAG_LOW_RESIDUAL"
+    ]
+  },
+  {
+    "name": "lease-soft-residual",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "LEASE_LOW_RESIDUAL",
+    "score": 84,
+    "flags": [
+      "FLAG_RESIDUAL_SOFT"
+    ]
+  },
+  {
+    "name": "lease-cap-reduction",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "LEASE_STANDARD",
+    "score": 98,
+    "flags": [
+      "FLAG_LEASE_CAP_REDUCTION"
+    ]
+  },
+  {
+    "name": "lease-acq-high",
+    "grade": "B",
+    "recommendation": "negotiate",
+    "archetype": "LEASE_HIGH_FEES",
+    "score": 92,
+    "flags": [
+      "FLAG_ACQ_FEE_HIGH"
+    ]
+  },
+  {
+    "name": "lease-addons",
+    "grade": "C",
+    "recommendation": "negotiate",
+    "archetype": "LEASE_ADDONS",
+    "score": 76,
+    "flags": [
+      "FLAG_GAP_HIGH",
+      "FLAG_PAINT_HIGH"
+    ]
+  },
+  {
+    "name": "lease-missing-mf",
+    "grade": "A",
+    "recommendation": "sign",
+    "archetype": "LEASE_CLEAN",
+    "score": 100,
+    "flags": []
+  },
+  {
+    "name": "lease-at-buy-rate",
+    "grade": "A",
+    "recommendation": "sign",
+    "archetype": "LEASE_CLEAN",
+    "score": 100,
+    "flags": []
+  }
+]
